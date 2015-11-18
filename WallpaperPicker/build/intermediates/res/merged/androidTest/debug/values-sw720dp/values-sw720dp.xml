@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From: file:/D:/MyWork/jike/Launcher/Launcher3/WallpaperPicker/build/intermediates/bundles/debug/res/values-sw720dp/values-sw720dp.xml -->
+    <eat-comment/>
+    <dimen name="app_icon_size">72dp</dimen>
+    <dimen name="dragViewOffsetX">0dp</dimen>
+    <dimen name="dragViewOffsetY">0dp</dimen>
+    <dimen name="toolbar_button_horizontal_padding">8dip</dimen>
+    <dimen name="toolbar_button_vertical_padding">8dip</dimen>
+    <style name="Theme" parent="android:Theme.Holo.Wallpaper.NoTitleBar">
+        <item name="android:windowActionModeOverlay">true</item>
+    </style>
+</resources>

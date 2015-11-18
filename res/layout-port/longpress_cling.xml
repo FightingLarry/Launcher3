@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:launcher="http://schemas.android.com/apk/res-auto/com.android.launcher3"
+    android:id="@+id/longpress_cling"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cling_scrim_background" >
+
+    <FrameLayout
+        android:id="@+id/cling_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@drawable/cling_bg"
+        android:tag="crop_bg_top_and_sides" />
+
+</FrameLayout>
