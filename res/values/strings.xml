@@ -30,7 +30,7 @@
     <string name="receive_first_load_broadcast_permission" translatable="false">com.android.launcher3.permission.RECEIVE_FIRST_LOAD_BROADCAST_DH</string>
 
     <!-- Application name -->
-    <string name="application_name">Launcher3</string>
+    <string name="application_name">DH Launcher3</string>
     <!-- Accessibility-facing application name -->
     <string name="home">Home</string>
     <!-- Name for all applications running as this uid. -->
