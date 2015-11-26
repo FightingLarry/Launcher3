@@ -84,8 +84,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class LauncherModel extends BroadcastReceiver
         implements LauncherAppsCompat.OnAppsChangedCallbackCompat {
-    static final boolean DEBUG_LOADERS = false;
-    private static final boolean DEBUG_RECEIVER = false;
+    static final boolean DEBUG_LOADERS = true;
+    private static final boolean DEBUG_RECEIVER = true;
     private static final boolean REMOVE_UNRESTORED_ICONS = true;
 
     static final String TAG = "Launcher.Model";
@@ -1645,6 +1645,7 @@ public class LauncherModel extends BroadcastReceiver
                 isUpgrade = loadAndBindWorkspace();
 
                 if (mStopped) {
+                    if (DEBUG_LOADERS) Log.d(TAG, "mStopped:break keep_running;");
                     break keep_running;
                 }
 
