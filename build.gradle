@@ -1,13 +1,3 @@
-repositories {
-    mavenCentral()
-    maven {
-        url "http://repo1.maven.org/maven2"
-    }
-    jcenter {
-        url "http://jcenter.bintray.com"
-    }
-}
-
 buildscript {
 
 
@@ -66,13 +56,12 @@ android {
     }
 
     buildTypes {
-        debug {
-            signingConfig signingConfigs.release
-        }
-
         release {
             signingConfig signingConfigs.release
         }
+    }
+    lintOptions{
+        abortOnError false
     }
 }
 
