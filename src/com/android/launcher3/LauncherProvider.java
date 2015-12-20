@@ -71,7 +71,7 @@ import java.util.List;
 
 public class LauncherProvider extends ContentProvider {
     private static final String TAG = "Launcher.LauncherProvider";
-    private static final boolean LOGD = false;
+    private static final boolean LOGD = true;
 
     private static final String DATABASE_NAME = "launcher.db";
 
