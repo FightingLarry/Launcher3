@@ -249,8 +249,7 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
 
     public static boolean isDisableAllApps() {
         // Returns false on non-dogfood builds.
-        return getInstance().mBuildInfo.isDogfoodBuild() &&
-                Launcher.isPropertyEnabled(Launcher.DISABLE_ALL_APPS_PROPERTY);
+        return true;
     }
 
     public static boolean isDogfoodBuild() {
