@@ -15,17 +15,15 @@
 
 <favorites xmlns:launcher="http://schemas.android.com/apk/res-auto/com.android.launcher3">
 
-<favorite
+    <favorite
         launcher:appType="PHONE"
         launcher:container="-101"
-        launcher:queryIntent="\#Intent;action=android.intent.action.DIAL;launchFlags=0x10000000;end"
         launcher:screen="0"
         launcher:x="0"
         launcher:y="0" />
     <favorite
         launcher:appType="CONTACTS"
         launcher:container="-101"
-        launcher:queryIntent="content://com.android.contacts/contacts#Intent;action=android.intent.action.VIEW;launchFlags=0x10000000;end"
         launcher:screen="1"
         launcher:x="1"
         launcher:y="0" />
@@ -33,7 +31,6 @@
     <favorite
         launcher:appType="MMS"
         launcher:container="-101"
-        launcher:queryIntent="\#Intent;action=android.intent.action.MAIN;type=vnd.android-dir/mms-sms;launchFlags=0x10000000;end"
         launcher:screen="2"
         launcher:x="2"
         launcher:y="0" />
@@ -41,7 +38,6 @@
     <favorite
         launcher:appType="BROWSER"
         launcher:container="-101"
-        launcher:queryIntent="http://m.baidu.com/?from=1000228o#Intent;action=android.intent.action.VIEW;launchFlags=0x10000000;end"
         launcher:screen="3"
         launcher:x="3"
         launcher:y="0" />
