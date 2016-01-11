@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<favorites xmlns:launcher="http://schemas.android.com/apk/res-auto/com.android.launcher3">
+
+    <appwidget
+        launcher:className="com.android.alarmclock.AnalogAppWidgetProvider"
+        launcher:packageName="com.android.deskclock"
+        launcher:screen="1"
+        launcher:spanX="2"
+        launcher:spanY="2"
+        launcher:x="1"
+        launcher:y="0" />
+
+    <favorite
+        launcher:appType="GALLERY"
+        launcher:screen="1"
+        launcher:x="0"
+        launcher:y="3" />
+    <favorite
+        launcher:appType="CAMERA"
+        launcher:screen="1"
+        launcher:x="1"
+        launcher:y="3" />
+    <favorite
+        launcher:appType="MAPS"
+        launcher:screen="1"
+        launcher:x="2"
+        launcher:y="3" />
+    <favorite
+        launcher:appType="SETTING"
+        launcher:screen="1"
+        launcher:x="3"
+        launcher:y="3" />
+    <favorite
+        launcher:appType="CALENDAR"
+        launcher:screen="1"
+        launcher:x="0"
+        launcher:y="4" />
+    <favorite
+        launcher:appType="CLOCK"
+        launcher:screen="1"
+        launcher:x="1"
+        launcher:y="4" />
+    <favorite
+        launcher:appType="MARKET"
+        launcher:screen="1"
+        launcher:x="2"
+        launcher:y="4" />
+    <favorite
+        launcher:appType="MUSIC"
+        launcher:screen="1"
+        launcher:x="3"
+        launcher:y="4" />
+    <favorite
+        launcher:appType="PHONE"
+        launcher:container="-101"
+        launcher:screen="0"
+        launcher:x="0"
+        launcher:y="0" />
+    <favorite
+        launcher:appType="CONTACTS"
+        launcher:container="-101"
+        launcher:screen="1"
+        launcher:x="1"
+        launcher:y="0" />
+    <favorite
+        launcher:appType="MMS"
+        launcher:container="-101"
+        launcher:screen="2"
+        launcher:x="2"
+        launcher:y="0" />
+    <favorite
+        launcher:appType="BROWSER"
+        launcher:container="-101"
+        launcher:screen="3"
+        launcher:x="3"
+        launcher:y="0" />
+
+
+</favorites>
+
