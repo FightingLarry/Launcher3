@@ -58,32 +58,31 @@ public class DynamicGrid {
         boolean hasAA = !LauncherAppState.isDisableAllApps();
         DEFAULT_ICON_SIZE_PX = pxFromDp(DEFAULT_ICON_SIZE_DP, dm);
         // Our phone profiles include the bar sizes in each orientation
-        deviceProfiles.add(new DeviceProfile("Super Short Stubby", 255, 300, 3, 3, ICON_SIZE_DP_SMALL, 13, (hasAA
-                ? 3
-                : 3), ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_no_all_apps));
-        deviceProfiles.add(new DeviceProfile("Shorter Stubby", 255, 400, 4, 3, ICON_SIZE_DP_SMALL, 13, (hasAA ? 5 : 4),
-                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_no_all_apps));
-        deviceProfiles.add(new DeviceProfile("Short Stubby", 275, 420, 4, 4, ICON_SIZE_DP_SMALL, 13, (hasAA ? 5 : 4),
-                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_no_all_apps));
-        deviceProfiles.add(new DeviceProfile("Stubby", 255, 450, 4, 4, ICON_SIZE_DP_SMALL, 13, (hasAA ? 5 : 4),
-                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_no_all_apps));
+        deviceProfiles.add(new DeviceProfile("Super Short Stubby", 255, 300, 4, 3, ICON_SIZE_DP_SMALL, 13, 3,
+                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_4x3_no_all_apps));
+        deviceProfiles.add(new DeviceProfile("Shorter Stubby", 255, 400, 4, 3, ICON_SIZE_DP_SMALL, 13, 3,
+                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_4x3_no_all_apps));
+        deviceProfiles.add(new DeviceProfile("Short Stubby", 275, 420, 4, 3, ICON_SIZE_DP_SMALL, 13, 3,
+                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_4x3_no_all_apps));
+        deviceProfiles.add(new DeviceProfile("Stubby", 255, 450, 5, 4, ICON_SIZE_DP_SMALL, 13, (hasAA ? 5 : 4),
+                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_5x4_no_all_apps));
         deviceProfiles.add(new DeviceProfile("Nexus S", 296, 491.33f, 5, 4, ICON_SIZE_DP_SMALL, 13, (hasAA ? 5 : 4),
-                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_no_all_apps));
+                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_5x4_no_all_apps));
         deviceProfiles.add(new DeviceProfile("Nexus 4", 335, 567, 5, 4, DEFAULT_ICON_SIZE_DP, 13, (hasAA ? 5 : 4),
-                DEFAULT_ICON_SIZE_DP, R.xml.default_workspace, R.xml.default_workspace_no_all_apps));
+                DEFAULT_ICON_SIZE_DP, R.xml.default_workspace, R.xml.default_workspace_5x4_no_all_apps));
         deviceProfiles.add(new DeviceProfile("Nexus 5", 359, 567, 5, 4, DEFAULT_ICON_SIZE_DP, 13, (hasAA ? 5 : 4),
-                DEFAULT_ICON_SIZE_DP, R.xml.default_workspace, R.xml.default_workspace_no_all_apps));
+                DEFAULT_ICON_SIZE_DP, R.xml.default_workspace, R.xml.default_workspace_5x4_no_all_apps));
         deviceProfiles.add(new DeviceProfile("Large Phone", 406, 694, 5, 4, ICON_SIZE_DP_BIGGER, 14.4f, 4,
-                ICON_SIZE_DP_BIGGER, R.xml.default_workspace, R.xml.default_workspace_no_all_apps));
+                ICON_SIZE_DP_BIGGER, R.xml.default_workspace, R.xml.default_workspace_5x4_no_all_apps));
         // The tablet profile is odd in that the landscape orientation
         // also includes the nav bar on the side
         deviceProfiles.add(new DeviceProfile("Nexus 7", 575, 904, 7, 6, ICON_SIZE_DP_BIGGER, 14.4f, (hasAA ? 7 : 6),
-                ICON_SIZE_DP_BIGGER, R.xml.default_workspace, R.xml.default_workspace_no_all_apps));
+                ICON_SIZE_DP_BIGGER, R.xml.default_workspace, R.xml.default_workspace_7x6_no_all_apps));
         // Larger tablet profiles always have system bars on the top & bottom
         deviceProfiles.add(new DeviceProfile("Nexus 10", 727, 1207, 7, 6, ICON_SIZE_DP_BIGGER, 14.4f, (hasAA ? 7 : 6),
-                ICON_SIZE_DP_BIGGER, R.xml.default_workspace, R.xml.default_workspace_no_all_apps));
-        deviceProfiles.add(new DeviceProfile("20-inch Tablet", 1527, 2527, 7, 7, ICON_SIZE_DP_LARGE, 20, 7,
-                ICON_SIZE_DP_LARGE, R.xml.default_workspace, R.xml.default_workspace_no_all_apps));
+                ICON_SIZE_DP_BIGGER, R.xml.default_workspace, R.xml.default_workspace_7x6_no_all_apps));
+        deviceProfiles.add(new DeviceProfile("20-inch Tablet", 1527, 2527, 7, 6, ICON_SIZE_DP_LARGE, 20,
+                (hasAA ? 7 : 6), ICON_SIZE_DP_LARGE, R.xml.default_workspace, R.xml.default_workspace_7x6_no_all_apps));
         mMinWidth = dpiFromPx(minWidthPx, dm);
         mMinHeight = dpiFromPx(minHeightPx, dm);
         mProfile =
