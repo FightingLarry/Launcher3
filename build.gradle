@@ -30,6 +30,8 @@ android {
         applicationId "com.dh.launcher3"
         minSdkVersion 17
         targetSdkVersion 21
+        versionCode 210
+        versionName "2.1.0"
     }
     sourceSets {
         main {
