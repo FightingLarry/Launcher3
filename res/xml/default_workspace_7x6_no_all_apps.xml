@@ -15,42 +15,43 @@
         launcher:appType="GALLERY"
         launcher:screen="1"
         launcher:x="0"
-        launcher:y="3" />
+        launcher:y="6" />
     <favorite
         launcher:appType="CAMERA"
         launcher:screen="1"
         launcher:x="1"
-        launcher:y="3" />
+        launcher:y="6" />
     <favorite
         launcher:appType="MAPS"
         launcher:screen="1"
         launcher:x="2"
-        launcher:y="3" />
+        launcher:y="6" />
     <favorite
         launcher:appType="SETTING"
         launcher:screen="1"
         launcher:x="3"
-        launcher:y="3" />
+        launcher:y="6" />
     <favorite
         launcher:appType="CALENDAR"
         launcher:screen="1"
-        launcher:x="0"
-        launcher:y="4" />
+        launcher:x="4"
+        launcher:y="6" />
     <favorite
         launcher:appType="CLOCK"
         launcher:screen="1"
-        launcher:x="1"
-        launcher:y="4" />
+        launcher:x="5"
+        launcher:y="6" />
     <favorite
         launcher:appType="MARKET"
         launcher:screen="1"
-        launcher:x="2"
-        launcher:y="4" />
+        launcher:x="6"
+        launcher:y="6" />
     <favorite
         launcher:appType="MUSIC"
-        launcher:screen="1"
-        launcher:x="3"
-        launcher:y="4" />
+        launcher:container="-101"
+        launcher:screen="4"
+        launcher:x="4"
+        launcher:y="0" />
     <favorite
         launcher:appType="PHONE"
         launcher:container="-101"

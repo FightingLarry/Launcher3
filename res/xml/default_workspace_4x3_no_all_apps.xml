@@ -8,49 +8,39 @@
         launcher:screen="1"
         launcher:spanX="2"
         launcher:spanY="2"
-        launcher:x="1"
+        launcher:x="0"
         launcher:y="0" />
 
     <favorite
         launcher:appType="GALLERY"
         launcher:screen="1"
         launcher:x="0"
-        launcher:y="3" />
+        launcher:y="2" />
     <favorite
         launcher:appType="CAMERA"
         launcher:screen="1"
         launcher:x="1"
-        launcher:y="3" />
+        launcher:y="2" />
     <favorite
-        launcher:appType="MAPS"
+        launcher:appType="CONTACTS"
         launcher:screen="1"
         launcher:x="2"
-        launcher:y="3" />
-    <favorite
-        launcher:appType="SETTING"
-        launcher:screen="1"
-        launcher:x="3"
-        launcher:y="3" />
+        launcher:y="2" />
     <favorite
         launcher:appType="CALENDAR"
         launcher:screen="1"
         launcher:x="0"
-        launcher:y="4" />
+        launcher:y="3" />
     <favorite
         launcher:appType="CLOCK"
         launcher:screen="1"
         launcher:x="1"
-        launcher:y="4" />
+        launcher:y="3" />
     <favorite
-        launcher:appType="MARKET"
+        launcher:appType="SETTING"
         launcher:screen="1"
         launcher:x="2"
-        launcher:y="4" />
-    <favorite
-        launcher:appType="MUSIC"
-        launcher:screen="1"
-        launcher:x="3"
-        launcher:y="4" />
+        launcher:y="3" />
     <favorite
         launcher:appType="PHONE"
         launcher:container="-101"
@@ -58,22 +48,16 @@
         launcher:x="0"
         launcher:y="0" />
     <favorite
-        launcher:appType="CONTACTS"
+        launcher:appType="MMS"
         launcher:container="-101"
         launcher:screen="1"
         launcher:x="1"
         launcher:y="0" />
     <favorite
-        launcher:appType="MMS"
+        launcher:appType="BROWSER"
         launcher:container="-101"
         launcher:screen="2"
         launcher:x="2"
-        launcher:y="0" />
-    <favorite
-        launcher:appType="BROWSER"
-        launcher:container="-101"
-        launcher:screen="3"
-        launcher:x="3"
         launcher:y="0" />
 
 
