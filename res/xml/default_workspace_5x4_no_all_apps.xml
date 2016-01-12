@@ -22,7 +22,7 @@
         launcher:x="1"
         launcher:y="3" />
     <favorite
-        launcher:appType="MAPS"
+        launcher:appType="EMAIL"
         launcher:screen="1"
         launcher:x="2"
         launcher:y="3" />
@@ -42,7 +42,7 @@
         launcher:x="1"
         launcher:y="4" />
     <favorite
-        launcher:appType="MARKET"
+        launcher:appType="CALCULATOR"
         launcher:screen="1"
         launcher:x="2"
         launcher:y="4" />
