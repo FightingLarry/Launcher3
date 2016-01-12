@@ -397,17 +397,17 @@ public class AppTypeHelper {
         localArrayList.clear();
     }
 
-    private static void matchLoaclApps(Context paramContext, List<ResolveInfo> paramList, List<String> paramArrayList,
+    private static void matchLoaclApps(Context paramContext, List<ResolveInfo> localList, List<String> collectList,
             String paramString) {
         List<ActivityInfo> localArrayList = new ArrayList<>();
-        Iterator<String> localIterator1 = paramArrayList.iterator();
-        while (localIterator1.hasNext()) {
-            String str = (String) localIterator1.next();
-            Iterator<ResolveInfo> resolveInfos = paramList.iterator();
+        Iterator<String> collectIterator = collectList.iterator();
+        while (collectIterator.hasNext()) {
+            String collect = (String) collectIterator.next();
+            Iterator<ResolveInfo> resolveInfos = localList.iterator();
             while (resolveInfos.hasNext()) {
                 ResolveInfo localResolveInfo = (ResolveInfo) resolveInfos.next();
-                if ((str.equals(localResolveInfo.activityInfo.name))
-                        || (str.equals(localResolveInfo.activityInfo.packageName)))
+                if ((collect.equals(localResolveInfo.activityInfo.name))
+                        || (collect.equals(localResolveInfo.activityInfo.packageName)))
                     if (!localArrayList.contains(localResolveInfo.activityInfo)) {
                         localArrayList.add(localResolveInfo.activityInfo);
                     }
