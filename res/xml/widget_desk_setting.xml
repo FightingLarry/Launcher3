@@ -1,0 +1,13 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/widget_desk_setting"
+    android:minHeight="40dp"
+    android:minResizeHeight="40dp"
+    android:minResizeWidth="40dp"
+    android:minWidth="40dp"
+    android:previewImage="@drawable/desk_settings"
+    android:resizeMode="none"
+    android:updatePeriodMillis="86400000"
+    android:widgetCategory="home_screen|keyguard">
+
+
+</appwidget-provider>

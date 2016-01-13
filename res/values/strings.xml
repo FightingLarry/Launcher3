@@ -306,4 +306,6 @@ s -->
     <string name="abandoned_promise_explanation">The app for this icon isn\'t installed.
         You can remove it, or search for the app and install it manually.
     </string>
+
+    <string name="desk_setting">桌面设置</string>
 </resources>
