@@ -11,14 +11,38 @@
         launcher:x="1"
         launcher:y="0" />
 
-    <appwidget
-        launcher:className="com.dh.widget.DeskSettingWidget"
-        launcher:packageName="com.dh.launcher3"
-        launcher:screen="1"
-        launcher:spanX="1"
-        launcher:spanY="1"
-        launcher:x="0"
-        launcher:y="2" />
+    <!-- <appwidget
+         launcher:className="com.dh.widget.DeskSettingWidget"
+         launcher:packageName="com.dh.launcher3"
+         launcher:screen="1"
+         launcher:spanX="1"
+         launcher:spanY="1"
+         launcher:x="0"
+         launcher:y="2" />
+     <appwidget
+         launcher:className="com.dh.widget.DeskSettingWidget"
+         launcher:packageName="com.dh.launcher3"
+         launcher:screen="1"
+         launcher:spanX="1"
+         launcher:spanY="1"
+         launcher:x="1"
+         launcher:y="2" />
+     <appwidget
+         launcher:className="com.dh.widget.DeskSettingWidget"
+         launcher:packageName="com.dh.launcher3"
+         launcher:screen="1"
+         launcher:spanX="1"
+         launcher:spanY="1"
+         launcher:x="2"
+         launcher:y="2" />
+     <appwidget
+         launcher:className="com.dh.widget.DeskSettingWidget"
+         launcher:packageName="com.dh.launcher3"
+         launcher:screen="1"
+         launcher:spanX="1"
+         launcher:spanY="1"
+         launcher:x="3"
+         launcher:y="2" />-->
 
     <favorite
         launcher:appType="GALLERY"
