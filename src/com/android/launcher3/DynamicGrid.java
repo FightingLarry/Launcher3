@@ -58,12 +58,12 @@ public class DynamicGrid {
         boolean hasAA = !LauncherAppState.isDisableAllApps();
         DEFAULT_ICON_SIZE_PX = pxFromDp(DEFAULT_ICON_SIZE_DP, dm);
         // Our phone profiles include the bar sizes in each orientation
-        deviceProfiles.add(new DeviceProfile("Super Short Stubby", 255, 300, 4, 3, ICON_SIZE_DP_SMALL, 13, 3,
-                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_4x3_no_all_apps));
-        deviceProfiles.add(new DeviceProfile("Shorter Stubby", 255, 400, 4, 3, ICON_SIZE_DP_SMALL, 13, 3,
-                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_4x3_no_all_apps));
-        deviceProfiles.add(new DeviceProfile("Short Stubby", 275, 420, 4, 3, ICON_SIZE_DP_SMALL, 13, 3,
-                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_4x3_no_all_apps));
+        deviceProfiles.add(new DeviceProfile("Super Short Stubby", 255, 300, 4, 4, ICON_SIZE_DP_SMALL, 13, 3,
+                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_4x4_no_all_apps));
+        deviceProfiles.add(new DeviceProfile("Shorter Stubby", 255, 400, 4, 4, ICON_SIZE_DP_SMALL, 13, 3,
+                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_4x4_no_all_apps));
+        deviceProfiles.add(new DeviceProfile("Short Stubby", 275, 420, 4, 4, ICON_SIZE_DP_SMALL, 13, 3,
+                ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_4x4_no_all_apps));
         deviceProfiles.add(new DeviceProfile("Stubby", 255, 450, 5, 4, ICON_SIZE_DP_SMALL, 13, (hasAA ? 5 : 4),
                 ICON_SIZE_DP_SMALL, R.xml.default_workspace, R.xml.default_workspace_5x4_no_all_apps));
         deviceProfiles.add(new DeviceProfile("Nexus S", 296, 491.33f, 5, 4, ICON_SIZE_DP_SMALL, 13, (hasAA ? 5 : 4),
