@@ -1433,6 +1433,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
         }
     }
 
+
     /** Loads the workspace screens db into a map of Rank -> ScreenId */
     private static TreeMap<Integer, Long> loadWorkspaceScreensDb(Context context) {
         final ContentResolver contentResolver = context.getContentResolver();

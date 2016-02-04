@@ -66,7 +66,8 @@ import com.android.launcher3.LauncherSettings.Favorites;
 import com.android.launcher3.compat.UserHandleCompat;
 import com.android.launcher3.compat.UserManagerCompat;
 import com.android.launcher3.config.ProviderConfig;
-import com.dh.home.AppTypeHelper;
+import com.dh.home.AppTypeModel;
+import com.dh.home.AppTypeTable;
 
 public class LauncherProvider extends ContentProvider {
     private static final String TAG = "Launcher.LauncherProvider";
@@ -74,10 +75,10 @@ public class LauncherProvider extends ContentProvider {
 
     private static final String DATABASE_NAME = "launcher.db";
 
-    private static final int DATABASE_VERSION = 20;
+    private static final int DATABASE_VERSION = 21;
 
     static final String OLD_AUTHORITY = "com.android.launcher2.settings";
-    static final String AUTHORITY = ProviderConfig.AUTHORITY;
+    public static final String AUTHORITY = ProviderConfig.AUTHORITY;
 
     // Should we attempt to load anything from the com.android.launcher2 provider?
     static final boolean IMPORT_LAUNCHER2_DATABASE = false;
@@ -476,6 +477,8 @@ public class LauncherProvider extends ContentProvider {
                     + "profileId INTEGER DEFAULT " + userSerialNumber + ");");
             addWorkspacesTable(db);
 
+            addAppTypeTable(db);
+
             // Database was just created, so wipe any previous widgets
             if (mAppWidgetHost != null) {
                 mAppWidgetHost.deleteHost();
@@ -519,6 +522,13 @@ public class LauncherProvider extends ContentProvider {
             db.execSQL("CREATE TABLE " + TABLE_WORKSPACE_SCREENS + " (" + LauncherSettings.WorkspaceScreens._ID
                     + " INTEGER," + LauncherSettings.WorkspaceScreens.SCREEN_RANK + " INTEGER,"
                     + LauncherSettings.ChangeLogColumns.MODIFIED + " INTEGER NOT NULL DEFAULT 0" + ");");
+        }
+
+        private void addAppTypeTable(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + AppTypeTable.TABLE_APPTYPE + " (" + AppTypeTable.ID
+                    + " INTEGER PRIMARY KEY AUTOINCREMENT," + AppTypeTable.APPTYPE + " TEXT,"
+                    + AppTypeTable.PACKAGENAME + " TEXT," + AppTypeTable.CLASSNAME + " TEXT," + AppTypeTable.TITLE
+                    + " TEXT" + ");");
         }
 
         private void removeOrphanedItems(SQLiteDatabase db) {
@@ -864,9 +874,13 @@ public class LauncherProvider extends ContentProvider {
             }
 
             if (version != DATABASE_VERSION) {
+                version = DATABASE_VERSION;
+
                 Log.w(TAG, "Destroying all old data.");
                 db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAVORITES);
                 db.execSQL("DROP TABLE IF EXISTS " + TABLE_WORKSPACE_SCREENS);
+                // version = 21
+                db.execSQL("DROP TABLE IF EXISTS " + AppTypeTable.TABLE_APPTYPE);
 
                 onCreate(db);
             }
@@ -1657,26 +1671,24 @@ public class LauncherProvider extends ContentProvider {
             return true;
         }
 
-        private long addInfoToDb(SQLiteDatabase db, final ContentValues childValues, ActivityInfo info) {
-            ComponentName cn = new ComponentName(info.packageName, info.name);
+        private long addInfoToDb(SQLiteDatabase db, final ContentValues childValues, AppTypeModel model) {
+            ComponentName cn = new ComponentName(model.packageName, model.className);
             final Intent intent = buildMainIntent();
             intent.setComponent(cn);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            return addAppShortcut(db, childValues, info.loadLabel(mPackageManager).toString(), intent);
+            return addAppShortcut(db, childValues, model.title, intent);
         }
 
         private long addAppShortcut(SQLiteDatabase db, ContentValues values, XmlResourceParser parser) {
 
             String appType = getAttributeValue(parser, ATTR_APPTYPE);
             if (!TextUtils.isEmpty(appType)) {
-                List<ActivityInfo> list = AppTypeHelper.matchLoaclAppsByAppType(mContext, appType);
-                if (list != null && list.size() > 0) {
-                    ActivityInfo info = list.get(0);
-                    return addInfoToDb(db, values, info);
+                AppTypeModel model = AppTypeTable.queryByAppType(mContext, appType);
+                if (model != null) {
+                    return addInfoToDb(db, values, model);
                 }
                 return -1;
             }
-
 
             final String packageName = getAttributeValue(parser, ATTR_PACKAGE_NAME);
             final String className = getAttributeValue(parser, ATTR_CLASS_NAME);
@@ -1694,7 +1706,10 @@ public class LauncherProvider extends ContentProvider {
                         cn = new ComponentName(packages[0], className);
                         info = mPackageManager.getActivityInfo(cn, 0);
                     }
-                    return addInfoToDb(db, values, info);
+                    final Intent intent = buildMainIntent();
+                    intent.setComponent(cn);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                    return addAppShortcut(db, values, info.loadLabel(mPackageManager).toString(), intent);
                 } catch (PackageManager.NameNotFoundException e) {
                     Log.w(TAG, "Unable to add favorite: " + packageName + "/" + className, e);
                 }

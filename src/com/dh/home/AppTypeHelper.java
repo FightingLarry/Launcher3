@@ -79,7 +79,8 @@ public class AppTypeHelper {
             }
             if (infos != null && infos.size() > 0) {
                 if (isQueryIntent) {
-                    AppTypePreference.getInstance(context).saveAppType(infos.get(0).name, appType.getValue());
+                    ActivityInfo activityInfo = infos.get(0);
+                    saveToDb(context, appType, activityInfo);
                 } else {
                     for (ActivityInfo info : infos) {
                         String packageName = info.packageName;
@@ -93,20 +94,29 @@ public class AppTypeHelper {
                             } catch (NameNotFoundException e) {}
                         }
                         if (isSystemApp) {
-                            AppTypePreference.getInstance(context).saveAppType(info.name, appType.getValue());
-                            if (appType == AppType.CALENDAR) {
-                                AppTypePreference.getInstance(context).saveCalendarPkg(packageName);
-                            }
+                            saveToDb(context, appType, info);
                             continue next;
                         }
                     }
+                    ActivityInfo activityInfo = infos.get(0);
+                    saveToDb(context, appType, activityInfo);
                 }
             }
 
         }
     }
 
-    public synchronized static List<ActivityInfo> matchLoaclAppsByAppType(Context context, String appType) {
+    private static void saveToDb(Context context, AppType appType, ActivityInfo activityInfo) {
+        PackageManager packageManager = context.getPackageManager();
+        AppTypeModel model = new AppTypeModel();
+        model.appType = appType.getValue();
+        model.packageName = activityInfo.packageName;
+        model.className = activityInfo.name;
+        model.title = activityInfo.loadLabel(packageManager).toString();
+        AppTypeTable.save(context, model);
+    }
+
+    synchronized static List<ActivityInfo> matchLoaclAppsByAppType(Context context, String appType) {
         if (sPackageMap.isEmpty()) {
             matchLoaclApps(context);
         }
@@ -123,7 +133,7 @@ public class AppTypeHelper {
         return list;
     }
 
-    public synchronized static ActivityInfo matchLoaclAppsByQueryIntent(Context context, String queryIntent) {
+    synchronized static ActivityInfo matchLoaclAppsByQueryIntent(Context context, String queryIntent) {
         PackageManager localPackageManager = context.getPackageManager();
         try {
             Iterator<ResolveInfo> localIterator =

@@ -3,8 +3,6 @@ package com.dh.preference;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.dh.home.AppType;
-
 public class AppTypePreference {
 
     private static final String TAG = "AppTypePreference";
@@ -39,30 +37,5 @@ public class AppTypePreference {
         }
         return instance;
     }
-
-    public SharedPreferences.Editor getEditor() {
-        return mPrefs.edit();
-    }
-
-    public void saveAppType(String className, String apptype) {
-        mPrefs.edit().putString(className, apptype).putString(apptype, className).apply();
-    }
-
-    public String getAppType(String className) {
-        return mPrefs.getString(className, "");
-    }
-
-    public String getClassNameFromAppType(AppType apptype) {
-        return mPrefs.getString(apptype.getValue(), "");
-    }
-
-    public void saveCalendarPkg(String pkg) {
-        mPrefs.edit().putString(CALENDAR_PKG, pkg).commit();
-    }
-
-    public String getCalendarPkg() {
-        return mPrefs.getString(CALENDAR_PKG, "");
-    }
-
 
 }
