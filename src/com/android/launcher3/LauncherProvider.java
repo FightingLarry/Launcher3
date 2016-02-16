@@ -151,10 +151,12 @@ public class LauncherProvider extends ContentProvider {
         if (values == null) {
             throw new RuntimeException("Error: attempting to insert null values");
         }
-        if (!values.containsKey(LauncherSettings.ChangeLogColumns._ID)) {
-            throw new RuntimeException("Error: attempting to add item without specifying an id");
+        if (!table.equals(AppTypeTable.TABLE_APPTYPE)) {
+            if (!values.containsKey(LauncherSettings.ChangeLogColumns._ID)) {
+                throw new RuntimeException("Error: attempting to add item without specifying an id");
+            }
+            helper.checkId(table, values);
         }
-        helper.checkId(table, values);
         return db.insert(table, nullColumnHack, values);
     }
 
@@ -528,7 +530,7 @@ public class LauncherProvider extends ContentProvider {
             db.execSQL("CREATE TABLE " + AppTypeTable.TABLE_APPTYPE + " (" + AppTypeTable.ID
                     + " INTEGER PRIMARY KEY AUTOINCREMENT," + AppTypeTable.APPTYPE + " TEXT,"
                     + AppTypeTable.PACKAGENAME + " TEXT," + AppTypeTable.CLASSNAME + " TEXT," + AppTypeTable.TITLE
-                    + " TEXT" + ");");
+                    + " TEXT," + "modified INTEGER NOT NULL DEFAULT 0);");
         }
 
         private void removeOrphanedItems(SQLiteDatabase db) {

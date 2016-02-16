@@ -18,7 +18,7 @@ public class AppTypeTable {
 
     public static final String TABLE_APPTYPE = "appType";
 
-    public static final String ID = "id";
+    public static final String ID = "_id";
 
     public static final Uri CONTENT_URI = Uri.parse("content://" + LauncherProvider.AUTHORITY + "/" + TABLE_APPTYPE);
 
@@ -29,6 +29,8 @@ public class AppTypeTable {
     public static final String CLASSNAME = "className";
 
     public static final String TITLE = "title";
+
+    public static final String MODIFIED = "modified";
 
     public static AppTypeModel queryByPackage(Context context, String packageName) {
         String[] selectionArgs = {packageName};
