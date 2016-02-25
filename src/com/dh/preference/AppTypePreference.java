@@ -26,6 +26,7 @@ public class AppTypePreference {
     }
 
     public boolean getHasConfigSystemAppIcon() {
+        // mHasConfigSystemAppIcon 提高效率，不用每次都读SharedPreferences
         if (mHasConfigSystemAppIcon == null) {
             mHasConfigSystemAppIcon = mPrefs.getBoolean(HAS_CONFIG_SYSTEM_APP_ICON, false);
         }

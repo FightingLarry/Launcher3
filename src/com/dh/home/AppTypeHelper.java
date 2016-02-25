@@ -30,11 +30,13 @@ public class AppTypeHelper {
             "#Intent;action=android.intent.action.MAIN;type=vnd.android-dir/mms-sms;launchFlags=0x10000000;end";
     private static final String QUERYINTENT_BROWSER =
             "http://m.baidu.com/?from=1000228o#Intent;action=android.intent.action.VIEW;launchFlags=0x10000000;end";
-
+    // AppType对应的本机应用信息
     private static Map<String, List<ActivityInfo>> sPackageMap = new HashMap<>();
 
+    // 持久化Apptype和本机应用的对应关系，1对1
     public synchronized static void configSystemAppIcon(Context context) {
 
+        // configSystemAppIcon只执行一次。
         if (AppTypePreference.getInstance(context).getHasConfigSystemAppIcon()) {
             return;
         }
@@ -75,6 +77,7 @@ public class AppTypeHelper {
                     }
                 }
             } else {
+                // 得到AppType对应的包名的List
                 infos = matchLoaclAppsByAppType(context, appType.getValue());
             }
             if (infos != null && infos.size() > 0) {
@@ -82,6 +85,7 @@ public class AppTypeHelper {
                     ActivityInfo activityInfo = infos.get(0);
                     saveToDb(context, appType, activityInfo);
                 } else {
+                    // 筛选出唯一的应用，系统应用优先。
                     for (ActivityInfo info : infos) {
                         String packageName = info.packageName;
                         boolean isSystemApp = false;
@@ -94,10 +98,12 @@ public class AppTypeHelper {
                             } catch (NameNotFoundException e) {}
                         }
                         if (isSystemApp) {
+                            // 如果是系统应用，直接持久化
                             saveToDb(context, appType, info);
                             continue next;
                         }
                     }
+                    // 如果不是系统应用，找到list的第一个应用信息，持久化。
                     ActivityInfo activityInfo = infos.get(0);
                     saveToDb(context, appType, activityInfo);
                 }
@@ -117,10 +123,13 @@ public class AppTypeHelper {
     }
 
     synchronized static List<ActivityInfo> matchLoaclAppsByAppType(Context context, String appType) {
+
         if (sPackageMap.isEmpty()) {
             matchLoaclApps(context);
         }
+
         List<ActivityInfo> list = new ArrayList<>();
+        // 多个Apptype，用逗号隔开。
         String[] appTypeArr = appType.split(",");
         for (int i = 0; i < appTypeArr.length; i++) {
             if (!TextUtils.isEmpty(appTypeArr[i])) {
@@ -162,260 +171,275 @@ public class AppTypeHelper {
         return null;
     }
 
+    // v2.1 start
     private static void matchLoaclApps(Context paramContext) {
+        // 查找出本地所有应用
         Intent localIntent = new Intent(Intent.ACTION_MAIN, null);
         localIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> localList = paramContext.getPackageManager().queryIntentActivities(localIntent, 0);
-        List<String> localArrayList = new ArrayList<>();
-        localArrayList.add("com.tcl.mid.android.camera");
-        localArrayList.add("com.android.jrdcamera.CameraLauncher");
-        localArrayList.add("com.jrdcom.camera.CameraLauncher");
-        localArrayList.add("com.android.camera.Camera");
-        localArrayList.add("com.google.android.camera");
-        localArrayList.add("com.android.camera");
-        localArrayList.add("com.android.camera.CameraActivity");
-        localArrayList.add("com.miui.camera");
-        localArrayList.add("com.motorola.Camera.Camera");
-        localArrayList.add("com.sec.android.app.camera.Camera");
-        localArrayList.add("com.android.camera.CameraEntry");
-        localArrayList.add("com.android.camera.CameraLauncher");
-        localArrayList.add("com.sonyericsson.android.camera");
-        localArrayList.add("com.lge.camera");
-        localArrayList.add("com.android.lgecamera");
-        localArrayList.add("com.android.hwcamera");
-        localArrayList.add("com.mediatek.camera");
-        localArrayList.add("com.baidu.camera");
-        localArrayList.add("com.oppo.camera");
-        localArrayList.add("com.oppo.camera.CameraLauncher");
-        localArrayList.add("com.motorola.camera");
-        localArrayList.add("zte.com.cn.camera.Camera");
-        localArrayList.add("com.baidu.camera.CameraLauncher");
-        localArrayList.add("com.htc.camera");
-        localArrayList.add("com.asus.camera");
-        localArrayList.add("com.meizu.media.camera");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.CAMERA.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.jrdcom.music");
-        localArrayList.add("com.lewa.player");
-        localArrayList.add("com.lewa.player.activity.SplashActivity");
-        localArrayList.add("com.android.music.MusicBrowserActivity");
-        localArrayList.add("com.miui.player");
-        localArrayList.add("com.miui.music");
-        localArrayList.add("com.motorola.cmp");
-        localArrayList.add("com.motorola.motmusic");
-        localArrayList.add("com.motorola.blur.music");
-        localArrayList.add("com.sec.android.app.music");
-        localArrayList.add("com.lenovo.leos.lephone.music");
-        localArrayList.add("com.lenovo.music");
-        localArrayList.add("com.htc.music");
-        localArrayList.add("com.lge.music");
-        localArrayList.add("com.sonyericsson.music");
-        localArrayList.add("com.andrew.apollo");
-        localArrayList.add("com.android.mediacenter");
-        localArrayList.add("com.oppo.music");
-        localArrayList.add("com.airplayme.android.phone");
-        localArrayList.add("com.android.bbkmusic.MusicBrowserActivity");
-        localArrayList.add("com.gwsoft.imusic.controller");
-        localArrayList.add("com.google.android.music");
-        localArrayList.add("com.android.music");
-        localArrayList.add("com.android.bbkmusic");
-        localArrayList.add("com.meizu.musiconline");
-        localArrayList.add("com.meizu.media.music");
-        localArrayList.add("com.lewa.player.ui.outer.MusicMainEntryActivity");
-        localArrayList.add("com.oppo.music.MainListActivity");
-        localArrayList.add("com.smartisanos.music.activities.MusicMain");
-        localArrayList.add("com.coolpad.music");
-        localArrayList.add("com.ting.mp3.android");
-        localArrayList.add("com.android.strengthenmusic");
-        localArrayList.add("cn.zte.music.MusicBrowserActivity");
-        localArrayList.add("cn.nubia.music.preset");
-        localArrayList.add("com.baidu.musicplayer");
-        localArrayList.add("com.imusic.musicplayer");
-        localArrayList.add("com.asus.music");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.MUSIC.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.lenovomobile.deskclock");
-        localArrayList.add("com.tct.timetool");
-        localArrayList.add("com.lenovo.deskclock");
-        localArrayList.add("com.sec.android.app.clockpackage");
-        localArrayList.add("com.htc.android.worldclock.WorldClockTabControl");
-        localArrayList.add("com.lge.alarm");
-        localArrayList.add("com.lge.clock");
-        localArrayList.add("com.android.alarmclock.AlarmClock");
-        localArrayList.add("com.motorola.blur.alarmclock");
-        localArrayList.add("com.sonyericsson.organizer.deskclock.DeskClock");
-        localArrayList.add("com.sonyericsson.organizer.Organizer");
-        localArrayList.add("com.baidu.baiduclock");
-        localArrayList.add("zte.com.cn.alarmclock");
-        localArrayList.add("com.leadcore.clock");
-        localArrayList.add("com.android.BBKClock");
-        localArrayList.add("com.yulong.android.xtime");
-        localArrayList.add("com.android.alarmclock");
-        localArrayList.add("com.android.deskclock.DeskClock");
-        localArrayList.add("com.android.deskclock");
-        localArrayList.add("com.oppo.alarmclock.AlarmClock");
-        localArrayList.add("com.aurora.deskclock");
-        localArrayList.add("com.smartisanos.clock.activity.ClockActivity");
-        localArrayList.add("com.android.timemanager");
-        localArrayList.add("cn.nubia.deskclock.preset");
-        localArrayList.add("com.asus.deskclock");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.CLOCK.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.tct.calendar");
-        localArrayList.add("com.motorola.calendar");
-        localArrayList.add("com.lenovo.app.Calendar");
-        localArrayList.add("com.htc.calendar");
-        localArrayList.add("com.bbk.calendar.MainActivity");
-        localArrayList.add("com.yulong.android.calendar");
-        localArrayList.add("com.google.android.syncadapters.calendar");
-        localArrayList.add("com.android.providers.calendar");
-        localArrayList.add("com.lenovo.calendar.SplashActivity");
-        localArrayList.add("com.google.android.calendar");
-        localArrayList.add("com.android.calendar.AllInOneActivity");
-        localArrayList.add("com.android.calendar2");
-        localArrayList.add("com.android.calendar");
-        localArrayList.add("cn.nubia.calendar.preset");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.CALENDAR.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.google.android.calculator");
-        localArrayList.add("com.tct.calculator");
-        localArrayList.add("com.sec.android.app.calculator.Calculator");
-        localArrayList.add("com.sec.android.app.calculator");
-        localArrayList.add("com.sec.android.app.popupcalculator");
-        localArrayList.add("com.baidu.calculator2");
-        localArrayList.add("com.android.bbkcalculator.Calculator");
-        localArrayList.add("my.android.calc");
-        localArrayList.add("com.android.calculator2");
-        localArrayList.add("com.android.calculator");
-        localArrayList.add("com.smartisanos.calculator.Calculator");
-        localArrayList.add("cn.nubia.calculator2.preset");
-        localArrayList.add("com.htc.calculator");
-        localArrayList.add("com.asus.calculator");
-        localArrayList.add("com.lenovo.calculator");
-        localArrayList.add("com.meizu.flyme.calculator");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.CALCULATOR.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.lewa.gallery3d");
-        localArrayList.add("com.jrdcom.android.gallery3d.app.Gallery");
-        localArrayList.add("com.tct.gallery3d");
-        localArrayList.add("com.google.android.apps.photos");
-        localArrayList.add("com.google.android.apps.plus.phone.ConversationListActivity");
-        localArrayList.add("com.google.android.gallery3d");
-        localArrayList.add("com.android.gallery3d");
-        localArrayList.add("com.android.gallery");
-        localArrayList.add("com.android.gallery3d.app.GalleryActivity");
-        localArrayList.add("com.cooliris.media");
-        localArrayList.add("com.cooliris.media.Gallery");
-        localArrayList.add("com.motorola.blurgallery");
-        localArrayList.add("com.motorola.motgallery");
-        localArrayList.add("com.motorola.cgallery.Dashboard");
-        localArrayList.add("com.cooliris.media.RenderView");
-        localArrayList.add("com.htc.album");
-        localArrayList.add("com.lenovo.scg");
-        localArrayList.add("com.sonyericsson.gallery");
-        localArrayList.add("com.sonyericsson.album");
-        localArrayList.add("com.sec.android.gallery3d");
-        localArrayList.add("com.motorola.gallery");
-        localArrayList.add("com.baidu.gallery3D.media");
-        localArrayList.add("com.oppo.cooliris.media");
-        localArrayList.add("com.miui.gallery");
-        localArrayList.add("com.htc.album.AlbumTabSwitchActivity");
-        localArrayList.add("com.android.camera.GalleryPicker");
-        localArrayList.add("com.alensw.PicFolder");
-        localArrayList.add("com.oppo.gallery3d.app.Gallery");
-        localArrayList.add("zte.com.cn.gallery3d.app.Gallery");
-        localArrayList.add("com.gionee.gallery");
-        localArrayList.add("com.baidu.gallery3d.app.Gallery");
-        localArrayList.add("com.asus.ephoto");
-        localArrayList.add("com.meizu.media.gallery");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.GALLERY.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.android.settings");
-        localArrayList.add("com.android.settings.MiuiSettings");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.SETTING.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.tclmarket");
-        localArrayList.add("com.android.vending.AssetBrowserActivity");
-        localArrayList.add("com.tencent.assistant");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.MARKET.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.android.email.activity.Welcome");
-        localArrayList.add("com.htc.android.mail.MailListTab");
-        localArrayList.add("com.htc.android.mail.MultipleActivitiesMain");
-        localArrayList.add("com.motorola.blur.email.mailbox.ViewFolderActivity");
-        localArrayList.add("com.android.email.activity.EmailActivity");
-        localArrayList.add("com.lge.email");
-        localArrayList.add("com.google.android.gm.ConversationListActivityGmail");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.EMAIL.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.google.android.maps.MapsActivity");
-        localArrayList.add("com.baidu.BaiduMap");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.MAPS.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.lewa.updater");
-        localArrayList.add("com.android.updater.MainActivity");
-        localArrayList.add("com.sonyericsson.updatecenter");
-        localArrayList.add("com.oppo.ota.activity.HomeActivity");
-        localArrayList.add("com.oppo.ota");
-        localArrayList.add("com.lenovo.ota");
-        localArrayList.add("com.yulong.android.ota");
-        localArrayList.add("gn.com.android.update");
-        localArrayList.add("com.mediatek.updatesystem");
-        localArrayList.add("com.huawei.android.hwouc.ui.activities.MainEntranceActivity");
-        localArrayList.add("com.lewa.updater");
-        localArrayList.add("com.mediatek.GoogleOta");
-        localArrayList.add("com.baidu.android.ota");
-        localArrayList.add("com.lge.updatecenter");
-        localArrayList.add("com.meizu.flyme.update");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.UPDATER.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.android.providers.downloads.ui.DownloadList");
-        localArrayList.add("com.android.providers.downloads.ui.DownloadsListTab");
-        localArrayList.add("com.android.providers.downloads.ui.DownloadPagerActivity");
-        localArrayList.add("com.android.providers.downloads.ui");
-        localArrayList.add("com.android.providers.downloads");
-        localArrayList.add("com.yulong.android.filebrowser.activity.FileLatestActivity");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.DOWNLOADS.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.android.dialer");
-        localArrayList.add("com.google.android.dialer");
-        localArrayList.add("com.android.htcdialer");
-        localArrayList.add("com.android.contacts.activities.TwelveKeyDialer");
-        localArrayList.add("com.android.contacts.TwelveKeyDialer");
-        localArrayList.add("com.android.phone");
-        localArrayList.add("com.android.contacts.activities.DialtactsActivity");
-        localArrayList.add("com.android.providers.telephony");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.PHONE.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.android.contacts");
-        localArrayList.add("com.google.android.contacts");
-        localArrayList.add("com.android.contacts.activities.PeopleActivity");
-        localArrayList.add("com.android.contacts.DialtactsContactsEntryActivity");
-        localArrayList.add("com.google.android.syncadapters.contacts");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.CONTACTS.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.google.android.browser");
-        localArrayList.add("com.android.browser");
-        localArrayList.add("com.android.chrome");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.BROWSER.getValue());
-        localArrayList.clear();
-        localArrayList.add("com.google.android.talk");
-        localArrayList.add("com.android.contacts.activities.MessageActivity");
-        localArrayList.add("com.android.mms");
-        localArrayList.add("com.google.android.mms");
-        matchLoaclApps(paramContext, localList, localArrayList, AppType.MMS.getValue());
-        localArrayList.clear();
+        // 筛选市场上的应用。
+        List<String> matchArrayList = new ArrayList<>();
+        matchArrayList.add("com.tcl.mid.android.camera");
+        matchArrayList.add("com.android.jrdcamera.CameraLauncher");
+        matchArrayList.add("com.jrdcom.camera.CameraLauncher");
+        matchArrayList.add("com.android.camera.Camera");
+        matchArrayList.add("com.google.android.camera");
+        matchArrayList.add("com.android.camera");
+        matchArrayList.add("com.android.camera.CameraActivity");
+        matchArrayList.add("com.miui.camera");
+        matchArrayList.add("com.motorola.Camera.Camera");
+        matchArrayList.add("com.sec.android.app.camera.Camera");
+        matchArrayList.add("com.android.camera.CameraEntry");
+        matchArrayList.add("com.android.camera.CameraLauncher");
+        matchArrayList.add("com.sonyericsson.android.camera");
+        matchArrayList.add("com.lge.camera");
+        matchArrayList.add("com.android.lgecamera");
+        matchArrayList.add("com.android.hwcamera");
+        matchArrayList.add("com.mediatek.camera");
+        matchArrayList.add("com.baidu.camera");
+        matchArrayList.add("com.oppo.camera");
+        matchArrayList.add("com.oppo.camera.CameraLauncher");
+        matchArrayList.add("com.motorola.camera");
+        matchArrayList.add("zte.com.cn.camera.Camera");
+        matchArrayList.add("com.baidu.camera.CameraLauncher");
+        matchArrayList.add("com.htc.camera");
+        matchArrayList.add("com.asus.camera");
+        matchArrayList.add("com.meizu.media.camera");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.CAMERA.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.jrdcom.music");
+        matchArrayList.add("com.lewa.player");
+        matchArrayList.add("com.lewa.player.activity.SplashActivity");
+        matchArrayList.add("com.android.music.MusicBrowserActivity");
+        matchArrayList.add("com.miui.player");
+        matchArrayList.add("com.miui.music");
+        matchArrayList.add("com.motorola.cmp");
+        matchArrayList.add("com.motorola.motmusic");
+        matchArrayList.add("com.motorola.blur.music");
+        matchArrayList.add("com.sec.android.app.music");
+        matchArrayList.add("com.lenovo.leos.lephone.music");
+        matchArrayList.add("com.lenovo.music");
+        matchArrayList.add("com.htc.music");
+        matchArrayList.add("com.lge.music");
+        matchArrayList.add("com.sonyericsson.music");
+        matchArrayList.add("com.andrew.apollo");
+        matchArrayList.add("com.android.mediacenter");
+        matchArrayList.add("com.oppo.music");
+        matchArrayList.add("com.airplayme.android.phone");
+        matchArrayList.add("com.android.bbkmusic.MusicBrowserActivity");
+        matchArrayList.add("com.gwsoft.imusic.controller");
+        matchArrayList.add("com.google.android.music");
+        matchArrayList.add("com.android.music");
+        matchArrayList.add("com.android.bbkmusic");
+        matchArrayList.add("com.meizu.musiconline");
+        matchArrayList.add("com.meizu.media.music");
+        matchArrayList.add("com.lewa.player.ui.outer.MusicMainEntryActivity");
+        matchArrayList.add("com.oppo.music.MainListActivity");
+        matchArrayList.add("com.smartisanos.music.activities.MusicMain");
+        matchArrayList.add("com.coolpad.music");
+        matchArrayList.add("com.ting.mp3.android");
+        matchArrayList.add("com.android.strengthenmusic");
+        matchArrayList.add("cn.zte.music.MusicBrowserActivity");
+        matchArrayList.add("cn.nubia.music.preset");
+        matchArrayList.add("com.baidu.musicplayer");
+        matchArrayList.add("com.imusic.musicplayer");
+        matchArrayList.add("com.asus.music");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.MUSIC.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.lenovomobile.deskclock");
+        matchArrayList.add("com.tct.timetool");
+        matchArrayList.add("com.lenovo.deskclock");
+        matchArrayList.add("com.sec.android.app.clockpackage");
+        matchArrayList.add("com.htc.android.worldclock.WorldClockTabControl");
+        matchArrayList.add("com.lge.alarm");
+        matchArrayList.add("com.lge.clock");
+        matchArrayList.add("com.android.alarmclock.AlarmClock");
+        matchArrayList.add("com.motorola.blur.alarmclock");
+        matchArrayList.add("com.sonyericsson.organizer.deskclock.DeskClock");
+        matchArrayList.add("com.sonyericsson.organizer.Organizer");
+        matchArrayList.add("com.baidu.baiduclock");
+        matchArrayList.add("zte.com.cn.alarmclock");
+        matchArrayList.add("com.leadcore.clock");
+        matchArrayList.add("com.android.BBKClock");
+        matchArrayList.add("com.yulong.android.xtime");
+        matchArrayList.add("com.android.alarmclock");
+        matchArrayList.add("com.android.deskclock.DeskClock");
+        matchArrayList.add("com.android.deskclock");
+        matchArrayList.add("com.oppo.alarmclock.AlarmClock");
+        matchArrayList.add("com.aurora.deskclock");
+        matchArrayList.add("com.smartisanos.clock.activity.ClockActivity");
+        matchArrayList.add("com.android.timemanager");
+        matchArrayList.add("cn.nubia.deskclock.preset");
+        matchArrayList.add("com.asus.deskclock");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.CLOCK.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.tct.calendar");
+        matchArrayList.add("com.motorola.calendar");
+        matchArrayList.add("com.lenovo.app.Calendar");
+        matchArrayList.add("com.htc.calendar");
+        matchArrayList.add("com.bbk.calendar.MainActivity");
+        matchArrayList.add("com.yulong.android.calendar");
+        matchArrayList.add("com.google.android.syncadapters.calendar");
+        matchArrayList.add("com.android.providers.calendar");
+        matchArrayList.add("com.lenovo.calendar.SplashActivity");
+        matchArrayList.add("com.google.android.calendar");
+        matchArrayList.add("com.android.calendar.AllInOneActivity");
+        matchArrayList.add("com.android.calendar2");
+        matchArrayList.add("com.android.calendar");
+        matchArrayList.add("cn.nubia.calendar.preset");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.CALENDAR.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.google.android.calculator");
+        matchArrayList.add("com.tct.calculator");
+        matchArrayList.add("com.sec.android.app.calculator.Calculator");
+        matchArrayList.add("com.sec.android.app.calculator");
+        matchArrayList.add("com.sec.android.app.popupcalculator");
+        matchArrayList.add("com.baidu.calculator2");
+        matchArrayList.add("com.android.bbkcalculator.Calculator");
+        matchArrayList.add("my.android.calc");
+        matchArrayList.add("com.android.calculator2");
+        matchArrayList.add("com.android.calculator");
+        matchArrayList.add("com.smartisanos.calculator.Calculator");
+        matchArrayList.add("cn.nubia.calculator2.preset");
+        matchArrayList.add("com.htc.calculator");
+        matchArrayList.add("com.asus.calculator");
+        matchArrayList.add("com.lenovo.calculator");
+        matchArrayList.add("com.meizu.flyme.calculator");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.CALCULATOR.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.lewa.gallery3d");
+        matchArrayList.add("com.jrdcom.android.gallery3d.app.Gallery");
+        matchArrayList.add("com.tct.gallery3d");
+        matchArrayList.add("com.google.android.apps.photos");
+        matchArrayList.add("com.google.android.apps.plus.phone.ConversationListActivity");
+        matchArrayList.add("com.google.android.gallery3d");
+        matchArrayList.add("com.android.gallery3d");
+        matchArrayList.add("com.android.gallery");
+        matchArrayList.add("com.android.gallery3d.app.GalleryActivity");
+        matchArrayList.add("com.cooliris.media");
+        matchArrayList.add("com.cooliris.media.Gallery");
+        matchArrayList.add("com.motorola.blurgallery");
+        matchArrayList.add("com.motorola.motgallery");
+        matchArrayList.add("com.motorola.cgallery.Dashboard");
+        matchArrayList.add("com.cooliris.media.RenderView");
+        matchArrayList.add("com.htc.album");
+        matchArrayList.add("com.lenovo.scg");
+        matchArrayList.add("com.sonyericsson.gallery");
+        matchArrayList.add("com.sonyericsson.album");
+        matchArrayList.add("com.sec.android.gallery3d");
+        matchArrayList.add("com.motorola.gallery");
+        matchArrayList.add("com.baidu.gallery3D.media");
+        matchArrayList.add("com.oppo.cooliris.media");
+        matchArrayList.add("com.miui.gallery");
+        matchArrayList.add("com.htc.album.AlbumTabSwitchActivity");
+        matchArrayList.add("com.android.camera.GalleryPicker");
+        matchArrayList.add("com.alensw.PicFolder");
+        matchArrayList.add("com.oppo.gallery3d.app.Gallery");
+        matchArrayList.add("zte.com.cn.gallery3d.app.Gallery");
+        matchArrayList.add("com.gionee.gallery");
+        matchArrayList.add("com.baidu.gallery3d.app.Gallery");
+        matchArrayList.add("com.asus.ephoto");
+        matchArrayList.add("com.meizu.media.gallery");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.GALLERY.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.android.settings");
+        matchArrayList.add("com.android.settings.MiuiSettings");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.SETTING.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.tclmarket");
+        matchArrayList.add("com.android.vending.AssetBrowserActivity");
+        matchArrayList.add("com.tencent.assistant");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.MARKET.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.android.email.activity.Welcome");
+        matchArrayList.add("com.htc.android.mail.MailListTab");
+        matchArrayList.add("com.htc.android.mail.MultipleActivitiesMain");
+        matchArrayList.add("com.motorola.blur.email.mailbox.ViewFolderActivity");
+        matchArrayList.add("com.android.email.activity.EmailActivity");
+        matchArrayList.add("com.lge.email");
+        matchArrayList.add("com.google.android.gm.ConversationListActivityGmail");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.EMAIL.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.google.android.maps.MapsActivity");
+        matchArrayList.add("com.baidu.BaiduMap");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.MAPS.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.lewa.updater");
+        matchArrayList.add("com.android.updater.MainActivity");
+        matchArrayList.add("com.sonyericsson.updatecenter");
+        matchArrayList.add("com.oppo.ota.activity.HomeActivity");
+        matchArrayList.add("com.oppo.ota");
+        matchArrayList.add("com.lenovo.ota");
+        matchArrayList.add("com.yulong.android.ota");
+        matchArrayList.add("gn.com.android.update");
+        matchArrayList.add("com.mediatek.updatesystem");
+        matchArrayList.add("com.huawei.android.hwouc.ui.activities.MainEntranceActivity");
+        matchArrayList.add("com.lewa.updater");
+        matchArrayList.add("com.mediatek.GoogleOta");
+        matchArrayList.add("com.baidu.android.ota");
+        matchArrayList.add("com.lge.updatecenter");
+        matchArrayList.add("com.meizu.flyme.update");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.UPDATER.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.android.providers.downloads.ui.DownloadList");
+        matchArrayList.add("com.android.providers.downloads.ui.DownloadsListTab");
+        matchArrayList.add("com.android.providers.downloads.ui.DownloadPagerActivity");
+        matchArrayList.add("com.android.providers.downloads.ui");
+        matchArrayList.add("com.android.providers.downloads");
+        matchArrayList.add("com.yulong.android.filebrowser.activity.FileLatestActivity");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.DOWNLOADS.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.android.dialer");
+        matchArrayList.add("com.google.android.dialer");
+        matchArrayList.add("com.android.htcdialer");
+        matchArrayList.add("com.android.contacts.activities.TwelveKeyDialer");
+        matchArrayList.add("com.android.contacts.TwelveKeyDialer");
+        matchArrayList.add("com.android.phone");
+        matchArrayList.add("com.android.contacts.activities.DialtactsActivity");
+        matchArrayList.add("com.android.providers.telephony");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.PHONE.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.android.contacts");
+        matchArrayList.add("com.google.android.contacts");
+        matchArrayList.add("com.android.contacts.activities.PeopleActivity");
+        matchArrayList.add("com.android.contacts.DialtactsContactsEntryActivity");
+        matchArrayList.add("com.google.android.syncadapters.contacts");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.CONTACTS.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.google.android.browser");
+        matchArrayList.add("com.android.browser");
+        matchArrayList.add("com.android.chrome");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.BROWSER.getValue());
+        matchArrayList.clear();
+        matchArrayList.add("com.google.android.talk");
+        matchArrayList.add("com.android.contacts.activities.MessageActivity");
+        matchArrayList.add("com.android.mms");
+        matchArrayList.add("com.google.android.mms");
+        matchLoaclApps(paramContext, localList, matchArrayList, AppType.MMS.getValue());
+        matchArrayList.clear();
     }
 
-    private static void matchLoaclApps(Context paramContext, List<ResolveInfo> localList, List<String> collectList,
-            String paramString) {
+    /**
+     *
+     * @param paramContext
+     * @param localList 手机上所有应用
+     * @param matchArrayList 应用类型对应的市场上的应用
+     * @param appType 应用类型
+     */
+    private static void matchLoaclApps(Context paramContext, List<ResolveInfo> localList, List<String> matchArrayList,
+            String appType) {
+        // 用于保存匹配的应用信息。
         List<ActivityInfo> localArrayList = new ArrayList<>();
-        Iterator<String> collectIterator = collectList.iterator();
+        Iterator<String> collectIterator = matchArrayList.iterator();
+        // 市场上的应用
         while (collectIterator.hasNext()) {
-            String collect = (String) collectIterator.next();
+            String collect = collectIterator.next();
             Iterator<ResolveInfo> resolveInfos = localList.iterator();
+            // 本机应用
             while (resolveInfos.hasNext()) {
-                ResolveInfo localResolveInfo = (ResolveInfo) resolveInfos.next();
+                // 本机的一个应用信息
+                ResolveInfo localResolveInfo = resolveInfos.next();
+                // className，packageName
                 if ((collect.equals(localResolveInfo.activityInfo.name))
                         || (collect.equals(localResolveInfo.activityInfo.packageName)))
                     if (!localArrayList.contains(localResolveInfo.activityInfo)) {
@@ -423,7 +447,7 @@ public class AppTypeHelper {
                     }
             }
         }
-        sPackageMap.put(paramString, localArrayList);
+        sPackageMap.put(appType, localArrayList);
     }
 
 }
