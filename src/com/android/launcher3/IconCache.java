@@ -20,9 +20,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map.Entry;
 
 import android.app.ActivityManager;
@@ -65,6 +68,7 @@ public class IconCache {
     private static final String EMPTY_CLASS_NAME = ".";
 
     private static final boolean DEBUG = false;
+    private String[] mIconsArray;
 
     private static class CacheEntry {
         public Bitmap icon;
@@ -236,7 +240,7 @@ public class IconCache {
      * Fill in "application" with the icon and label for "info."
      */
     public void getTitleAndIcon(AppInfo application, LauncherActivityInfoCompat info,
-            HashMap<Object, CharSequence> labelCache) {
+                                HashMap<Object, CharSequence> labelCache) {
         synchronized (mCache) {
             CacheEntry entry = cacheLocked(application.componentName, info, labelCache, info.getUser(), false);
 
@@ -301,7 +305,7 @@ public class IconCache {
     }
 
     public Bitmap getIcon(ComponentName component, LauncherActivityInfoCompat info,
-            HashMap<Object, CharSequence> labelCache) {
+                          HashMap<Object, CharSequence> labelCache) {
         synchronized (mCache) {
             if (info == null || component == null) {
                 return null;
@@ -317,7 +321,7 @@ public class IconCache {
     }
 
     private CacheEntry cacheLocked(ComponentName componentName, LauncherActivityInfoCompat info,
-            HashMap<Object, CharSequence> labelCache, UserHandleCompat user, boolean usePackageIcon) {
+                                   HashMap<Object, CharSequence> labelCache, UserHandleCompat user, boolean usePackageIcon) {
         CacheKey cacheKey = new CacheKey(componentName, user);
         CacheEntry entry = mCache.get(cacheKey);
         if (entry == null) {
@@ -342,30 +346,74 @@ public class IconCache {
                         AppTypeTable.queryByPackageClassName(mContext, labelKey.getPackageName(),
                                 labelKey.getClassName());
                 String apptype = model != null ? model.appType : null;
-                if (AppType.CALENDAR.getValue().equals(apptype)) {
-                    entry.icon = Utilities.createCalendarIconBitmap(info.getBadgedIcon(mIconDpi), mContext);
+                // @}
+
+                // {@ v3.1
+                Drawable icon = null;
+                boolean isFromAppType = false;
+                InputStream is = null;
+                String filename;
+                try {
+                    String path = "icons";
+                    String unit = ".png";
+                    if (!TextUtils.isEmpty(apptype)) {
+                        filename = apptype.toLowerCase(Locale.CHINA);
+                        is = getIconsInputStream(is, filename, path, unit);
+                    }
+                    if (is == null) {
+                        isFromAppType = false;
+                        filename = labelKey.getPackageName();
+                        is = getIconsInputStream(is, filename, path, unit);
+                    } else {
+                        isFromAppType = true;
+                    }
+                    if (is != null) {
+                        icon = Drawable.createFromStream(is, null);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (is != null) {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                if (icon == null) {
+                    icon = info.getBadgedIcon(mIconDpi);
+                }
+                // @}
+                
+                // {@ v3.0
+                if (isFromAppType && AppType.CALENDAR.getValue().equals(apptype)) {
+                    entry.icon = Utilities.createCalendarIconBitmap(icon, mContext);
                     // @}
                 } else {
-                    entry.icon = Utilities.createIconBitmap(info.getBadgedIcon(mIconDpi), mContext);
+                    entry.icon = Utilities.createIconBitmap(icon, mContext);
                 }
 
             } else {
                 entry.title = "";
                 Bitmap preloaded = getPreloadedIcon(componentName, user);
                 if (preloaded != null) {
-                    if (DEBUG) Log.d(TAG, "using preloaded icon for " + componentName.toShortString());
+                    if (DEBUG)
+                        Log.d(TAG, "using preloaded icon for " + componentName.toShortString());
                     entry.icon = preloaded;
                 } else {
                     if (usePackageIcon) {
                         CacheEntry packageEntry = getEntryForPackage(componentName.getPackageName(), user);
                         if (packageEntry != null) {
-                            if (DEBUG) Log.d(TAG, "using package default icon for " + componentName.toShortString());
+                            if (DEBUG)
+                                Log.d(TAG, "using package default icon for " + componentName.toShortString());
                             entry.icon = packageEntry.icon;
                             entry.title = packageEntry.title;
                         }
                     }
                     if (entry.icon == null) {
-                        if (DEBUG) Log.d(TAG, "using default icon for " + componentName.toShortString());
+                        if (DEBUG)
+                            Log.d(TAG, "using default icon for " + componentName.toShortString());
                         entry.icon = getDefaultIcon(user);
                     }
                 }
@@ -373,6 +421,23 @@ public class IconCache {
         }
         return entry;
     }
+
+
+    private InputStream getIconsInputStream(InputStream is, String filename, String path, String unit) {
+        try {
+            if (mIconsArray == null) {
+                mIconsArray = mContext.getAssets().list(path);
+            }
+            int index = Arrays.binarySearch(mIconsArray, filename + unit);
+            if (index >= 0) {
+                is = mContext.getAssets().open(path + "/" + filename + unit);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return is;
+    }
+
 
     /**
      * Adds a default package entry in the cache. This entry is not persisted and will be removed
@@ -430,15 +495,15 @@ public class IconCache {
 
     /**
      * Pre-load an icon into the persistent cache.
-     *
-     * <P>
+     * <p/>
+     * <p/>
      * Queries for a component that does not exist in the package manager will be answered by the
      * persistent cache.
      *
-     * @param context application context
+     * @param context       application context
      * @param componentName the icon should be returned for this component
-     * @param icon the icon to be persisted
-     * @param dpi the native density of the icon
+     * @param icon          the icon to be persisted
+     * @param dpi           the native density of the icon
      */
     public static void preloadIcon(Context context, ComponentName componentName, Bitmap icon, int dpi) {
         // TODO rescale to the correct native DPI
