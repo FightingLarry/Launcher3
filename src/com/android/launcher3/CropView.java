@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -42,18 +40,20 @@ public class CropView extends TiledImageView implements OnScaleGestureListener {
     private float mMinScale;
     private boolean mTouchEnabled = true;
     private RectF mTempEdges = new RectF();
-    private float[] mTempPoint = new float[] { 0, 0 };
-    private float[] mTempCoef = new float[] { 0, 0 };
-    private float[] mTempAdjustment = new float[] { 0, 0 };
-    private float[] mTempImageDims = new float[] { 0, 0 };
-    private float[] mTempRendererCenter = new float[] { 0, 0 };
+    private float[] mTempPoint = new float[] {0, 0};
+    private float[] mTempCoef = new float[] {0, 0};
+    private float[] mTempAdjustment = new float[] {0, 0};
+    private float[] mTempImageDims = new float[] {0, 0};
+    private float[] mTempRendererCenter = new float[] {0, 0};
     TouchCallback mTouchCallback;
     Matrix mRotateMatrix;
     Matrix mInverseRotateMatrix;
 
     public interface TouchCallback {
         void onTouchDown();
+
         void onTap();
+
         void onTouchUp();
     }
 
@@ -98,10 +98,8 @@ public class CropView extends TiledImageView implements OnScaleGestureListener {
         rendererCenter[1] += imageHeight / 2;
 
         final float scale = mRenderer.scale;
-        float centerX = (width / 2f - rendererCenter[0] + (imageWidth - width) / 2f)
-                * scale + width / 2f;
-        float centerY = (height / 2f - rendererCenter[1] + (imageHeight - height) / 2f)
-                * scale + height / 2f;
+        float centerX = (width / 2f - rendererCenter[0] + (imageWidth - width) / 2f) * scale + width / 2f;
+        float centerY = (height / 2f - rendererCenter[1] + (imageHeight - height) / 2f) * scale + height / 2f;
         float leftEdge = centerX - imageWidth / 2f * scale;
         float rightEdge = centerX + imageWidth / 2f * scale;
         float topEdge = centerY - imageHeight / 2f * scale;
@@ -165,8 +163,7 @@ public class CropView extends TiledImageView implements OnScaleGestureListener {
                 final float imageWidth = imageDims[0];
                 final float imageHeight = imageDims[1];
                 mMinScale = Math.max(w / imageWidth, h / imageHeight);
-                mRenderer.scale =
-                        Math.max(mMinScale, resetScale ? Float.MIN_VALUE : mRenderer.scale);
+                mRenderer.scale = Math.max(mMinScale, resetScale ? Float.MIN_VALUE : mRenderer.scale);
             }
         }
     }
@@ -187,18 +184,17 @@ public class CropView extends TiledImageView implements OnScaleGestureListener {
     }
 
     @Override
-    public void onScaleEnd(ScaleGestureDetector detector) {
-    }
+    public void onScaleEnd(ScaleGestureDetector detector) {}
 
     public void moveToLeft() {
         if (getWidth() == 0 || getHeight() == 0) {
             final ViewTreeObserver observer = getViewTreeObserver();
             observer.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-                    public void onGlobalLayout() {
-                        moveToLeft();
-                        getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    }
-                });
+                public void onGlobalLayout() {
+                    moveToLeft();
+                    getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            });
         }
         final RectF edges = mTempEdges;
         getEdgesHelper(edges);
@@ -230,8 +226,7 @@ public class CropView extends TiledImageView implements OnScaleGestureListener {
         float sumX = 0, sumY = 0;
         final int count = event.getPointerCount();
         for (int i = 0; i < count; i++) {
-            if (skipIndex == i)
-                continue;
+            if (skipIndex == i) continue;
             sumX += event.getX(i);
             sumY += event.getY(i);
         }
@@ -254,8 +249,7 @@ public class CropView extends TiledImageView implements OnScaleGestureListener {
             long now = System.currentTimeMillis();
             if (mTouchCallback != null) {
                 // only do this if it's a small movement
-                if (squaredDist < slop &&
-                        now < mTouchDownTime + ViewConfiguration.getTapTimeout()) {
+                if (squaredDist < slop && now < mTouchDownTime + ViewConfiguration.getTapTimeout()) {
                     mTouchCallback.onTap();
                 }
                 mTouchCallback.onTouchUp();

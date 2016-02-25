@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -81,27 +79,25 @@ public class HolographicOutlineHelper {
      * Applies a more expensive and accurate outline to whatever is currently drawn in a specified
      * bitmap.
      */
-    void applyExpensiveOutlineWithBlur(Bitmap srcDst, Canvas srcDstCanvas, int color,
-            int outlineColor) {
+    void applyExpensiveOutlineWithBlur(Bitmap srcDst, Canvas srcDstCanvas, int color, int outlineColor) {
         applyExpensiveOutlineWithBlur(srcDst, srcDstCanvas, color, outlineColor, true);
     }
-    void applyExpensiveOutlineWithBlur(Bitmap srcDst, Canvas srcDstCanvas, int color,
-            int outlineColor, boolean clipAlpha) {
+
+    void applyExpensiveOutlineWithBlur(Bitmap srcDst, Canvas srcDstCanvas, int color, int outlineColor,
+            boolean clipAlpha) {
 
         // We start by removing most of the alpha channel so as to ignore shadows, and
         // other types of partial transparency when defining the shape of the object
         if (clipAlpha) {
             int[] srcBuffer = new int[srcDst.getWidth() * srcDst.getHeight()];
-            srcDst.getPixels(srcBuffer,
-                    0, srcDst.getWidth(), 0, 0, srcDst.getWidth(), srcDst.getHeight());
+            srcDst.getPixels(srcBuffer, 0, srcDst.getWidth(), 0, 0, srcDst.getWidth(), srcDst.getHeight());
             for (int i = 0; i < srcBuffer.length; i++) {
                 final int alpha = srcBuffer[i] >>> 24;
                 if (alpha < 188) {
                     srcBuffer[i] = 0;
                 }
             }
-            srcDst.setPixels(srcBuffer,
-                    0, srcDst.getWidth(), 0, 0, srcDst.getWidth(), srcDst.getHeight());
+            srcDst.setPixels(srcBuffer, 0, srcDst.getWidth(), 0, 0, srcDst.getWidth(), srcDst.getHeight());
         }
         Bitmap glowShape = srcDst.extractAlpha();
 
@@ -123,26 +119,20 @@ public class HolographicOutlineHelper {
 
         // mask out the inner blur
         srcDstCanvas.setBitmap(thickInnerBlur);
-        srcDstCanvas.drawBitmap(glowShape, -thickInnerBlurOffset[0],
-                -thickInnerBlurOffset[1], mErasePaint);
-        srcDstCanvas.drawRect(0, 0, -thickInnerBlurOffset[0], thickInnerBlur.getHeight(),
-                mErasePaint);
-        srcDstCanvas.drawRect(0, 0, thickInnerBlur.getWidth(), -thickInnerBlurOffset[1],
-                mErasePaint);
+        srcDstCanvas.drawBitmap(glowShape, -thickInnerBlurOffset[0], -thickInnerBlurOffset[1], mErasePaint);
+        srcDstCanvas.drawRect(0, 0, -thickInnerBlurOffset[0], thickInnerBlur.getHeight(), mErasePaint);
+        srcDstCanvas.drawRect(0, 0, thickInnerBlur.getWidth(), -thickInnerBlurOffset[1], mErasePaint);
 
         // draw the inner and outer blur
         srcDstCanvas.setBitmap(srcDst);
         srcDstCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         mDrawPaint.setColor(color);
-        srcDstCanvas.drawBitmap(thickInnerBlur, thickInnerBlurOffset[0], thickInnerBlurOffset[1],
-                mDrawPaint);
-        srcDstCanvas.drawBitmap(thickOuterBlur, outerBlurOffset[0], outerBlurOffset[1],
-                mDrawPaint);
+        srcDstCanvas.drawBitmap(thickInnerBlur, thickInnerBlurOffset[0], thickInnerBlurOffset[1], mDrawPaint);
+        srcDstCanvas.drawBitmap(thickOuterBlur, outerBlurOffset[0], outerBlurOffset[1], mDrawPaint);
 
         // draw the bright outline
         mDrawPaint.setColor(outlineColor);
-        srcDstCanvas.drawBitmap(brightOutline, brightOutlineOffset[0], brightOutlineOffset[1],
-                mDrawPaint);
+        srcDstCanvas.drawBitmap(brightOutline, brightOutlineOffset[0], brightOutlineOffset[1], mDrawPaint);
 
         // cleanup
         srcDstCanvas.setBitmap(null);
@@ -153,28 +143,25 @@ public class HolographicOutlineHelper {
     }
 
     Bitmap createMediumDropShadow(BubbleTextView view) {
-        final Bitmap result = Bitmap.createBitmap(
-                view.getWidth() + shadowBitmapPadding + shadowBitmapPadding,
-                view.getHeight() + shadowBitmapPadding + shadowBitmapPadding + mShadowOffset,
-                Bitmap.Config.ARGB_8888);
+        final Bitmap result =
+                Bitmap.createBitmap(view.getWidth() + shadowBitmapPadding + shadowBitmapPadding, view.getHeight()
+                        + shadowBitmapPadding + shadowBitmapPadding + mShadowOffset, Bitmap.Config.ARGB_8888);
 
         mCanvas.setBitmap(result);
 
         final Rect clipRect = sTempRect;
         view.getDrawingRect(sTempRect);
         // adjust the clip rect so that we don't include the text label
-        clipRect.bottom = view.getExtendedPaddingTop() - (int) BubbleTextView.PADDING_V
-                + view.getLayout().getLineTop(0);
+        clipRect.bottom =
+                view.getExtendedPaddingTop() - (int) BubbleTextView.PADDING_V + view.getLayout().getLineTop(0);
 
         // Draw the View into the bitmap.
         // The translate of scrollX and scrollY is necessary when drawing TextViews, because
         // they set scrollX and scrollY to large values to achieve centered text
         mCanvas.save();
-        mCanvas.scale(view.getScaleX(), view.getScaleY(),
-                view.getWidth() / 2 + shadowBitmapPadding,
-                view.getHeight() / 2 + shadowBitmapPadding);
-        mCanvas.translate(-view.getScrollX() + shadowBitmapPadding,
-                -view.getScrollY() + shadowBitmapPadding);
+        mCanvas.scale(view.getScaleX(), view.getScaleY(), view.getWidth() / 2 + shadowBitmapPadding, view.getHeight()
+                / 2 + shadowBitmapPadding);
+        mCanvas.translate(-view.getScrollX() + shadowBitmapPadding, -view.getScrollY() + shadowBitmapPadding);
         mCanvas.clipRect(clipRect, Op.REPLACE);
         view.draw(mCanvas);
         mCanvas.restore();

@@ -1,20 +1,25 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.photos.views;
+
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.egl.EGLDisplay;
+import javax.microedition.khronos.egl.EGLSurface;
+import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
@@ -24,18 +29,10 @@ import android.util.Log;
 import android.view.TextureView;
 import android.view.TextureView.SurfaceTextureListener;
 
-import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.egl.EGLContext;
-import javax.microedition.khronos.egl.EGLDisplay;
-import javax.microedition.khronos.egl.EGLSurface;
-import javax.microedition.khronos.opengles.GL10;
-
 /**
  * A TextureView that supports blocking rendering for synchronous drawing
  */
-public class BlockingGLTextureView extends TextureView
-        implements SurfaceTextureListener {
+public class BlockingGLTextureView extends TextureView implements SurfaceTextureListener {
 
     private RenderThread mRenderThread;
 
@@ -63,15 +60,13 @@ public class BlockingGLTextureView extends TextureView
     }
 
     @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width,
-            int height) {
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         mRenderThread.setSurface(surface);
         mRenderThread.setSize(width, height);
     }
 
     @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width,
-            int height) {
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
         mRenderThread.setSize(width, height);
     }
 
@@ -84,8 +79,7 @@ public class BlockingGLTextureView extends TextureView
     }
 
     @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-    }
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {}
 
     @Override
     protected void finalize() throws Throwable {
@@ -116,8 +110,8 @@ public class BlockingGLTextureView extends TextureView
             EGLConfig[] configs = new EGLConfig[1];
             int[] configSpec = getConfig();
             if (!mEgl.eglChooseConfig(mEglDisplay, configSpec, configs, 1, configsCount)) {
-                throw new IllegalArgumentException("eglChooseConfig failed " +
-                        GLUtils.getEGLErrorString(mEgl.eglGetError()));
+                throw new IllegalArgumentException("eglChooseConfig failed "
+                        + GLUtils.getEGLErrorString(mEgl.eglGetError()));
             } else if (configsCount[0] > 0) {
                 return configs[0];
             }
@@ -125,20 +119,13 @@ public class BlockingGLTextureView extends TextureView
         }
 
         private static int[] getConfig() {
-            return new int[] {
-                    EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-                    EGL10.EGL_RED_SIZE, 8,
-                    EGL10.EGL_GREEN_SIZE, 8,
-                    EGL10.EGL_BLUE_SIZE, 8,
-                    EGL10.EGL_ALPHA_SIZE, 8,
-                    EGL10.EGL_DEPTH_SIZE, 0,
-                    EGL10.EGL_STENCIL_SIZE, 0,
-                    EGL10.EGL_NONE
-            };
+            return new int[] {EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT, EGL10.EGL_RED_SIZE, 8,
+                    EGL10.EGL_GREEN_SIZE, 8, EGL10.EGL_BLUE_SIZE, 8, EGL10.EGL_ALPHA_SIZE, 8, EGL10.EGL_DEPTH_SIZE, 0,
+                    EGL10.EGL_STENCIL_SIZE, 0, EGL10.EGL_NONE};
         }
 
         EGLContext createContext(EGL10 egl, EGLDisplay eglDisplay, EGLConfig eglConfig) {
-            int[] attribList = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE };
+            int[] attribList = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE};
             return egl.eglCreateContext(eglDisplay, eglConfig, EGL10.EGL_NO_CONTEXT, attribList);
         }
 
@@ -170,9 +157,9 @@ public class BlockingGLTextureView extends TextureView
             mEglConfig = chooseEglConfig();
 
             /*
-            * Create an EGL context. We want to do this as rarely as we can, because an
-            * EGL context is a somewhat heavy object.
-            */
+             * Create an EGL context. We want to do this as rarely as we can, because an EGL context
+             * is a somewhat heavy object.
+             */
             mEglContext = createContext(mEgl, mEglDisplay, mEglConfig);
 
             if (mEglContext == null || mEglContext == EGL10.EGL_NO_CONTEXT) {
@@ -184,8 +171,8 @@ public class BlockingGLTextureView extends TextureView
         }
 
         /**
-         * Create an egl surface for the current SurfaceTexture surface. If a surface
-         * already exists, destroy it before creating the new surface.
+         * Create an egl surface for the current SurfaceTexture surface. If a surface already
+         * exists, destroy it before creating the new surface.
          *
          * @return true if the surface was created successfully.
          */
@@ -204,8 +191,7 @@ public class BlockingGLTextureView extends TextureView
             }
 
             /*
-             *  The window size has changed, so we need to create a new
-             *  surface.
+             * The window size has changed, so we need to create a new surface.
              */
             destroySurfaceImp();
 
@@ -227,13 +213,13 @@ public class BlockingGLTextureView extends TextureView
             }
 
             /*
-             * Before we can issue GL commands, we need to make sure
-             * the context is current and bound to a surface.
+             * Before we can issue GL commands, we need to make sure the context is current and
+             * bound to a surface.
              */
             if (!mEgl.eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mEglContext)) {
                 /*
-                 * Could not make the context current, probably because the underlying
-                 * SurfaceView surface has been destroyed.
+                 * Could not make the context current, probably because the underlying SurfaceView
+                 * surface has been destroyed.
                  */
                 logEglErrorAsWarning("EGLHelper", "eglMakeCurrent", mEgl.eglGetError());
                 return false;
@@ -251,6 +237,7 @@ public class BlockingGLTextureView extends TextureView
 
         /**
          * Display the current render surface.
+         * 
          * @return the EGL error code from eglSwapBuffers.
          */
         public int swap() {
@@ -266,9 +253,7 @@ public class BlockingGLTextureView extends TextureView
 
         private void destroySurfaceImp() {
             if (mEglSurface != null && mEglSurface != EGL10.EGL_NO_SURFACE) {
-                mEgl.eglMakeCurrent(mEglDisplay, EGL10.EGL_NO_SURFACE,
-                        EGL10.EGL_NO_SURFACE,
-                        EGL10.EGL_NO_CONTEXT);
+                mEgl.eglMakeCurrent(mEglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
                 mEgl.eglDestroySurface(mEglDisplay, mEglSurface);
                 mEglSurface = null;
             }
@@ -379,8 +364,7 @@ public class BlockingGLTextureView extends TextureView
         private void exec(int msgid) {
             synchronized (mLock) {
                 if (mExecMsgId != INVALID) {
-                    throw new IllegalArgumentException(
-                            "Message already set - multithreaded access?");
+                    throw new IllegalArgumentException("Message already set - multithreaded access?");
                 }
                 mExecMsgId = msgid;
                 mLock.notify();
@@ -394,24 +378,24 @@ public class BlockingGLTextureView extends TextureView
 
         private void handleMessageLocked(int what) {
             switch (what) {
-            case CHANGE_SURFACE:
-                if (mEglHelper.createSurface(mSurface)) {
-                    mGL = mEglHelper.createGL();
-                    mRenderer.onSurfaceCreated(mGL, mEglHelper.mEglConfig);
-                }
-                break;
-            case RESIZE_SURFACE:
-                mRenderer.onSurfaceChanged(mGL, mWidth, mHeight);
-                break;
-            case RENDER:
-                mRenderer.onDrawFrame(mGL);
-                mEglHelper.swap();
-                break;
-            case FINISH:
-                mEglHelper.destroySurface();
-                mEglHelper.finish();
-                mFinished = true;
-                break;
+                case CHANGE_SURFACE:
+                    if (mEglHelper.createSurface(mSurface)) {
+                        mGL = mEglHelper.createGL();
+                        mRenderer.onSurfaceCreated(mGL, mEglHelper.mEglConfig);
+                    }
+                    break;
+                case RESIZE_SURFACE:
+                    mRenderer.onSurfaceChanged(mGL, mWidth, mHeight);
+                    break;
+                case RENDER:
+                    mRenderer.onDrawFrame(mGL);
+                    mEglHelper.swap();
+                    break;
+                case FINISH:
+                    mEglHelper.destroySurface();
+                    mEglHelper.finish();
+                    mFinished = true;
+                    break;
             }
         }
 

@@ -1,20 +1,25 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Stack;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -46,13 +51,6 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LayoutAnimationController;
 
 import com.android.launcher3.FolderIcon.FolderRingAnimator;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Stack;
 
 public class CellLayout extends ViewGroup {
     static final String TAG = "CellLayout";
@@ -116,8 +114,7 @@ public class CellLayout extends ViewGroup {
     // They are used as circular arrays, indexed by mDragOutlineCurrent.
     private Rect[] mDragOutlines = new Rect[4];
     private float[] mDragOutlineAlphas = new float[mDragOutlines.length];
-    private InterruptibleInOutAnimator[] mDragOutlineAnims =
-            new InterruptibleInOutAnimator[mDragOutlines.length];
+    private InterruptibleInOutAnimator[] mDragOutlineAnims = new InterruptibleInOutAnimator[mDragOutlines.length];
 
     // Used as an index into the above 3 arrays; indicates which is the most current value.
     private int mDragOutlineCurrent = 0;
@@ -125,10 +122,9 @@ public class CellLayout extends ViewGroup {
 
     private final FastBitmapView mTouchFeedbackView;
 
-    private HashMap<CellLayout.LayoutParams, Animator> mReorderAnimators = new
-            HashMap<CellLayout.LayoutParams, Animator>();
-    private HashMap<View, ReorderPreviewAnimation>
-            mShakeAnimators = new HashMap<View, ReorderPreviewAnimation>();
+    private HashMap<CellLayout.LayoutParams, Animator> mReorderAnimators =
+            new HashMap<CellLayout.LayoutParams, Animator>();
+    private HashMap<View, ReorderPreviewAnimation> mShakeAnimators = new HashMap<View, ReorderPreviewAnimation>();
 
     private boolean mItemPlacementDirty = false;
 
@@ -215,11 +211,9 @@ public class CellLayout extends ViewGroup {
 
         mOverScrollLeft = res.getDrawable(R.drawable.overscroll_glow_left);
         mOverScrollRight = res.getDrawable(R.drawable.overscroll_glow_right);
-        mForegroundPadding =
-                res.getDimensionPixelSize(R.dimen.workspace_overscroll_drawable_padding);
+        mForegroundPadding = res.getDimensionPixelSize(R.dimen.workspace_overscroll_drawable_padding);
 
-        mReorderPreviewAnimationMagnitude = (REORDER_PREVIEW_MAGNITUDE *
-                grid.iconSizePx);
+        mReorderPreviewAnimationMagnitude = (REORDER_PREVIEW_MAGNITUDE * grid.iconSizePx);
 
         mNormalBackground.setFilterBitmap(true);
         mActiveGlowBackground.setFilterBitmap(true);
@@ -237,28 +231,28 @@ public class CellLayout extends ViewGroup {
         // Set up all the animations that are used to implement this fading.
         final int duration = res.getInteger(R.integer.config_dragOutlineFadeTime);
         final float fromAlphaValue = 0;
-        final float toAlphaValue = (float)res.getInteger(R.integer.config_dragOutlineMaxAlpha);
+        final float toAlphaValue = (float) res.getInteger(R.integer.config_dragOutlineMaxAlpha);
 
         Arrays.fill(mDragOutlineAlphas, fromAlphaValue);
 
         for (int i = 0; i < mDragOutlineAnims.length; i++) {
             final InterruptibleInOutAnimator anim =
-                new InterruptibleInOutAnimator(this, duration, fromAlphaValue, toAlphaValue);
+                    new InterruptibleInOutAnimator(this, duration, fromAlphaValue, toAlphaValue);
             anim.getAnimator().setInterpolator(mEaseOutInterpolator);
             final int thisIndex = i;
             anim.getAnimator().addUpdateListener(new AnimatorUpdateListener() {
                 public void onAnimationUpdate(ValueAnimator animation) {
-                    final Bitmap outline = (Bitmap)anim.getTag();
+                    final Bitmap outline = (Bitmap) anim.getTag();
 
                     // If an animation is started and then stopped very quickly, we can still
                     // get spurious updates we've cleared the tag. Guard against this.
                     if (outline == null) {
-                        @SuppressWarnings("all") // suppress dead code warning
+                        @SuppressWarnings("all")
+                        // suppress dead code warning
                         final boolean debug = false;
                         if (debug) {
                             Object val = animation.getAnimatedValue();
-                            Log.d(TAG, "anim " + thisIndex + " update: " + val +
-                                     ", isStopped " + anim.isStopped());
+                            Log.d(TAG, "anim " + thisIndex + " update: " + val + ", isStopped " + anim.isStopped());
                         }
                         // Try to prevent it from continuing to run
                         animation.cancel();
@@ -285,8 +279,7 @@ public class CellLayout extends ViewGroup {
         mForegroundRect = new Rect();
 
         mShortcutsAndWidgets = new ShortcutAndWidgetContainer(context);
-        mShortcutsAndWidgets.setCellDimensions(mCellWidth, mCellHeight, mWidthGap, mHeightGap,
-                mCountX, mCountY);
+        mShortcutsAndWidgets.setCellDimensions(mCellWidth, mCellHeight, mWidthGap, mHeightGap, mCountX, mCountY);
 
         mTouchFeedbackView = new FastBitmapView(context);
         // Make the feedback view large enough to hold the blur bitmap.
@@ -309,8 +302,7 @@ public class CellLayout extends ViewGroup {
     public void setCellDimensions(int width, int height) {
         mFixedCellWidth = mCellWidth = width;
         mFixedCellHeight = mCellHeight = height;
-        mShortcutsAndWidgets.setCellDimensions(mCellWidth, mCellHeight, mWidthGap, mHeightGap,
-                mCountX, mCountY);
+        mShortcutsAndWidgets.setCellDimensions(mCellWidth, mCellHeight, mWidthGap, mHeightGap, mCountX, mCountY);
     }
 
     public void setGridSize(int x, int y) {
@@ -319,8 +311,7 @@ public class CellLayout extends ViewGroup {
         mOccupied = new boolean[mCountX][mCountY];
         mTmpOccupied = new boolean[mCountX][mCountY];
         mTempRectStack.clear();
-        mShortcutsAndWidgets.setCellDimensions(mCellWidth, mCellHeight, mWidthGap, mHeightGap,
-                mCountX, mCountY);
+        mShortcutsAndWidgets.setCellDimensions(mCellWidth, mCellHeight, mWidthGap, mHeightGap, mCountX, mCountY);
         requestLayout();
     }
 
@@ -355,17 +346,13 @@ public class CellLayout extends ViewGroup {
             mTouchFeedbackView.setBitmap(null);
             mTouchFeedbackView.animate().cancel();
         } else {
-            int offset = getMeasuredWidth() - getPaddingLeft() - getPaddingRight()
-                    - (mCountX * mCellWidth);
-            mTouchFeedbackView.setTranslationX(icon.getLeft() + (int) Math.ceil(offset / 2f)
-                    - padding);
+            int offset = getMeasuredWidth() - getPaddingLeft() - getPaddingRight() - (mCountX * mCellWidth);
+            mTouchFeedbackView.setTranslationX(icon.getLeft() + (int) Math.ceil(offset / 2f) - padding);
             mTouchFeedbackView.setTranslationY(icon.getTop() - padding);
             if (mTouchFeedbackView.setBitmap(background)) {
                 mTouchFeedbackView.setAlpha(0);
-                mTouchFeedbackView.animate().alpha(1)
-                    .setDuration(FastBitmapDrawable.CLICK_FEEDBACK_DURATION)
-                    .setInterpolator(FastBitmapDrawable.CLICK_FEEDBACK_INTERPOLATOR)
-                    .start();
+                mTouchFeedbackView.animate().alpha(1).setDuration(FastBitmapDrawable.CLICK_FEEDBACK_DURATION)
+                        .setInterpolator(FastBitmapDrawable.CLICK_FEEDBACK_INTERPOLATOR).start();
             }
         }
     }
@@ -428,7 +415,7 @@ public class CellLayout extends ViewGroup {
                 mTempRect.set(r);
                 Utilities.scaleRectAboutCenter(mTempRect, getChildrenScale());
                 final Bitmap b = (Bitmap) mDragOutlineAnims[i].getTag();
-                paint.setAlpha((int)(alpha + .5f));
+                paint.setAlpha((int) (alpha + .5f));
                 canvas.drawBitmap(b, null, mTempRect, paint);
             }
         }
@@ -436,7 +423,7 @@ public class CellLayout extends ViewGroup {
         if (DEBUG_VISUALIZE_OCCUPIED) {
             int[] pt = new int[2];
             ColorDrawable cd = new ColorDrawable(Color.RED);
-            cd.setBounds(0, 0,  mCellWidth, mCellHeight);
+            cd.setBounds(0, 0, mCellWidth, mCellHeight);
             for (int i = 0; i < mCountX; i++) {
                 for (int j = 0; j < mCountY; j++) {
                     if (mOccupied[i][j]) {
@@ -465,8 +452,8 @@ public class CellLayout extends ViewGroup {
 
             if (child != null) {
                 int centerX = mTempLocation[0] + mCellWidth / 2;
-                int centerY = mTempLocation[1] + previewOffset / 2 +
-                        child.getPaddingTop() + grid.folderBackgroundOffset;
+                int centerY =
+                        mTempLocation[1] + previewOffset / 2 + child.getPaddingTop() + grid.folderBackgroundOffset;
 
                 // Draw outer ring, if it exists
                 if (FolderIcon.HAS_OUTER_RING) {
@@ -501,8 +488,8 @@ public class CellLayout extends ViewGroup {
             View child = getChildAt(mFolderLeaveBehindCell[0], mFolderLeaveBehindCell[1]);
             if (child != null) {
                 int centerX = mTempLocation[0] + mCellWidth / 2;
-                int centerY = mTempLocation[1] + previewOffset / 2 +
-                        child.getPaddingTop() + grid.folderBackgroundOffset;
+                int centerY =
+                        mTempLocation[1] + previewOffset / 2 + child.getPaddingTop() + grid.folderBackgroundOffset;
 
                 canvas.save();
                 canvas.translate(centerX - width / 2, centerY - width / 2);
@@ -591,8 +578,7 @@ public class CellLayout extends ViewGroup {
         mShortcutsAndWidgets.setIsHotseat(isHotseat);
     }
 
-    public boolean addViewToCellLayout(View child, int index, int childId, LayoutParams params,
-            boolean markCells) {
+    public boolean addViewToCellLayout(View child, int index, int childId, LayoutParams params, boolean markCells) {
         final LayoutParams lp = params;
 
         // Hotseat icons - remove text
@@ -689,6 +675,7 @@ public class CellLayout extends ViewGroup {
 
     /**
      * Given a point, return the cell that strictly encloses that point
+     * 
      * @param x X coordinate of the point
      * @param y Y coordinate of the point
      * @param result Array of 2 ints to hold the x and y coordinate of the cell
@@ -711,6 +698,7 @@ public class CellLayout extends ViewGroup {
 
     /**
      * Given a point, return the cell that most closely encloses that point
+     * 
      * @param x X coordinate of the point
      * @param y Y coordinate of the point
      * @param result Array of 2 ints to hold the x and y coordinate of the cell
@@ -758,32 +746,32 @@ public class CellLayout extends ViewGroup {
     void regionToCenterPoint(int cellX, int cellY, int spanX, int spanY, int[] result) {
         final int hStartPadding = getPaddingLeft();
         final int vStartPadding = getPaddingTop();
-        result[0] = hStartPadding + cellX * (mCellWidth + mWidthGap) +
-                (spanX * mCellWidth + (spanX - 1) * mWidthGap) / 2;
-        result[1] = vStartPadding + cellY * (mCellHeight + mHeightGap) +
-                (spanY * mCellHeight + (spanY - 1) * mHeightGap) / 2;
+        result[0] =
+                hStartPadding + cellX * (mCellWidth + mWidthGap) + (spanX * mCellWidth + (spanX - 1) * mWidthGap) / 2;
+        result[1] =
+                vStartPadding + cellY * (mCellHeight + mHeightGap) + (spanY * mCellHeight + (spanY - 1) * mHeightGap)
+                        / 2;
     }
 
-     /**
+    /**
      * Given a cell coordinate and span fills out a corresponding pixel rect
      *
      * @param cellX X coordinate of the cell
      * @param cellY Y coordinate of the cell
      * @param result Rect in which to write the result
      */
-     void regionToRect(int cellX, int cellY, int spanX, int spanY, Rect result) {
+    void regionToRect(int cellX, int cellY, int spanX, int spanY, Rect result) {
         final int hStartPadding = getPaddingLeft();
         final int vStartPadding = getPaddingTop();
         final int left = hStartPadding + cellX * (mCellWidth + mWidthGap);
         final int top = vStartPadding + cellY * (mCellHeight + mHeightGap);
-        result.set(left, top, left + (spanX * mCellWidth + (spanX - 1) * mWidthGap),
-                top + (spanY * mCellHeight + (spanY - 1) * mHeightGap));
+        result.set(left, top, left + (spanX * mCellWidth + (spanX - 1) * mWidthGap), top
+                + (spanY * mCellHeight + (spanY - 1) * mHeightGap));
     }
 
     public float getDistanceFromCell(float x, float y, int[] cell) {
         cellToCenterPoint(cell[0], cell[1], mTmpPoint);
-        float distance = (float) Math.sqrt( Math.pow(x - mTmpPoint[0], 2) +
-                Math.pow(y - mTmpPoint[1], 2));
+        float distance = (float) Math.sqrt(Math.pow(x - mTmpPoint[0], 2) + Math.pow(y - mTmpPoint[1], 2));
         return distance;
     }
 
@@ -815,10 +803,11 @@ public class CellLayout extends ViewGroup {
         return r;
     }
 
-    /** Return a rect that has the cellWidth/cellHeight (left, top), and
-     * widthGap/heightGap (right, bottom) */
-    static void getMetrics(Rect metrics, int paddedMeasureWidth,
-            int paddedMeasureHeight, int countX, int countY) {
+    /**
+     * Return a rect that has the cellWidth/cellHeight (left, top), and widthGap/heightGap (right,
+     * bottom)
+     */
+    static void getMetrics(Rect metrics, int paddedMeasureWidth, int paddedMeasureHeight, int countX, int countY) {
         LauncherAppState app = LauncherAppState.getInstance();
         DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
         metrics.set(grid.calculateCellWidth(paddedMeasureWidth, countX),
@@ -838,7 +827,7 @@ public class CellLayout extends ViewGroup {
         int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
         int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-        int heightSize =  MeasureSpec.getSize(heightMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
         int childWidthSize = widthSize - (getPaddingLeft() + getPaddingRight());
         int childHeightSize = heightSize - (getPaddingTop() + getPaddingBottom());
         if (mFixedCellWidth < 0 || mFixedCellHeight < 0) {
@@ -847,8 +836,8 @@ public class CellLayout extends ViewGroup {
             if (cw != mCellWidth || ch != mCellHeight) {
                 mCellWidth = cw;
                 mCellHeight = ch;
-                mShortcutsAndWidgets.setCellDimensions(mCellWidth, mCellHeight, mWidthGap,
-                        mHeightGap, mCountX, mCountY);
+                mShortcutsAndWidgets
+                        .setCellDimensions(mCellWidth, mCellHeight, mWidthGap, mHeightGap, mCountX, mCountY);
             }
         }
 
@@ -870,9 +859,8 @@ public class CellLayout extends ViewGroup {
             int hFreeSpace = hSpace - (mCountX * mCellWidth);
             int vFreeSpace = vSpace - (mCountY * mCellHeight);
             mWidthGap = Math.min(mMaxGap, numWidthGaps > 0 ? (hFreeSpace / numWidthGaps) : 0);
-            mHeightGap = Math.min(mMaxGap,numHeightGaps > 0 ? (vFreeSpace / numHeightGaps) : 0);
-            mShortcutsAndWidgets.setCellDimensions(mCellWidth, mCellHeight, mWidthGap,
-                    mHeightGap, mCountX, mCountY);
+            mHeightGap = Math.min(mMaxGap, numHeightGaps > 0 ? (vFreeSpace / numHeightGaps) : 0);
+            mShortcutsAndWidgets.setCellDimensions(mCellWidth, mCellHeight, mWidthGap, mHeightGap, mCountX, mCountY);
         } else {
             mWidthGap = mOriginalWidthGap;
             mHeightGap = mOriginalHeightGap;
@@ -882,10 +870,8 @@ public class CellLayout extends ViewGroup {
         int maxHeight = 0;
         for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
-            int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(newWidth,
-                    MeasureSpec.EXACTLY);
-            int childheightMeasureSpec = MeasureSpec.makeMeasureSpec(newHeight,
-                    MeasureSpec.EXACTLY);
+            int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(newWidth, MeasureSpec.EXACTLY);
+            int childheightMeasureSpec = MeasureSpec.makeMeasureSpec(newHeight, MeasureSpec.EXACTLY);
             child.measure(childWidthMeasureSpec, childheightMeasureSpec);
             maxWidth = Math.max(maxWidth, child.getMeasuredWidth());
             maxHeight = Math.max(maxHeight, child.getMeasuredHeight());
@@ -899,16 +885,13 @@ public class CellLayout extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int offset = getMeasuredWidth() - getPaddingLeft() - getPaddingRight() -
-                (mCountX * mCellWidth);
+        int offset = getMeasuredWidth() - getPaddingLeft() - getPaddingRight() - (mCountX * mCellWidth);
         int left = getPaddingLeft() + (int) Math.ceil(offset / 2f);
         int top = getPaddingTop();
         int count = getChildCount();
         for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
-            child.layout(left, top,
-                    left + r - l,
-                    top + b - t);
+            child.layout(left, top, left + r - l, top + b - t);
         }
     }
 
@@ -921,8 +904,7 @@ public class CellLayout extends ViewGroup {
         mNormalBackground.getPadding(padding);
         mBackgroundRect.set(-padding.left, -padding.top, w + padding.right, h + padding.bottom);
 
-        mForegroundRect.set(mForegroundPadding, mForegroundPadding,
-                w - mForegroundPadding, h - mForegroundPadding);
+        mForegroundRect.set(mForegroundPadding, mForegroundPadding, w - mForegroundPadding, h - mForegroundPadding);
     }
 
     @Override
@@ -970,8 +952,8 @@ public class CellLayout extends ViewGroup {
         return mShortcutsAndWidgets.getChildAt(x, y);
     }
 
-    public boolean animateChildToPosition(final View child, int cellX, int cellY, int duration,
-            int delay, boolean permanent, boolean adjustOccupied) {
+    public boolean animateChildToPosition(final View child, int cellX, int cellY, int duration, int delay,
+            boolean permanent, boolean adjustOccupied) {
         ShortcutAndWidgetContainer clc = getShortcutsAndWidgets();
         boolean[][] occupied = mOccupied;
         if (!permanent) {
@@ -1031,6 +1013,7 @@ public class CellLayout extends ViewGroup {
             });
             va.addListener(new AnimatorListenerAdapter() {
                 boolean cancelled = false;
+
                 public void onAnimationEnd(Animator animation) {
                     // If the animation was cancelled, it means that another animation
                     // has interrupted this one, and we don't want to lock the item into
@@ -1043,6 +1026,7 @@ public class CellLayout extends ViewGroup {
                         mReorderAnimators.remove(lp);
                     }
                 }
+
                 public void onAnimationCancel(Animator animation) {
                     cancelled = true;
                 }
@@ -1084,8 +1068,8 @@ public class CellLayout extends ViewGroup {
         result[1] = Math.max(0, result[1]); // Snap to top
     }
 
-    void visualizeDropLocation(View v, Bitmap dragOutline, int originX, int originY, int cellX,
-            int cellY, int spanX, int spanY, boolean resize, Point dragOffset, Rect dragRegion) {
+    void visualizeDropLocation(View v, Bitmap dragOutline, int originX, int originY, int cellX, int cellY, int spanX,
+            int spanY, boolean resize, Point dragOffset, Rect dragRegion) {
         final int oldDragCellX = mDragCell[0];
         final int oldDragCellY = mDragCell[1];
 
@@ -1115,23 +1099,19 @@ public class CellLayout extends ViewGroup {
                 // outside the bounds of the view.
                 top += (v.getHeight() - dragOutline.getHeight()) / 2;
                 // We center about the x axis
-                left += ((mCellWidth * spanX) + ((spanX - 1) * mWidthGap)
-                        - dragOutline.getWidth()) / 2;
+                left += ((mCellWidth * spanX) + ((spanX - 1) * mWidthGap) - dragOutline.getWidth()) / 2;
             } else {
                 if (dragOffset != null && dragRegion != null) {
                     // Center the drag region *horizontally* in the cell and apply a drag
                     // outline offset
-                    left += dragOffset.x + ((mCellWidth * spanX) + ((spanX - 1) * mWidthGap)
-                             - dragRegion.width()) / 2;
+                    left += dragOffset.x + ((mCellWidth * spanX) + ((spanX - 1) * mWidthGap) - dragRegion.width()) / 2;
                     int cHeight = getShortcutsAndWidgets().getCellContentHeight();
                     int cellPaddingY = (int) Math.max(0, ((mCellHeight - cHeight) / 2f));
                     top += dragOffset.y + cellPaddingY;
                 } else {
                     // Center the drag outline in the cell
-                    left += ((mCellWidth * spanX) + ((spanX - 1) * mWidthGap)
-                            - dragOutline.getWidth()) / 2;
-                    top += ((mCellHeight * spanY) + ((spanY - 1) * mHeightGap)
-                            - dragOutline.getHeight()) / 2;
+                    left += ((mCellWidth * spanX) + ((spanX - 1) * mWidthGap) - dragOutline.getWidth()) / 2;
+                    top += ((mCellHeight * spanY) + ((spanY - 1) * mHeightGap) - dragOutline.getHeight()) / 2;
                 }
             }
             final int oldIndex = mDragOutlineCurrent;
@@ -1155,26 +1135,25 @@ public class CellLayout extends ViewGroup {
     }
 
     /**
-     * Find a vacant area that will fit the given bounds nearest the requested
-     * cell location. Uses Euclidean distance to score multiple vacant areas.
+     * Find a vacant area that will fit the given bounds nearest the requested cell location. Uses
+     * Euclidean distance to score multiple vacant areas.
      *
      * @param pixelX The X location at which you want to search for a vacant area.
      * @param pixelY The Y location at which you want to search for a vacant area.
      * @param spanX Horizontal span of the object.
      * @param spanY Vertical span of the object.
-     * @param result Array in which to place the result, or null (in which case a new array will
-     *        be allocated)
-     * @return The X, Y cell of a vacant area that can contain this object,
-     *         nearest the requested location.
+     * @param result Array in which to place the result, or null (in which case a new array will be
+     *        allocated)
+     * @return The X, Y cell of a vacant area that can contain this object, nearest the requested
+     *         location.
      */
-    int[] findNearestVacantArea(int pixelX, int pixelY, int spanX, int spanY,
-            int[] result) {
+    int[] findNearestVacantArea(int pixelX, int pixelY, int spanX, int spanY, int[] result) {
         return findNearestVacantArea(pixelX, pixelY, spanX, spanY, null, result);
     }
 
     /**
-     * Find a vacant area that will fit the given bounds nearest the requested
-     * cell location. Uses Euclidean distance to score multiple vacant areas.
+     * Find a vacant area that will fit the given bounds nearest the requested cell location. Uses
+     * Euclidean distance to score multiple vacant areas.
      *
      * @param pixelX The X location at which you want to search for a vacant area.
      * @param pixelY The Y location at which you want to search for a vacant area.
@@ -1182,38 +1161,38 @@ public class CellLayout extends ViewGroup {
      * @param minSpanY The minimum vertical span required
      * @param spanX Horizontal span of the object.
      * @param spanY Vertical span of the object.
-     * @param result Array in which to place the result, or null (in which case a new array will
-     *        be allocated)
-     * @return The X, Y cell of a vacant area that can contain this object,
-     *         nearest the requested location.
+     * @param result Array in which to place the result, or null (in which case a new array will be
+     *        allocated)
+     * @return The X, Y cell of a vacant area that can contain this object, nearest the requested
+     *         location.
      */
-    int[] findNearestVacantArea(int pixelX, int pixelY, int minSpanX, int minSpanY, int spanX,
-            int spanY, int[] result, int[] resultSpan) {
-        return findNearestVacantArea(pixelX, pixelY, minSpanX, minSpanY, spanX, spanY, null,
-                result, resultSpan);
+    int[] findNearestVacantArea(int pixelX, int pixelY, int minSpanX, int minSpanY, int spanX, int spanY, int[] result,
+            int[] resultSpan) {
+        return findNearestVacantArea(pixelX, pixelY, minSpanX, minSpanY, spanX, spanY, null, result, resultSpan);
     }
 
     /**
-     * Find a vacant area that will fit the given bounds nearest the requested
-     * cell location. Uses Euclidean distance to score multiple vacant areas.
+     * Find a vacant area that will fit the given bounds nearest the requested cell location. Uses
+     * Euclidean distance to score multiple vacant areas.
      *
      * @param pixelX The X location at which you want to search for a vacant area.
      * @param pixelY The Y location at which you want to search for a vacant area.
      * @param spanX Horizontal span of the object.
      * @param spanY Vertical span of the object.
      * @param ignoreOccupied If true, the result can be an occupied cell
-     * @param result Array in which to place the result, or null (in which case a new array will
-     *        be allocated)
-     * @return The X, Y cell of a vacant area that can contain this object,
-     *         nearest the requested location.
+     * @param result Array in which to place the result, or null (in which case a new array will be
+     *        allocated)
+     * @return The X, Y cell of a vacant area that can contain this object, nearest the requested
+     *         location.
      */
-    int[] findNearestArea(int pixelX, int pixelY, int spanX, int spanY, View ignoreView,
-            boolean ignoreOccupied, int[] result) {
-        return findNearestArea(pixelX, pixelY, spanX, spanY,
-                spanX, spanY, ignoreView, ignoreOccupied, result, null, mOccupied);
+    int[] findNearestArea(int pixelX, int pixelY, int spanX, int spanY, View ignoreView, boolean ignoreOccupied,
+            int[] result) {
+        return findNearestArea(pixelX, pixelY, spanX, spanY, spanX, spanY, ignoreView, ignoreOccupied, result, null,
+                mOccupied);
     }
 
     private final Stack<Rect> mTempRectStack = new Stack<Rect>();
+
     private void lazyInitTempRectStack() {
         if (mTempRectStack.isEmpty()) {
             for (int i = 0; i < mCountX * mCountY; i++) {
@@ -1229,8 +1208,8 @@ public class CellLayout extends ViewGroup {
     }
 
     /**
-     * Find a vacant area that will fit the given bounds nearest the requested
-     * cell location. Uses Euclidean distance to score multiple vacant areas.
+     * Find a vacant area that will fit the given bounds nearest the requested cell location. Uses
+     * Euclidean distance to score multiple vacant areas.
      *
      * @param pixelX The X location at which you want to search for a vacant area.
      * @param pixelY The Y location at which you want to search for a vacant area.
@@ -1239,14 +1218,13 @@ public class CellLayout extends ViewGroup {
      * @param spanX Horizontal span of the object.
      * @param spanY Vertical span of the object.
      * @param ignoreOccupied If true, the result can be an occupied cell
-     * @param result Array in which to place the result, or null (in which case a new array will
-     *        be allocated)
-     * @return The X, Y cell of a vacant area that can contain this object,
-     *         nearest the requested location.
+     * @param result Array in which to place the result, or null (in which case a new array will be
+     *        allocated)
+     * @return The X, Y cell of a vacant area that can contain this object, nearest the requested
+     *         location.
      */
-    int[] findNearestArea(int pixelX, int pixelY, int minSpanX, int minSpanY, int spanX, int spanY,
-            View ignoreView, boolean ignoreOccupied, int[] result, int[] resultSpan,
-            boolean[][] occupied) {
+    int[] findNearestArea(int pixelX, int pixelY, int minSpanX, int minSpanY, int spanX, int spanY, View ignoreView,
+            boolean ignoreOccupied, int[] result, int[] resultSpan, boolean[][] occupied) {
         lazyInitTempRectStack();
         // mark space take by ignoreView as available (method checks if ignoreView is null)
         markCellsAsUnoccupiedForView(ignoreView, occupied);
@@ -1266,14 +1244,12 @@ public class CellLayout extends ViewGroup {
         final int countX = mCountX;
         final int countY = mCountY;
 
-        if (minSpanX <= 0 || minSpanY <= 0 || spanX <= 0 || spanY <= 0 ||
-                spanX < minSpanX || spanY < minSpanY) {
+        if (minSpanX <= 0 || minSpanY <= 0 || spanX <= 0 || spanY <= 0 || spanX < minSpanX || spanY < minSpanY) {
             return bestXY;
         }
 
         for (int y = 0; y < countY - (minSpanY - 1); y++) {
-            inner:
-            for (int x = 0; x < countX - (minSpanX - 1); x++) {
+            inner: for (int x = 0; x < countX - (minSpanX - 1); x++) {
                 int ySize = -1;
                 int xSize = -1;
                 if (ignoreOccupied) {
@@ -1297,7 +1273,7 @@ public class CellLayout extends ViewGroup {
                     while (!(hitMaxX && hitMaxY)) {
                         if (incX && !hitMaxX) {
                             for (int j = 0; j < ySize; j++) {
-                                if (x + xSize > countX -1 || occupied[x + xSize][y + j]) {
+                                if (x + xSize > countX - 1 || occupied[x + xSize][y + j]) {
                                     // We can't move out horizontally
                                     hitMaxX = true;
                                 }
@@ -1340,11 +1316,9 @@ public class CellLayout extends ViewGroup {
                     }
                 }
                 validRegions.push(currentRect);
-                double distance = Math.sqrt(Math.pow(cellXY[0] - pixelX, 2)
-                        + Math.pow(cellXY[1] - pixelY, 2));
+                double distance = Math.sqrt(Math.pow(cellXY[0] - pixelX, 2) + Math.pow(cellXY[1] - pixelY, 2));
 
-                if ((distance <= bestDistance && !contained) ||
-                        currentRect.contains(bestRect)) {
+                if ((distance <= bestDistance && !contained) || currentRect.contains(bestRect)) {
                     bestDistance = distance;
                     bestXY[0] = x;
                     bestXY[1] = y;
@@ -1368,11 +1342,10 @@ public class CellLayout extends ViewGroup {
         return bestXY;
     }
 
-     /**
-     * Find a vacant area that will fit the given bounds nearest the requested
-     * cell location, and will also weigh in a suggested direction vector of the
-     * desired location. This method computers distance based on unit grid distances,
-     * not pixel distances.
+    /**
+     * Find a vacant area that will fit the given bounds nearest the requested cell location, and
+     * will also weigh in a suggested direction vector of the desired location. This method
+     * computers distance based on unit grid distances, not pixel distances.
      *
      * @param cellX The X cell nearest to which you want to search for a vacant area.
      * @param cellY The Y cell nearest which you want to search for a vacant area.
@@ -1384,13 +1357,13 @@ public class CellLayout extends ViewGroup {
      * @param occoupied The array which represents which cells in the CellLayout are occupied
      * @param blockOccupied The array which represents which cells in the specified block (cellX,
      *        cellY, spanX, spanY) are occupied. This is used when try to move a group of views.
-     * @param result Array in which to place the result, or null (in which case a new array will
-     *        be allocated)
-     * @return The X, Y cell of a vacant area that can contain this object,
-     *         nearest the requested location.
+     * @param result Array in which to place the result, or null (in which case a new array will be
+     *        allocated)
+     * @return The X, Y cell of a vacant area that can contain this object, nearest the requested
+     *         location.
      */
-    private int[] findNearestArea(int cellX, int cellY, int spanX, int spanY, int[] direction,
-            boolean[][] occupied, boolean blockOccupied[][], int[] result) {
+    private int[] findNearestArea(int cellX, int cellY, int spanX, int spanY, int[] direction, boolean[][] occupied,
+            boolean blockOccupied[][], int[] result) {
         // Keep track of best-scoring drop area
         final int[] bestXY = result != null ? result : new int[2];
         float bestDistance = Float.MAX_VALUE;
@@ -1400,8 +1373,7 @@ public class CellLayout extends ViewGroup {
         final int countY = mCountY;
 
         for (int y = 0; y < countY - (spanY - 1); y++) {
-            inner:
-            for (int x = 0; x < countX - (spanX - 1); x++) {
+            inner: for (int x = 0; x < countX - (spanX - 1); x++) {
                 // First, let's see if this thing fits anywhere
                 for (int i = 0; i < spanX; i++) {
                     for (int j = 0; j < spanY; j++) {
@@ -1411,20 +1383,16 @@ public class CellLayout extends ViewGroup {
                     }
                 }
 
-                float distance = (float)
-                        Math.sqrt((x - cellX) * (x - cellX) + (y - cellY) * (y - cellY));
+                float distance = (float) Math.sqrt((x - cellX) * (x - cellX) + (y - cellY) * (y - cellY));
                 int[] curDirection = mTmpPoint;
                 computeDirectionVector(x - cellX, y - cellY, curDirection);
                 // The direction score is just the dot product of the two candidate direction
                 // and that passed in.
-                int curDirectionScore = direction[0] * curDirection[0] +
-                        direction[1] * curDirection[1];
+                int curDirectionScore = direction[0] * curDirection[0] + direction[1] * curDirection[1];
                 boolean exactDirectionOnly = false;
-                boolean directionMatches = direction[0] == curDirection[0] &&
-                        direction[0] == curDirection[0];
-                if ((directionMatches || !exactDirectionOnly) &&
-                        Float.compare(distance,  bestDistance) < 0 || (Float.compare(distance,
-                        bestDistance) == 0 && curDirectionScore > bestDirectionScore)) {
+                boolean directionMatches = direction[0] == curDirection[0] && direction[0] == curDirection[0];
+                if ((directionMatches || !exactDirectionOnly) && Float.compare(distance, bestDistance) < 0
+                        || (Float.compare(distance, bestDistance) == 0 && curDirectionScore > bestDirectionScore)) {
                     bestDistance = distance;
                     bestDirectionScore = curDirectionScore;
                     bestXY[0] = x;
@@ -1441,8 +1409,8 @@ public class CellLayout extends ViewGroup {
         return bestXY;
     }
 
-    private boolean addViewToTempLocation(View v, Rect rectOccupiedByPotentialDrop,
-            int[] direction, ItemConfiguration currentState) {
+    private boolean addViewToTempLocation(View v, Rect rectOccupiedByPotentialDrop, int[] direction,
+            ItemConfiguration currentState) {
         CellAndSpan c = currentState.map.get(v);
         boolean success = false;
         markCellsForView(c.x, c.y, c.spanX, c.spanY, mTmpOccupied, false);
@@ -1460,10 +1428,10 @@ public class CellLayout extends ViewGroup {
     }
 
     /**
-     * This helper class defines a cluster of views. It helps with defining complex edges
-     * of the cluster and determining how those edges interact with other views. The edges
-     * essentially define a fine-grained boundary around the cluster of views -- like a more
-     * precise version of a bounding box.
+     * This helper class defines a cluster of views. It helps with defining complex edges of the
+     * cluster and determining how those edges interact with other views. The edges essentially
+     * define a fine-grained boundary around the cluster of views -- like a more precise version of
+     * a bounding box.
      */
     private class ViewCluster {
         final static int LEFT = 0;
@@ -1584,7 +1552,7 @@ public class CellLayout extends ViewGroup {
         }
 
         void shift(int whichEdge, int delta) {
-            for (View v: views) {
+            for (View v : views) {
                 CellAndSpan c = config.map.get(v);
                 switch (whichEdge) {
                     case LEFT:
@@ -1613,7 +1581,7 @@ public class CellLayout extends ViewGroup {
         public Rect getBoundingRect() {
             if (boundingRectDirty) {
                 boolean first = true;
-                for (View v: views) {
+                for (View v : views) {
                     CellAndSpan c = config.map.get(v);
                     if (first) {
                         boundingRect.set(c.x, c.y, c.x + c.spanX, c.y + c.spanY);
@@ -1669,8 +1637,10 @@ public class CellLayout extends ViewGroup {
         }
 
         PositionComparator comparator = new PositionComparator();
+
         class PositionComparator implements Comparator<View> {
             int whichEdge = 0;
+
             public int compare(View left, View right) {
                 CellAndSpan l = config.map.get(left);
                 CellAndSpan r = config.map.get(right);
@@ -1694,8 +1664,8 @@ public class CellLayout extends ViewGroup {
         }
     }
 
-    private boolean pushViewsToTempLocation(ArrayList<View> views, Rect rectOccupiedByPotentialDrop,
-            int[] direction, View dragView, ItemConfiguration currentState) {
+    private boolean pushViewsToTempLocation(ArrayList<View> views, Rect rectOccupiedByPotentialDrop, int[] direction,
+            View dragView, ItemConfiguration currentState) {
 
         ViewCluster cluster = new ViewCluster(views, currentState);
         Rect clusterRect = cluster.getBoundingRect();
@@ -1725,7 +1695,7 @@ public class CellLayout extends ViewGroup {
         }
 
         // Mark the occupied state as false for the group of views we want to move.
-        for (View v: views) {
+        for (View v : views) {
             CellAndSpan c = currentState.map.get(v);
             markCellsForView(c.x, c.y, c.spanX, c.spanY, mTmpOccupied, false);
         }
@@ -1741,7 +1711,7 @@ public class CellLayout extends ViewGroup {
         cluster.sortConfigurationForEdgePush(whichEdge);
 
         while (pushDistance > 0 && !fail) {
-            for (View v: currentState.sortedViews) {
+            for (View v : currentState.sortedViews) {
                 // For each view that isn't in the cluster, we see if the leading edge of the
                 // cluster is contacting the edge of that view. If so, we add that view to the
                 // cluster.
@@ -1773,15 +1743,15 @@ public class CellLayout extends ViewGroup {
 
         // Due to the nature of the algorithm, the only check required to verify a valid solution
         // is to ensure that completed shifted cluster lies completely within the cell layout.
-        if (!fail && clusterRect.left >= 0 && clusterRect.right <= mCountX && clusterRect.top >= 0 &&
-                clusterRect.bottom <= mCountY) {
+        if (!fail && clusterRect.left >= 0 && clusterRect.right <= mCountX && clusterRect.top >= 0
+                && clusterRect.bottom <= mCountY) {
             foundSolution = true;
         } else {
             currentState.restore();
         }
 
         // In either case, we set the occupied array as marked for the location of the views
-        for (View v: cluster.views) {
+        for (View v : cluster.views) {
             CellAndSpan c = currentState.map.get(v);
             markCellsForView(c.x, c.y, c.spanX, c.spanY, mTmpOccupied, true);
         }
@@ -1789,14 +1759,14 @@ public class CellLayout extends ViewGroup {
         return foundSolution;
     }
 
-    private boolean addViewsToTempLocation(ArrayList<View> views, Rect rectOccupiedByPotentialDrop,
-            int[] direction, View dragView, ItemConfiguration currentState) {
+    private boolean addViewsToTempLocation(ArrayList<View> views, Rect rectOccupiedByPotentialDrop, int[] direction,
+            View dragView, ItemConfiguration currentState) {
         if (views.size() == 0) return true;
 
         boolean success = false;
         Rect boundingRect = null;
         // We construct a rect which represents the entire group of views passed in
-        for (View v: views) {
+        for (View v : views) {
             CellAndSpan c = currentState.map.get(v);
             if (boundingRect == null) {
                 boundingRect = new Rect(c.x, c.y, c.x + c.spanX, c.y + c.spanY);
@@ -1806,7 +1776,7 @@ public class CellLayout extends ViewGroup {
         }
 
         // Mark the occupied state as false for the group of views we want to move.
-        for (View v: views) {
+        for (View v : views) {
             CellAndSpan c = currentState.map.get(v);
             markCellsForView(c.x, c.y, c.spanX, c.spanY, mTmpOccupied, false);
         }
@@ -1816,21 +1786,21 @@ public class CellLayout extends ViewGroup {
         int left = boundingRect.left;
         // We mark more precisely which parts of the bounding rect are truly occupied, allowing
         // for interlocking.
-        for (View v: views) {
+        for (View v : views) {
             CellAndSpan c = currentState.map.get(v);
             markCellsForView(c.x - left, c.y - top, c.spanX, c.spanY, blockOccupied, true);
         }
 
         markCellsForRect(rectOccupiedByPotentialDrop, mTmpOccupied, true);
 
-        findNearestArea(boundingRect.left, boundingRect.top, boundingRect.width(),
-                boundingRect.height(), direction, mTmpOccupied, blockOccupied, mTempLocation);
+        findNearestArea(boundingRect.left, boundingRect.top, boundingRect.width(), boundingRect.height(), direction,
+                mTmpOccupied, blockOccupied, mTempLocation);
 
         // If we successfuly found a location by pushing the block of views, we commit it
         if (mTempLocation[0] >= 0 && mTempLocation[1] >= 0) {
             int deltaX = mTempLocation[0] - boundingRect.left;
             int deltaY = mTempLocation[1] - boundingRect.top;
-            for (View v: views) {
+            for (View v : views) {
                 CellAndSpan c = currentState.map.get(v);
                 c.x += deltaX;
                 c.y += deltaY;
@@ -1839,7 +1809,7 @@ public class CellLayout extends ViewGroup {
         }
 
         // In either case, we set the occupied array as marked for the location of the views
-        for (View v: views) {
+        for (View v : views) {
             CellAndSpan c = currentState.map.get(v);
             markCellsForView(c.x, c.y, c.spanX, c.spanY, mTmpOccupied, true);
         }
@@ -1853,24 +1823,22 @@ public class CellLayout extends ViewGroup {
     // This method tries to find a reordering solution which satisfies the push mechanic by trying
     // to push items in each of the cardinal directions, in an order based on the direction vector
     // passed.
-    private boolean attemptPushInDirection(ArrayList<View> intersectingViews, Rect occupied,
-            int[] direction, View ignoreView, ItemConfiguration solution) {
+    private boolean attemptPushInDirection(ArrayList<View> intersectingViews, Rect occupied, int[] direction,
+            View ignoreView, ItemConfiguration solution) {
         if ((Math.abs(direction[0]) + Math.abs(direction[1])) > 1) {
             // If the direction vector has two non-zero components, we try pushing
             // separately in each of the components.
             int temp = direction[1];
             direction[1] = 0;
 
-            if (pushViewsToTempLocation(intersectingViews, occupied, direction,
-                    ignoreView, solution)) {
+            if (pushViewsToTempLocation(intersectingViews, occupied, direction, ignoreView, solution)) {
                 return true;
             }
             direction[1] = temp;
             temp = direction[0];
             direction[0] = 0;
 
-            if (pushViewsToTempLocation(intersectingViews, occupied, direction,
-                    ignoreView, solution)) {
+            if (pushViewsToTempLocation(intersectingViews, occupied, direction, ignoreView, solution)) {
                 return true;
             }
             // Revert the direction
@@ -1881,16 +1849,14 @@ public class CellLayout extends ViewGroup {
             direction[1] *= -1;
             temp = direction[1];
             direction[1] = 0;
-            if (pushViewsToTempLocation(intersectingViews, occupied, direction,
-                    ignoreView, solution)) {
+            if (pushViewsToTempLocation(intersectingViews, occupied, direction, ignoreView, solution)) {
                 return true;
             }
 
             direction[1] = temp;
             temp = direction[0];
             direction[0] = 0;
-            if (pushViewsToTempLocation(intersectingViews, occupied, direction,
-                    ignoreView, solution)) {
+            if (pushViewsToTempLocation(intersectingViews, occupied, direction, ignoreView, solution)) {
                 return true;
             }
             // revert the direction
@@ -1901,15 +1867,13 @@ public class CellLayout extends ViewGroup {
         } else {
             // If the direction vector has a single non-zero component, we push first in the
             // direction of the vector
-            if (pushViewsToTempLocation(intersectingViews, occupied, direction,
-                    ignoreView, solution)) {
+            if (pushViewsToTempLocation(intersectingViews, occupied, direction, ignoreView, solution)) {
                 return true;
             }
             // Then we try the opposite direction
             direction[0] *= -1;
             direction[1] *= -1;
-            if (pushViewsToTempLocation(intersectingViews, occupied, direction,
-                    ignoreView, solution)) {
+            if (pushViewsToTempLocation(intersectingViews, occupied, direction, ignoreView, solution)) {
                 return true;
             }
             // Switch the direction back
@@ -1923,16 +1887,14 @@ public class CellLayout extends ViewGroup {
             int temp = direction[1];
             direction[1] = direction[0];
             direction[0] = temp;
-            if (pushViewsToTempLocation(intersectingViews, occupied, direction,
-                    ignoreView, solution)) {
+            if (pushViewsToTempLocation(intersectingViews, occupied, direction, ignoreView, solution)) {
                 return true;
             }
 
             // Then we try the opposite direction
             direction[0] *= -1;
             direction[1] *= -1;
-            if (pushViewsToTempLocation(intersectingViews, occupied, direction,
-                    ignoreView, solution)) {
+            if (pushViewsToTempLocation(intersectingViews, occupied, direction, ignoreView, solution)) {
                 return true;
             }
             // Switch the direction back
@@ -1947,8 +1909,8 @@ public class CellLayout extends ViewGroup {
         return false;
     }
 
-    private boolean rearrangementExists(int cellX, int cellY, int spanX, int spanY, int[] direction,
-            View ignoreView, ItemConfiguration solution) {
+    private boolean rearrangementExists(int cellX, int cellY, int spanX, int spanY, int[] direction, View ignoreView,
+            ItemConfiguration solution) {
         // Return early if get invalid cell positions
         if (cellX < 0 || cellY < 0) return false;
 
@@ -1965,7 +1927,7 @@ public class CellLayout extends ViewGroup {
         }
         Rect r0 = new Rect(cellX, cellY, cellX + spanX, cellY + spanY);
         Rect r1 = new Rect();
-        for (View child: solution.map.keySet()) {
+        for (View child : solution.map.keySet()) {
             if (child == ignoreView) continue;
             CellAndSpan c = solution.map.get(child);
             LayoutParams lp = (LayoutParams) child.getLayoutParams();
@@ -1983,14 +1945,12 @@ public class CellLayout extends ViewGroup {
         // First we try to find a solution which respects the push mechanic. That is,
         // we try to find a solution such that no displaced item travels through another item
         // without also displacing that item.
-        if (attemptPushInDirection(mIntersectingViews, mOccupiedRect, direction, ignoreView,
-                solution)) {
+        if (attemptPushInDirection(mIntersectingViews, mOccupiedRect, direction, ignoreView, solution)) {
             return true;
         }
 
         // Next we try moving the views as a block, but without requiring the push mechanic.
-        if (addViewsToTempLocation(mIntersectingViews, mOccupiedRect, direction, ignoreView,
-                solution)) {
+        if (addViewsToTempLocation(mIntersectingViews, mOccupiedRect, direction, ignoreView, solution)) {
             return true;
         }
 
@@ -2004,8 +1964,8 @@ public class CellLayout extends ViewGroup {
     }
 
     /*
-     * Returns a pair (x, y), where x,y are in {-1, 0, 1} corresponding to vector between
-     * the provided point and the provided cell
+     * Returns a pair (x, y), where x,y are in {-1, 0, 1} corresponding to vector between the
+     * provided point and the provided cell
      */
     private void computeDirectionVector(float deltaX, float deltaY, int[] result) {
         double angle = Math.atan(((float) deltaY) / deltaX);
@@ -2028,9 +1988,8 @@ public class CellLayout extends ViewGroup {
         }
     }
 
-    ItemConfiguration findReorderSolution(int pixelX, int pixelY, int minSpanX, int minSpanY,
-            int spanX, int spanY, int[] direction, View dragView, boolean decX,
-            ItemConfiguration solution) {
+    ItemConfiguration findReorderSolution(int pixelX, int pixelY, int minSpanX, int minSpanY, int spanX, int spanY,
+            int[] direction, View dragView, boolean decX, ItemConfiguration solution) {
         // Copy the current state into the solution. This solution will be manipulated as necessary.
         copyCurrentStateToSolution(solution, false);
         // Copy the current occupied array into the temporary occupied array. This array will be
@@ -2045,18 +2004,17 @@ public class CellLayout extends ViewGroup {
         boolean success = false;
         // First we try the exact nearest position of the item being dragged,
         // we will then want to try to move this around to other neighbouring positions
-        success = rearrangementExists(result[0], result[1], spanX, spanY, direction, dragView,
-                solution);
+        success = rearrangementExists(result[0], result[1], spanX, spanY, direction, dragView, solution);
 
         if (!success) {
             // We try shrinking the widget down to size in an alternating pattern, shrink 1 in
             // x, then 1 in y etc.
             if (spanX > minSpanX && (minSpanY == spanY || decX)) {
-                return findReorderSolution(pixelX, pixelY, minSpanX, minSpanY, spanX - 1, spanY,
-                        direction, dragView, false, solution);
+                return findReorderSolution(pixelX, pixelY, minSpanX, minSpanY, spanX - 1, spanY, direction, dragView,
+                        false, solution);
             } else if (spanY > minSpanY) {
-                return findReorderSolution(pixelX, pixelY, minSpanX, minSpanY, spanX, spanY - 1,
-                        direction, dragView, true, solution);
+                return findReorderSolution(pixelX, pixelY, minSpanX, minSpanY, spanX, spanY - 1, direction, dragView,
+                        true, solution);
             }
             solution.isSolution = false;
         } else {
@@ -2105,12 +2063,11 @@ public class CellLayout extends ViewGroup {
                 markCellsForView(c.x, c.y, c.spanX, c.spanY, mTmpOccupied, true);
             }
         }
-        markCellsForView(solution.dragViewX, solution.dragViewY, solution.dragViewSpanX,
-                solution.dragViewSpanY, mTmpOccupied, true);
+        markCellsForView(solution.dragViewX, solution.dragViewY, solution.dragViewSpanX, solution.dragViewSpanY,
+                mTmpOccupied, true);
     }
 
-    private void animateItemsToSolution(ItemConfiguration solution, View dragView, boolean
-            commitDragView) {
+    private void animateItemsToSolution(ItemConfiguration solution, View dragView, boolean commitDragView) {
 
         boolean[][] occupied = DESTRUCTIVE_REORDER ? mOccupied : mTmpOccupied;
         for (int i = 0; i < mCountX; i++) {
@@ -2125,33 +2082,32 @@ public class CellLayout extends ViewGroup {
             if (child == dragView) continue;
             CellAndSpan c = solution.map.get(child);
             if (c != null) {
-                animateChildToPosition(child, c.x, c.y, REORDER_ANIMATION_DURATION, 0,
-                        DESTRUCTIVE_REORDER, false);
+                animateChildToPosition(child, c.x, c.y, REORDER_ANIMATION_DURATION, 0, DESTRUCTIVE_REORDER, false);
                 markCellsForView(c.x, c.y, c.spanX, c.spanY, occupied, true);
             }
         }
         if (commitDragView) {
-            markCellsForView(solution.dragViewX, solution.dragViewY, solution.dragViewSpanX,
-                    solution.dragViewSpanY, occupied, true);
+            markCellsForView(solution.dragViewX, solution.dragViewY, solution.dragViewSpanX, solution.dragViewSpanY,
+                    occupied, true);
         }
     }
 
 
     // This method starts or changes the reorder preview animations
-    private void beginOrAdjustReorderPreviewAnimations(ItemConfiguration solution,
-            View dragView, int delay, int mode) {
+    private void beginOrAdjustReorderPreviewAnimations(ItemConfiguration solution, View dragView, int delay, int mode) {
         int childCount = mShortcutsAndWidgets.getChildCount();
         for (int i = 0; i < childCount; i++) {
             View child = mShortcutsAndWidgets.getChildAt(i);
             if (child == dragView) continue;
             CellAndSpan c = solution.map.get(child);
-            boolean skip = mode == ReorderPreviewAnimation.MODE_HINT && solution.intersectingViews
-                    != null && !solution.intersectingViews.contains(child);
+            boolean skip =
+                    mode == ReorderPreviewAnimation.MODE_HINT && solution.intersectingViews != null
+                            && !solution.intersectingViews.contains(child);
 
             LayoutParams lp = (LayoutParams) child.getLayoutParams();
             if (c != null && !skip) {
-                ReorderPreviewAnimation rha = new ReorderPreviewAnimation(child, mode, lp.cellX,
-                        lp.cellY, c.x, c.y, c.spanX, c.spanY);
+                ReorderPreviewAnimation rha =
+                        new ReorderPreviewAnimation(child, mode, lp.cellX, lp.cellY, c.x, c.y, c.spanX, c.spanY);
                 rha.animate();
             }
         }
@@ -2177,8 +2133,8 @@ public class CellLayout extends ViewGroup {
 
         Animator a;
 
-        public ReorderPreviewAnimation(View child, int mode, int cellX0, int cellY0, int cellX1,
-                int cellY1, int spanX, int spanY) {
+        public ReorderPreviewAnimation(View child, int mode, int cellX0, int cellY0, int cellX1, int cellY1, int spanX,
+                int spanY) {
             regionToCenterPoint(cellX0, cellY0, spanX, spanY, mTmpPoint);
             final int x0 = mTmpPoint[0];
             final int y0 = mTmpPoint[1];
@@ -2190,18 +2146,19 @@ public class CellLayout extends ViewGroup {
             finalDeltaX = 0;
             finalDeltaY = 0;
             int dir = mode == MODE_HINT ? -1 : 1;
-            if (dX == dY && dX == 0) {
-            } else {
+            if (dX == dY && dX == 0) {} else {
                 if (dY == 0) {
-                    finalDeltaX = - dir * Math.signum(dX) * mReorderPreviewAnimationMagnitude;
+                    finalDeltaX = -dir * Math.signum(dX) * mReorderPreviewAnimationMagnitude;
                 } else if (dX == 0) {
-                    finalDeltaY = - dir * Math.signum(dY) * mReorderPreviewAnimationMagnitude;
+                    finalDeltaY = -dir * Math.signum(dY) * mReorderPreviewAnimationMagnitude;
                 } else {
-                    double angle = Math.atan( (float) (dY) / dX);
-                    finalDeltaX = (int) (- dir * Math.signum(dX) *
-                            Math.abs(Math.cos(angle) * mReorderPreviewAnimationMagnitude));
-                    finalDeltaY = (int) (- dir * Math.signum(dY) *
-                            Math.abs(Math.sin(angle) * mReorderPreviewAnimationMagnitude));
+                    double angle = Math.atan((float) (dY) / dX);
+                    finalDeltaX =
+                            (int) (-dir * Math.signum(dX) * Math.abs(Math.cos(angle)
+                                    * mReorderPreviewAnimationMagnitude));
+                    finalDeltaY =
+                            (int) (-dir * Math.signum(dY) * Math.abs(Math.sin(angle)
+                                    * mReorderPreviewAnimationMagnitude));
                 }
             }
             this.mode = mode;
@@ -2271,12 +2228,10 @@ public class CellLayout extends ViewGroup {
 
             AnimatorSet s = LauncherAnimUtils.createAnimatorSet();
             a = s;
-            s.playTogether(
-                LauncherAnimUtils.ofFloat(child, "scaleX", getChildrenScale()),
-                LauncherAnimUtils.ofFloat(child, "scaleY", getChildrenScale()),
-                LauncherAnimUtils.ofFloat(child, "translationX", 0f),
-                LauncherAnimUtils.ofFloat(child, "translationY", 0f)
-            );
+            s.playTogether(LauncherAnimUtils.ofFloat(child, "scaleX", getChildrenScale()),
+                    LauncherAnimUtils.ofFloat(child, "scaleY", getChildrenScale()),
+                    LauncherAnimUtils.ofFloat(child, "translationX", 0f),
+                    LauncherAnimUtils.ofFloat(child, "translationY", 0f));
             s.setDuration(REORDER_ANIMATION_DURATION);
             s.setInterpolator(new android.view.animation.DecelerateInterpolator(1.5f));
             s.start();
@@ -2284,7 +2239,7 @@ public class CellLayout extends ViewGroup {
     }
 
     private void completeAndClearReorderPreviewAnimations() {
-        for (ReorderPreviewAnimation a: mShakeAnimators.values()) {
+        for (ReorderPreviewAnimation a : mShakeAnimators.values()) {
             a.completeAnimationImmediately();
         }
         mShakeAnimators.clear();
@@ -2304,8 +2259,8 @@ public class CellLayout extends ViewGroup {
             // We do a null check here because the item info can be null in the case of the
             // AllApps button in the hotseat.
             if (info != null) {
-                if (info.cellX != lp.tmpCellX || info.cellY != lp.tmpCellY ||
-                        info.spanX != lp.cellHSpan || info.spanY != lp.cellVSpan) {
+                if (info.cellX != lp.tmpCellX || info.cellY != lp.tmpCellY || info.spanX != lp.cellHSpan
+                        || info.spanY != lp.cellVSpan) {
                     info.requiresDbUpdate = true;
                 }
                 info.cellX = lp.cellX = lp.tmpCellX;
@@ -2325,12 +2280,11 @@ public class CellLayout extends ViewGroup {
         }
     }
 
-    ItemConfiguration findConfigurationNoShuffle(int pixelX, int pixelY, int minSpanX, int minSpanY,
-            int spanX, int spanY, View dragView, ItemConfiguration solution) {
+    ItemConfiguration findConfigurationNoShuffle(int pixelX, int pixelY, int minSpanX, int minSpanY, int spanX,
+            int spanY, View dragView, ItemConfiguration solution) {
         int[] result = new int[2];
         int[] resultSpan = new int[2];
-        findNearestVacantArea(pixelX, pixelY, minSpanX, minSpanY, spanX, spanY, null, result,
-                resultSpan);
+        findNearestVacantArea(pixelX, pixelY, minSpanX, minSpanY, spanX, spanY, null, result, resultSpan);
         if (result[0] >= 0 && result[1] >= 0) {
             copyCurrentStateToSolution(solution, false);
             solution.dragViewX = result[0];
@@ -2348,16 +2302,17 @@ public class CellLayout extends ViewGroup {
         markCellsAsUnoccupiedForView(child);
     }
 
-    /* This seems like it should be obvious and straight-forward, but when the direction vector
-    needs to match with the notion of the dragView pushing other views, we have to employ
-    a slightly more subtle notion of the direction vector. The question is what two points is
-    the vector between? The center of the dragView and its desired destination? Not quite, as
-    this doesn't necessarily coincide with the interaction of the dragView and items occupying
-    those cells. Instead we use some heuristics to often lock the vector to up, down, left
-    or right, which helps make pushing feel right.
-    */
-    private void getDirectionVectorForDrop(int dragViewCenterX, int dragViewCenterY, int spanX,
-            int spanY, View dragView, int[] resultDirection) {
+    /*
+     * This seems like it should be obvious and straight-forward, but when the direction vector
+     * needs to match with the notion of the dragView pushing other views, we have to employ a
+     * slightly more subtle notion of the direction vector. The question is what two points is the
+     * vector between? The center of the dragView and its desired destination? Not quite, as this
+     * doesn't necessarily coincide with the interaction of the dragView and items occupying those
+     * cells. Instead we use some heuristics to often lock the vector to up, down, left or right,
+     * which helps make pushing feel right.
+     */
+    private void getDirectionVectorForDrop(int dragViewCenterX, int dragViewCenterY, int spanX, int spanY,
+            View dragView, int[] resultDirection) {
         int[] targetDestination = new int[2];
 
         findNearestArea(dragViewCenterX, dragViewCenterY, spanX, spanY, targetDestination);
@@ -2366,14 +2321,14 @@ public class CellLayout extends ViewGroup {
         dragRect.offset(dragViewCenterX - dragRect.centerX(), dragViewCenterY - dragRect.centerY());
 
         Rect dropRegionRect = new Rect();
-        getViewsIntersectingRegion(targetDestination[0], targetDestination[1], spanX, spanY,
-                dragView, dropRegionRect, mIntersectingViews);
+        getViewsIntersectingRegion(targetDestination[0], targetDestination[1], spanX, spanY, dragView, dropRegionRect,
+                mIntersectingViews);
 
         int dropRegionSpanX = dropRegionRect.width();
         int dropRegionSpanY = dropRegionRect.height();
 
-        regionToRect(dropRegionRect.left, dropRegionRect.top, dropRegionRect.width(),
-                dropRegionRect.height(), dropRegionRect);
+        regionToRect(dropRegionRect.left, dropRegionRect.top, dropRegionRect.width(), dropRegionRect.height(),
+                dropRegionRect);
 
         int deltaX = (dropRegionRect.centerX() - dragViewCenterX) / spanX;
         int deltaY = (dropRegionRect.centerY() - dragViewCenterY) / spanY;
@@ -2395,8 +2350,8 @@ public class CellLayout extends ViewGroup {
     }
 
     // For a given cell and span, fetch the set of views intersecting the region.
-    private void getViewsIntersectingRegion(int cellX, int cellY, int spanX, int spanY,
-            View dragView, Rect boundingRect, ArrayList<View> intersectingViews) {
+    private void getViewsIntersectingRegion(int cellX, int cellY, int spanX, int spanY, View dragView,
+            Rect boundingRect, ArrayList<View> intersectingViews) {
         if (boundingRect != null) {
             boundingRect.set(cellX, cellY, cellX + spanX, cellY + spanY);
         }
@@ -2418,11 +2373,9 @@ public class CellLayout extends ViewGroup {
         }
     }
 
-    boolean isNearestDropLocationOccupied(int pixelX, int pixelY, int spanX, int spanY,
-            View dragView, int[] result) {
+    boolean isNearestDropLocationOccupied(int pixelX, int pixelY, int spanX, int spanY, View dragView, int[] result) {
         result = findNearestArea(pixelX, pixelY, spanX, spanY, result);
-        getViewsIntersectingRegion(result[0], result[1], spanX, spanY, dragView, null,
-                mIntersectingViews);
+        getViewsIntersectingRegion(result[0], result[1], spanX, spanY, dragView, null, mIntersectingViews);
         return !mIntersectingViews.isEmpty();
     }
 
@@ -2436,22 +2389,22 @@ public class CellLayout extends ViewGroup {
                 if (lp.tmpCellX != lp.cellX || lp.tmpCellY != lp.cellY) {
                     lp.tmpCellX = lp.cellX;
                     lp.tmpCellY = lp.cellY;
-                    animateChildToPosition(child, lp.cellX, lp.cellY, REORDER_ANIMATION_DURATION,
-                            0, false, false);
+                    animateChildToPosition(child, lp.cellX, lp.cellY, REORDER_ANIMATION_DURATION, 0, false, false);
                 }
             }
             setItemPlacementDirty(false);
         }
     }
 
-    boolean createAreaForResize(int cellX, int cellY, int spanX, int spanY,
-            View dragView, int[] direction, boolean commit) {
+    boolean createAreaForResize(int cellX, int cellY, int spanX, int spanY, View dragView, int[] direction,
+            boolean commit) {
         int[] pixelXY = new int[2];
         regionToCenterPoint(cellX, cellY, spanX, spanY, pixelXY);
 
         // First we determine if things have moved enough to cause a different layout
-        ItemConfiguration swapSolution = findReorderSolution(pixelXY[0], pixelXY[1], spanX, spanY,
-                 spanX,  spanY, direction, dragView,  true,  new ItemConfiguration());
+        ItemConfiguration swapSolution =
+                findReorderSolution(pixelXY[0], pixelXY[1], spanX, spanY, spanX, spanY, direction, dragView, true,
+                        new ItemConfiguration());
 
         setUseTempCoords(true);
         if (swapSolution != null && swapSolution.isSolution) {
@@ -2467,16 +2420,16 @@ public class CellLayout extends ViewGroup {
                 completeAndClearReorderPreviewAnimations();
                 setItemPlacementDirty(false);
             } else {
-                beginOrAdjustReorderPreviewAnimations(swapSolution, dragView,
-                        REORDER_ANIMATION_DURATION, ReorderPreviewAnimation.MODE_PREVIEW);
+                beginOrAdjustReorderPreviewAnimations(swapSolution, dragView, REORDER_ANIMATION_DURATION,
+                        ReorderPreviewAnimation.MODE_PREVIEW);
             }
             mShortcutsAndWidgets.requestLayout();
         }
         return swapSolution.isSolution;
     }
 
-    int[] performReorder(int pixelX, int pixelY, int minSpanX, int minSpanY, int spanX, int spanY,
-            View dragView, int[] result, int resultSpan[], int mode) {
+    int[] performReorder(int pixelX, int pixelY, int minSpanX, int minSpanY, int spanX, int spanY, View dragView,
+            int[] result, int resultSpan[], int mode) {
         // First we determine if things have moved enough to cause a different layout
         result = findNearestArea(pixelX, pixelY, spanX, spanY, result);
 
@@ -2488,7 +2441,7 @@ public class CellLayout extends ViewGroup {
         // direction vector, since we want the solution to match the preview, and it's possible
         // that the exact position of the item has changed to result in a new reordering outcome.
         if ((mode == MODE_ON_DROP || mode == MODE_ON_DROP_EXTERNAL || mode == MODE_ACCEPT_DROP)
-               && mPreviousReorderDirection[0] != INVALID_DIRECTION) {
+                && mPreviousReorderDirection[0] != INVALID_DIRECTION) {
             mDirectionVector[0] = mPreviousReorderDirection[0];
             mDirectionVector[1] = mPreviousReorderDirection[1];
             // We reset this vector after drop
@@ -2503,12 +2456,14 @@ public class CellLayout extends ViewGroup {
         }
 
         // Find a solution involving pushing / displacing any items in the way
-        ItemConfiguration swapSolution = findReorderSolution(pixelX, pixelY, minSpanX, minSpanY,
-                 spanX,  spanY, mDirectionVector, dragView,  true,  new ItemConfiguration());
+        ItemConfiguration swapSolution =
+                findReorderSolution(pixelX, pixelY, minSpanX, minSpanY, spanX, spanY, mDirectionVector, dragView, true,
+                        new ItemConfiguration());
 
         // We attempt the approach which doesn't shuffle views at all
-        ItemConfiguration noShuffleSolution = findConfigurationNoShuffle(pixelX, pixelY, minSpanX,
-                minSpanY, spanX, spanY, dragView, new ItemConfiguration());
+        ItemConfiguration noShuffleSolution =
+                findConfigurationNoShuffle(pixelX, pixelY, minSpanX, minSpanY, spanX, spanY, dragView,
+                        new ItemConfiguration());
 
         ItemConfiguration finalSolution = null;
 
@@ -2522,8 +2477,7 @@ public class CellLayout extends ViewGroup {
 
         if (mode == MODE_SHOW_REORDER_HINT) {
             if (finalSolution != null) {
-                beginOrAdjustReorderPreviewAnimations(finalSolution, dragView, 0,
-                        ReorderPreviewAnimation.MODE_HINT);
+                beginOrAdjustReorderPreviewAnimations(finalSolution, dragView, 0, ReorderPreviewAnimation.MODE_HINT);
                 result[0] = finalSolution.dragViewX;
                 result[1] = finalSolution.dragViewY;
                 resultSpan[0] = finalSolution.dragViewSpanX;
@@ -2555,14 +2509,13 @@ public class CellLayout extends ViewGroup {
                 setItemPlacementDirty(true);
                 animateItemsToSolution(finalSolution, dragView, mode == MODE_ON_DROP);
 
-                if (!DESTRUCTIVE_REORDER &&
-                        (mode == MODE_ON_DROP || mode == MODE_ON_DROP_EXTERNAL)) {
+                if (!DESTRUCTIVE_REORDER && (mode == MODE_ON_DROP || mode == MODE_ON_DROP_EXTERNAL)) {
                     commitTempPlacement();
                     completeAndClearReorderPreviewAnimations();
                     setItemPlacementDirty(false);
                 } else {
-                    beginOrAdjustReorderPreviewAnimations(finalSolution, dragView,
-                            REORDER_ANIMATION_DURATION,  ReorderPreviewAnimation.MODE_PREVIEW);
+                    beginOrAdjustReorderPreviewAnimations(finalSolution, dragView, REORDER_ANIMATION_DURATION,
+                            ReorderPreviewAnimation.MODE_PREVIEW);
                 }
             }
         } else {
@@ -2581,6 +2534,7 @@ public class CellLayout extends ViewGroup {
     void setItemPlacementDirty(boolean dirty) {
         mItemPlacementDirty = dirty;
     }
+
     boolean isItemPlacementDirty() {
         return mItemPlacementDirty;
     }
@@ -2595,14 +2549,14 @@ public class CellLayout extends ViewGroup {
 
         void save() {
             // Copy current state into savedMap
-            for (View v: map.keySet()) {
+            for (View v : map.keySet()) {
                 map.get(v).copy(savedMap.get(v));
             }
         }
 
         void restore() {
             // Restore current state from savedMap
-            for (View v: savedMap.keySet()) {
+            for (View v : savedMap.keySet()) {
                 savedMap.get(v).copy(map.get(v));
             }
         }
@@ -2622,8 +2576,7 @@ public class CellLayout extends ViewGroup {
         int x, y;
         int spanX, spanY;
 
-        public CellAndSpan() {
-        }
+        public CellAndSpan() {}
 
         public void copy(CellAndSpan copy) {
             copy.x = x;
@@ -2646,8 +2599,8 @@ public class CellLayout extends ViewGroup {
     }
 
     /**
-     * Find a vacant area that will fit the given bounds nearest the requested
-     * cell location. Uses Euclidean distance to score multiple vacant areas.
+     * Find a vacant area that will fit the given bounds nearest the requested cell location. Uses
+     * Euclidean distance to score multiple vacant areas.
      *
      * @param pixelX The X location at which you want to search for a vacant area.
      * @param pixelY The Y location at which you want to search for a vacant area.
@@ -2655,17 +2608,16 @@ public class CellLayout extends ViewGroup {
      * @param spanY Vertical span of the object.
      * @param ignoreView Considers space occupied by this view as unoccupied
      * @param result Previously returned value to possibly recycle.
-     * @return The X, Y cell of a vacant area that can contain this object,
-     *         nearest the requested location.
+     * @return The X, Y cell of a vacant area that can contain this object, nearest the requested
+     *         location.
      */
-    int[] findNearestVacantArea(
-            int pixelX, int pixelY, int spanX, int spanY, View ignoreView, int[] result) {
+    int[] findNearestVacantArea(int pixelX, int pixelY, int spanX, int spanY, View ignoreView, int[] result) {
         return findNearestArea(pixelX, pixelY, spanX, spanY, ignoreView, true, result);
     }
 
     /**
-     * Find a vacant area that will fit the given bounds nearest the requested
-     * cell location. Uses Euclidean distance to score multiple vacant areas.
+     * Find a vacant area that will fit the given bounds nearest the requested cell location. Uses
+     * Euclidean distance to score multiple vacant areas.
      *
      * @param pixelX The X location at which you want to search for a vacant area.
      * @param pixelY The Y location at which you want to search for a vacant area.
@@ -2675,18 +2627,18 @@ public class CellLayout extends ViewGroup {
      * @param spanY Vertical span of the object.
      * @param ignoreView Considers space occupied by this view as unoccupied
      * @param result Previously returned value to possibly recycle.
-     * @return The X, Y cell of a vacant area that can contain this object,
-     *         nearest the requested location.
+     * @return The X, Y cell of a vacant area that can contain this object, nearest the requested
+     *         location.
      */
-    int[] findNearestVacantArea(int pixelX, int pixelY, int minSpanX, int minSpanY,
-            int spanX, int spanY, View ignoreView, int[] result, int[] resultSpan) {
-        return findNearestArea(pixelX, pixelY, minSpanX, minSpanY, spanX, spanY, ignoreView, true,
-                result, resultSpan, mOccupied);
+    int[] findNearestVacantArea(int pixelX, int pixelY, int minSpanX, int minSpanY, int spanX, int spanY,
+            View ignoreView, int[] result, int[] resultSpan) {
+        return findNearestArea(pixelX, pixelY, minSpanX, minSpanY, spanX, spanY, ignoreView, true, result, resultSpan,
+                mOccupied);
     }
 
     /**
-     * Find a starting cell position that will fit the given bounds nearest the requested
-     * cell location. Uses Euclidean distance to score multiple vacant areas.
+     * Find a starting cell position that will fit the given bounds nearest the requested cell
+     * location. Uses Euclidean distance to score multiple vacant areas.
      *
      * @param pixelX The X location at which you want to search for a vacant area.
      * @param pixelY The Y location at which you want to search for a vacant area.
@@ -2694,11 +2646,10 @@ public class CellLayout extends ViewGroup {
      * @param spanY Vertical span of the object.
      * @param ignoreView Considers space occupied by this view as unoccupied
      * @param result Previously returned value to possibly recycle.
-     * @return The X, Y cell of a vacant area that can contain this object,
-     *         nearest the requested location.
+     * @return The X, Y cell of a vacant area that can contain this object, nearest the requested
+     *         location.
      */
-    int[] findNearestArea(
-            int pixelX, int pixelY, int spanX, int spanY, int[] result) {
+    int[] findNearestArea(int pixelX, int pixelY, int spanX, int spanY, int[] result) {
         return findNearestArea(pixelX, pixelY, spanX, spanY, null, false, result);
     }
 
@@ -2707,13 +2658,12 @@ public class CellLayout extends ViewGroup {
     }
 
     /**
-     * Finds the upper-left coordinate of the first rectangle in the grid that can
-     * hold a cell of the specified dimensions. If intersectX and intersectY are not -1,
-     * then this method will only return coordinates for rectangles that contain the cell
-     * (intersectX, intersectY)
+     * Finds the upper-left coordinate of the first rectangle in the grid that can hold a cell of
+     * the specified dimensions. If intersectX and intersectY are not -1, then this method will only
+     * return coordinates for rectangles that contain the cell (intersectX, intersectY)
      *
-     * @param cellXY The array that will contain the position of a vacant cell if such a cell
-     *               can be found.
+     * @param cellXY The array that will contain the position of a vacant cell if such a cell can be
+     *        found.
      * @param spanX The horizontal span of the cell we want to find.
      * @param spanY The vertical span of the cell we want to find.
      *
@@ -2726,21 +2676,20 @@ public class CellLayout extends ViewGroup {
     /**
      * Like above, but ignores any cells occupied by the item "ignoreView"
      *
-     * @param cellXY The array that will contain the position of a vacant cell if such a cell
-     *               can be found.
+     * @param cellXY The array that will contain the position of a vacant cell if such a cell can be
+     *        found.
      * @param spanX The horizontal span of the cell we want to find.
      * @param spanY The vertical span of the cell we want to find.
      * @param ignoreView The home screen item we should treat as not occupying any space
      * @return
      */
     boolean findCellForSpanIgnoring(int[] cellXY, int spanX, int spanY, View ignoreView) {
-        return findCellForSpanThatIntersectsIgnoring(cellXY, spanX, spanY, -1, -1,
-                ignoreView, mOccupied);
+        return findCellForSpanThatIntersectsIgnoring(cellXY, spanX, spanY, -1, -1, ignoreView, mOccupied);
     }
 
     /**
-     * Like above, but if intersectX and intersectY are not -1, then this method will try to
-     * return coordinates for rectangles that contain the cell [intersectX, intersectY]
+     * Like above, but if intersectX and intersectY are not -1, then this method will try to return
+     * coordinates for rectangles that contain the cell [intersectX, intersectY]
      *
      * @param spanX The horizontal span of the cell we want to find.
      * @param spanY The vertical span of the cell we want to find.
@@ -2750,17 +2699,15 @@ public class CellLayout extends ViewGroup {
      *
      * @return True if a vacant cell of the specified dimension was found, false otherwise.
      */
-    boolean findCellForSpanThatIntersects(int[] cellXY, int spanX, int spanY,
-            int intersectX, int intersectY) {
-        return findCellForSpanThatIntersectsIgnoring(
-                cellXY, spanX, spanY, intersectX, intersectY, null, mOccupied);
+    boolean findCellForSpanThatIntersects(int[] cellXY, int spanX, int spanY, int intersectX, int intersectY) {
+        return findCellForSpanThatIntersectsIgnoring(cellXY, spanX, spanY, intersectX, intersectY, null, mOccupied);
     }
 
     /**
      * The superset of the above two methods
      */
-    boolean findCellForSpanThatIntersectsIgnoring(int[] cellXY, int spanX, int spanY,
-            int intersectX, int intersectY, View ignoreView, boolean occupied[][]) {
+    boolean findCellForSpanThatIntersectsIgnoring(int[] cellXY, int spanX, int spanY, int intersectX, int intersectY,
+            View ignoreView, boolean occupied[][]) {
         // mark space take by ignoreView as available (method checks if ignoreView is null)
         markCellsAsUnoccupiedForView(ignoreView, occupied);
 
@@ -2784,8 +2731,7 @@ public class CellLayout extends ViewGroup {
             }
 
             for (int y = startY; y < endY && !foundCell; y++) {
-                inner:
-                for (int x = startX; x < endX; x++) {
+                inner: for (int x = startX; x < endX; x++) {
                     for (int i = 0; i < spanX; i++) {
                         for (int j = 0; j < spanY; j++) {
                             if (occupied[x + i][y + j]) {
@@ -2821,9 +2767,8 @@ public class CellLayout extends ViewGroup {
     }
 
     /**
-     * A drag event has begun over this layout.
-     * It may have begun over this layout (in which case onDragChild is called first),
-     * or it may have begun on another layout.
+     * A drag event has begun over this layout. It may have begun over this layout (in which case
+     * onDragChild is called first), or it may have begun on another layout.
      */
     void onDragEnter() {
         mDragEnforcer.onDragEnter();
@@ -2851,9 +2796,8 @@ public class CellLayout extends ViewGroup {
     }
 
     /**
-     * Mark a child as having been dropped.
-     * At the beginning of the drag operation, the child may have been on another
-     * screen, but it is re-parented before this method is called.
+     * Mark a child as having been dropped. At the beginning of the drag operation, the child may
+     * have been on another screen, but it is re-parented before this method is called.
      *
      * @param child The child that is being dropped
      */
@@ -2893,8 +2837,7 @@ public class CellLayout extends ViewGroup {
     }
 
     /**
-     * Computes the required horizontal and vertical cell spans to always
-     * fit the given rectangle.
+     * Computes the required horizontal and vertical cell spans to always fit the given rectangle.
      *
      * @param width Width in pixels
      * @param height Height in pixels
@@ -2903,15 +2846,12 @@ public class CellLayout extends ViewGroup {
     public static int[] rectToCell(int width, int height, int[] result) {
         LauncherAppState app = LauncherAppState.getInstance();
         DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
-        Rect padding = grid.getWorkspacePadding(grid.isLandscape ?
-                CellLayout.LANDSCAPE : CellLayout.PORTRAIT);
+        Rect padding = grid.getWorkspacePadding(grid.isLandscape ? CellLayout.LANDSCAPE : CellLayout.PORTRAIT);
 
         // Always assume we're working with the smallest span to make sure we
         // reserve enough space in both orientations.
-        int parentWidth = grid.calculateCellWidth(grid.widthPx
-                - padding.left - padding.right, (int) grid.numColumns);
-        int parentHeight = grid.calculateCellHeight(grid.heightPx
-                - padding.top - padding.bottom, (int) grid.numRows);
+        int parentWidth = grid.calculateCellWidth(grid.widthPx - padding.left - padding.right, (int) grid.numColumns);
+        int parentHeight = grid.calculateCellHeight(grid.heightPx - padding.top - padding.bottom, (int) grid.numRows);
         int smallerSize = Math.min(parentWidth, parentHeight);
 
         // Always round up to next largest cell
@@ -2919,7 +2859,7 @@ public class CellLayout extends ViewGroup {
         int spanY = (int) Math.ceil(height / (float) smallerSize);
 
         if (result == null) {
-            return new int[] { spanX, spanY };
+            return new int[] {spanX, spanY};
         }
         result[0] = spanX;
         result[1] = spanY;
@@ -2970,13 +2910,12 @@ public class CellLayout extends ViewGroup {
         return findVacantCell(vacant, spanX, spanY, mCountX, mCountY, mOccupied);
     }
 
-    static boolean findVacantCell(int[] vacant, int spanX, int spanY,
-            int xCount, int yCount, boolean[][] occupied) {
+    static boolean findVacantCell(int[] vacant, int spanX, int spanY, int xCount, int yCount, boolean[][] occupied) {
 
         for (int y = 0; y < yCount; y++) {
             for (int x = 0; x < xCount; x++) {
                 boolean available = !occupied[x][y];
-out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
+                out: for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
                     for (int j = y; j < y + spanY - 1 && y < yCount; j++) {
                         available = available && !occupied[i][j];
                         if (!available) break out;
@@ -3010,6 +2949,7 @@ out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
     public void markCellsAsOccupiedForView(View view) {
         markCellsAsOccupiedForView(view, mOccupied);
     }
+
     public void markCellsAsOccupiedForView(View view, boolean[][] occupied) {
         if (view == null || view.getParent() != mShortcutsAndWidgets) return;
         LayoutParams lp = (LayoutParams) view.getLayoutParams();
@@ -3019,14 +2959,14 @@ out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
     public void markCellsAsUnoccupiedForView(View view) {
         markCellsAsUnoccupiedForView(view, mOccupied);
     }
+
     public void markCellsAsUnoccupiedForView(View view, boolean occupied[][]) {
         if (view == null || view.getParent() != mShortcutsAndWidgets) return;
         LayoutParams lp = (LayoutParams) view.getLayoutParams();
         markCellsForView(lp.cellX, lp.cellY, lp.cellHSpan, lp.cellVSpan, occupied, false);
     }
 
-    private void markCellsForView(int cellX, int cellY, int spanX, int spanY, boolean[][] occupied,
-            boolean value) {
+    private void markCellsForView(int cellX, int cellY, int spanX, int spanY, boolean[][] occupied, boolean value) {
         if (cellX < 0 || cellY < 0) return;
         for (int x = cellX; x < cellX + spanX && x < mCountX; x++) {
             for (int y = cellY; y < cellY + spanY && y < mCountY; y++) {
@@ -3036,13 +2976,12 @@ out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
     }
 
     public int getDesiredWidth() {
-        return getPaddingLeft() + getPaddingRight() + (mCountX * mCellWidth) +
-                (Math.max((mCountX - 1), 0) * mWidthGap);
+        return getPaddingLeft() + getPaddingRight() + (mCountX * mCellWidth) + (Math.max((mCountX - 1), 0) * mWidthGap);
     }
 
-    public int getDesiredHeight()  {
-        return getPaddingTop() + getPaddingBottom() + (mCountY * mCellHeight) +
-                (Math.max((mCountY - 1), 0) * mHeightGap);
+    public int getDesiredHeight() {
+        return getPaddingTop() + getPaddingBottom() + (mCountY * mCellHeight)
+                + (Math.max((mCountY - 1), 0) * mHeightGap);
     }
 
     public boolean isOccupied(int x, int y) {
@@ -3120,8 +3059,8 @@ out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
         public int cellVSpan;
 
         /**
-         * Indicates whether the item will set its x, y, width and height parameters freely,
-         * or whether these will be computed based on cellX, cellY, cellHSpan and cellVSpan.
+         * Indicates whether the item will set its x, y, width and height parameters freely, or
+         * whether these will be computed based on cellX, cellY, cellHSpan and cellVSpan.
          */
         public boolean isLockedToGrid = true;
 
@@ -3131,8 +3070,8 @@ out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
         public boolean isFullscreen = false;
 
         /**
-         * Indicates whether this item can be reordered. Always true except in the case of the
-         * the AllApps button.
+         * Indicates whether this item can be reordered. Always true except in the case of the the
+         * AllApps button.
          */
         public boolean canReorder = true;
 
@@ -3173,8 +3112,8 @@ out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
             this.cellVSpan = cellVSpan;
         }
 
-        public void setup(int cellWidth, int cellHeight, int widthGap, int heightGap,
-                boolean invertHorizontally, int colCount) {
+        public void setup(int cellWidth, int cellHeight, int widthGap, int heightGap, boolean invertHorizontally,
+                int colCount) {
             if (isLockedToGrid) {
                 final int myCellHSpan = cellHSpan;
                 final int myCellVSpan = cellVSpan;
@@ -3185,10 +3124,8 @@ out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
                     myCellX = colCount - myCellX - cellHSpan;
                 }
 
-                width = myCellHSpan * cellWidth + ((myCellHSpan - 1) * widthGap) -
-                        leftMargin - rightMargin;
-                height = myCellVSpan * cellHeight + ((myCellVSpan - 1) * heightGap) -
-                        topMargin - bottomMargin;
+                width = myCellHSpan * cellWidth + ((myCellHSpan - 1) * widthGap) - leftMargin - rightMargin;
+                height = myCellVSpan * cellHeight + ((myCellVSpan - 1) * heightGap) - topMargin - bottomMargin;
                 x = (int) (myCellX * (cellWidth + widthGap) + leftMargin);
                 y = (int) (myCellY * (cellHeight + heightGap) + topMargin);
             }
@@ -3233,10 +3170,10 @@ out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
 
     // This class stores info for two purposes:
     // 1. When dragging items (mDragInfo in Workspace), we store the View, its cellX & cellY,
-    //    its spanX, spanY, and the screen it is on
+    // its spanX, spanY, and the screen it is on
     // 2. When long clicking on an empty cell in a CellLayout, we save information about the
-    //    cellX and cellY coordinates and which page was clicked. We then set this as a tag on
-    //    the CellLayout that was long clicked
+    // cellX and cellY coordinates and which page was clicked. We then set this as a tag on
+    // the CellLayout that was long clicked
     static final class CellInfo {
         View cell;
         int cellX = -1;
@@ -3258,8 +3195,7 @@ out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
 
         @Override
         public String toString() {
-            return "Cell[view=" + (cell == null ? "null" : cell.getClass())
-                    + ", x=" + cellX + ", y=" + cellY + "]";
+            return "Cell[view=" + (cell == null ? "null" : cell.getClass()) + ", x=" + cellX + ", y=" + cellY + "]";
         }
     }
 

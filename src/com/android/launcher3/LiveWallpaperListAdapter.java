@@ -1,20 +1,27 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.io.IOException;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
@@ -35,15 +42,6 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter {
     private static final String LOG_TAG = "LiveWallpaperListAdapter";
 
@@ -57,9 +55,9 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mPackageManager = context.getPackageManager();
 
-        List<ResolveInfo> list = mPackageManager.queryIntentServices(
-                new Intent(WallpaperService.SERVICE_INTERFACE),
-                PackageManager.GET_META_DATA);
+        List<ResolveInfo> list =
+                mPackageManager.queryIntentServices(new Intent(WallpaperService.SERVICE_INTERFACE),
+                        PackageManager.GET_META_DATA);
 
         mWallpapers = new ArrayList<LiveWallpaperTile>();
 
@@ -113,22 +111,22 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
     public static class LiveWallpaperTile extends WallpaperPickerActivity.WallpaperTileInfo {
         private Drawable mThumbnail;
         private WallpaperInfo mInfo;
+
         public LiveWallpaperTile(Drawable thumbnail, WallpaperInfo info, Intent intent) {
             mThumbnail = thumbnail;
             mInfo = info;
         }
+
         @Override
         public void onClick(WallpaperPickerActivity a) {
             Intent preview = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
-            preview.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-                    mInfo.getComponent());
+            preview.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, mInfo.getComponent());
             a.onLiveWallpaperPickerLaunch(mInfo);
             a.startActivityForResultSafely(preview, WallpaperPickerActivity.PICK_LIVE_WALLPAPER);
         }
     }
 
-    private class LiveWallpaperEnumerator extends
-            AsyncTask<List<ResolveInfo>, LiveWallpaperTile, Void> {
+    private class LiveWallpaperEnumerator extends AsyncTask<List<ResolveInfo>, LiveWallpaperTile, Void> {
         private Context mContext;
         private int mWallpaperPosition;
 
@@ -152,8 +150,7 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
                 }
 
                 public int compare(ResolveInfo info1, ResolveInfo info2) {
-                    return mCollator.compare(info1.loadLabel(packageManager),
-                            info2.loadLabel(packageManager));
+                    return mCollator.compare(info1.loadLabel(packageManager), info2.loadLabel(packageManager));
                 }
             });
 
@@ -183,7 +180,7 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
         }
 
         @Override
-        protected void onProgressUpdate(LiveWallpaperTile...infos) {
+        protected void onProgressUpdate(LiveWallpaperTile... infos) {
             for (LiveWallpaperTile info : infos) {
                 if (info == null) {
                     LiveWallpaperListAdapter.this.notifyDataSetChanged();

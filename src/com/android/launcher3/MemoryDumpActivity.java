@@ -1,20 +1,31 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -23,14 +34,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.*;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.IBinder;
 import android.util.Log;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 public class MemoryDumpActivity extends Activity {
     private static final String TAG = "MemoryDumpActivity";
@@ -43,9 +51,8 @@ public class MemoryDumpActivity extends Activity {
     public static String zipUp(ArrayList<String> paths) {
         final int BUFSIZ = 256 * 1024; // 256K
         final byte[] buf = new byte[BUFSIZ];
-        final String zipfilePath = String.format("%s/hprof-%d.zip",
-                Environment.getExternalStorageDirectory(),
-                System.currentTimeMillis());
+        final String zipfilePath =
+                String.format("%s/hprof-%d.zip", Environment.getExternalStorageDirectory(), System.currentTimeMillis());
         ZipOutputStream zos = null;
         try {
             OutputStream os = new FileOutputStream(zipfilePath);
@@ -57,7 +64,7 @@ public class MemoryDumpActivity extends Activity {
                     ZipEntry entry = new ZipEntry(filename);
                     zos.putNextEntry(entry);
                     int len;
-                    while ( 0 < (len = is.read(buf, 0, BUFSIZ)) ) {
+                    while (0 < (len = is.read(buf, 0, BUFSIZ))) {
                         zos.write(buf, 0, len);
                     }
                     zos.closeEntry();
@@ -91,16 +98,12 @@ public class MemoryDumpActivity extends Activity {
         for (int pid : pids_copy) {
             MemoryTracker.ProcessMemInfo info = tracker.getMemInfo(pid);
             if (info != null) {
-                body.append("pid ").append(pid).append(":")
-                    .append(" up=").append(info.getUptime())
-                    .append(" pss=").append(info.currentPss)
-                    .append(" uss=").append(info.currentUss)
-                    .append("\n");
+                body.append("pid ").append(pid).append(":").append(" up=").append(info.getUptime()).append(" pss=")
+                        .append(info.currentPss).append(" uss=").append(info.currentUss).append("\n");
             }
             if (pid == myPid) {
-                final String path = String.format("%s/launcher-memory-%d.ahprof",
-                        Environment.getExternalStorageDirectory(),
-                        pid);
+                final String path =
+                        String.format("%s/launcher-memory-%d.ahprof", Environment.getExternalStorageDirectory(), pid);
                 Log.v(TAG, "Dumping memory info for process " + pid + " to " + path);
                 try {
                     android.os.Debug.dumpHprofData(path); // will block
@@ -157,17 +160,14 @@ public class MemoryDumpActivity extends Activity {
         final ServiceConnection connection = new ServiceConnection() {
             public void onServiceConnected(ComponentName className, IBinder service) {
                 Log.v(TAG, "service connected, dumping...");
-                dumpHprofAndShare(context,
-                        ((MemoryTracker.MemoryTrackerInterface) service).getService());
+                dumpHprofAndShare(context, ((MemoryTracker.MemoryTrackerInterface) service).getService());
                 context.unbindService(this);
                 if (andThen != null) andThen.run();
             }
 
-            public void onServiceDisconnected(ComponentName className) {
-            }
+            public void onServiceDisconnected(ComponentName className) {}
         };
         Log.v(TAG, "attempting to bind to memory tracker");
-        context.bindService(new Intent(context, MemoryTracker.class),
-                connection, Context.BIND_AUTO_CREATE);
+        context.bindService(new Intent(context, MemoryTracker.class), connection, Context.BIND_AUTO_CREATE);
     }
 }

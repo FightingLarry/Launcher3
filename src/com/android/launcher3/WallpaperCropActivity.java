@@ -1,20 +1,25 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -48,13 +53,6 @@ import com.android.gallery3d.exif.ExifInterface;
 import com.android.photos.BitmapRegionTileSource;
 import com.android.photos.BitmapRegionTileSource.BitmapSource;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-
 public class WallpaperCropActivity extends Activity {
     private static final String LOGTAG = "Launcher3.CropActivity";
 
@@ -62,11 +60,10 @@ public class WallpaperCropActivity extends Activity {
     protected static final String WALLPAPER_HEIGHT_KEY = "wallpaper.height";
     private static final int DEFAULT_COMPRESS_QUALITY = 90;
     /**
-     * The maximum bitmap size we allow to be returned through the intent.
-     * Intents have a maximum of 1MB in total size. However, the Bitmap seems to
-     * have some overhead to hit so that we go way below the limit here to make
-     * sure the intent stays below 1MB.We should consider just returning a byte
-     * array instead of a Bitmap instance to avoid overhead.
+     * The maximum bitmap size we allow to be returned through the intent. Intents have a maximum of
+     * 1MB in total size. However, the Bitmap seems to have some overhead to hit so that we go way
+     * below the limit here to make sure the intent stays below 1MB.We should consider just
+     * returning a byte array instead of a Bitmap instance to avoid overhead.
      */
     public static final int MAX_BMAP_IN_INTENT = 750000;
     private static final float WALLPAPER_SCREENS_SPAN = 2f;
@@ -104,14 +101,13 @@ public class WallpaperCropActivity extends Activity {
         // Show the custom action bar view
         final ActionBar actionBar = getActionBar();
         actionBar.setCustomView(R.layout.actionbar_set_wallpaper);
-        actionBar.getCustomView().setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        boolean finishActivityWhenDone = true;
-                        cropImageAndSetWallpaper(imageUri, null, finishActivityWhenDone);
-                    }
-                });
+        actionBar.getCustomView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean finishActivityWhenDone = true;
+                cropImageAndSetWallpaper(imageUri, null, finishActivityWhenDone);
+            }
+        });
         mSetWallpaperButton = findViewById(R.id.set_wallpaper_button);
 
         // Load image in background
@@ -121,8 +117,7 @@ public class WallpaperCropActivity extends Activity {
         Runnable onLoad = new Runnable() {
             public void run() {
                 if (bitmapSource.getLoadingState() != BitmapSource.State.LOADED) {
-                    Toast.makeText(WallpaperCropActivity.this,
-                            getString(R.string.wallpaper_load_fail),
+                    Toast.makeText(WallpaperCropActivity.this, getString(R.string.wallpaper_load_fail),
                             Toast.LENGTH_LONG).show();
                     finish();
                 } else {
@@ -141,13 +136,12 @@ public class WallpaperCropActivity extends Activity {
         super.onDestroy();
     }
 
-    public void setCropViewTileSource(
-            final BitmapRegionTileSource.BitmapSource bitmapSource, final boolean touchEnabled,
-            final boolean moveToLeft, final Runnable postExecute) {
+    public void setCropViewTileSource(final BitmapRegionTileSource.BitmapSource bitmapSource,
+            final boolean touchEnabled, final boolean moveToLeft, final Runnable postExecute) {
         final Context context = WallpaperCropActivity.this;
         final View progressView = findViewById(R.id.loading);
         final AsyncTask<Void, Void, Void> loadBitmapTask = new AsyncTask<Void, Void, Void>() {
-            protected Void doInBackground(Void...args) {
+            protected Void doInBackground(Void... args) {
                 if (!isCancelled()) {
                     try {
                         bitmapSource.loadInBackground();
@@ -167,12 +161,12 @@ public class WallpaperCropActivity extends Activity {
                 }
                 return null;
             }
+
             protected void onPostExecute(Void arg) {
                 if (!isCancelled()) {
                     progressView.setVisibility(View.INVISIBLE);
                     if (bitmapSource.getLoadingState() == BitmapSource.State.LOADED) {
-                        mCropView.setTileSource(
-                                new BitmapRegionTileSource(context, bitmapSource), null);
+                        mCropView.setTileSource(new BitmapRegionTileSource(context, bitmapSource), null);
                         mCropView.setTouchEnabled(touchEnabled);
                         if (moveToLeft) {
                             mCropView.moveToLeft();
@@ -215,19 +209,19 @@ public class WallpaperCropActivity extends Activity {
         // We will use these two data points to extrapolate how much the wallpaper parallax effect
         // to span (ie travel) at any aspect ratio:
 
-        final float ASPECT_RATIO_LANDSCAPE = 16/10f;
-        final float ASPECT_RATIO_PORTRAIT = 10/16f;
+        final float ASPECT_RATIO_LANDSCAPE = 16 / 10f;
+        final float ASPECT_RATIO_PORTRAIT = 10 / 16f;
         final float WALLPAPER_WIDTH_TO_SCREEN_RATIO_LANDSCAPE = 1.5f;
         final float WALLPAPER_WIDTH_TO_SCREEN_RATIO_PORTRAIT = 1.2f;
 
         // To find out the desired width at different aspect ratios, we use the following two
         // formulas, where the coefficient on x is the aspect ratio (width/height):
-        //   (16/10)x + y = 1.5
-        //   (10/16)x + y = 1.2
+        // (16/10)x + y = 1.5
+        // (10/16)x + y = 1.2
         // We solve for x and y and end up with a final formula:
         final float x =
-            (WALLPAPER_WIDTH_TO_SCREEN_RATIO_LANDSCAPE - WALLPAPER_WIDTH_TO_SCREEN_RATIO_PORTRAIT) /
-            (ASPECT_RATIO_LANDSCAPE - ASPECT_RATIO_PORTRAIT);
+                (WALLPAPER_WIDTH_TO_SCREEN_RATIO_LANDSCAPE - WALLPAPER_WIDTH_TO_SCREEN_RATIO_PORTRAIT)
+                        / (ASPECT_RATIO_LANDSCAPE - ASPECT_RATIO_PORTRAIT);
         final float y = WALLPAPER_WIDTH_TO_SCREEN_RATIO_PORTRAIT - x * ASPECT_RATIO_PORTRAIT;
         return x * aspectRatio + y;
     }
@@ -275,8 +269,7 @@ public class WallpaperCropActivity extends Activity {
         return getRotationFromExifHelper(null, res, resId, null, null);
     }
 
-    private static int getRotationFromExifHelper(
-            String path, Resources res, int resId, Context context, Uri uri) {
+    private static int getRotationFromExifHelper(String path, Resources res, int resId, Context context, Uri uri) {
         ExifInterface ei = new ExifInterface();
         InputStream is = null;
         BufferedInputStream bis = null;
@@ -310,8 +303,7 @@ public class WallpaperCropActivity extends Activity {
 
     protected void setWallpaper(Uri uri, final boolean finishActivityWhenDone) {
         int rotation = getRotationFromExif(this, uri);
-        BitmapCropTask cropTask = new BitmapCropTask(
-                this, uri, null, rotation, 0, 0, true, false, null);
+        BitmapCropTask cropTask = new BitmapCropTask(this, uri, null, rotation, 0, 0, true, false, null);
         final Point bounds = cropTask.getImageBounds();
         Runnable onEndCrop = new Runnable() {
             public void run() {
@@ -327,16 +319,13 @@ public class WallpaperCropActivity extends Activity {
         cropTask.execute();
     }
 
-    protected void cropImageAndSetWallpaper(
-            Resources res, int resId, final boolean finishActivityWhenDone) {
+    protected void cropImageAndSetWallpaper(Resources res, int resId, final boolean finishActivityWhenDone) {
         // crop this image and scale it down to the default wallpaper size for
         // this device
         int rotation = getRotationFromExif(res, resId);
         Point inSize = mCropView.getSourceDimensions();
-        Point outSize = getDefaultWallpaperSize(getResources(),
-                getWindowManager());
-        RectF crop = getMaxCropRect(
-                inSize.x, inSize.y, outSize.x, outSize.y, false);
+        Point outSize = getDefaultWallpaperSize(getResources(), getWindowManager());
+        RectF crop = getMaxCropRect(inSize.x, inSize.y, outSize.x, outSize.y, false);
         Runnable onEndCrop = new Runnable() {
             public void run() {
                 // Passing 0, 0 will cause launcher to revert to using the
@@ -348,8 +337,8 @@ public class WallpaperCropActivity extends Activity {
                 }
             }
         };
-        BitmapCropTask cropTask = new BitmapCropTask(this, res, resId,
-                crop, rotation, outSize.x, outSize.y, true, false, onEndCrop);
+        BitmapCropTask cropTask =
+                new BitmapCropTask(this, res, resId, crop, rotation, outSize.x, outSize.y, true, false, onEndCrop);
         cropTask.execute();
     }
 
@@ -358,8 +347,8 @@ public class WallpaperCropActivity extends Activity {
         return config.smallestScreenWidthDp >= 720;
     }
 
-    protected void cropImageAndSetWallpaper(Uri uri,
-            OnBitmapCroppedHandler onBitmapCroppedHandler, final boolean finishActivityWhenDone) {
+    protected void cropImageAndSetWallpaper(Uri uri, OnBitmapCroppedHandler onBitmapCroppedHandler,
+            final boolean finishActivityWhenDone) {
         boolean centerCrop = getResources().getBoolean(R.bool.center_crop);
         // Get the crop
         boolean ltr = mCropView.getLayoutDirection() == View.LAYOUT_DIRECTION_LTR;
@@ -370,8 +359,7 @@ public class WallpaperCropActivity extends Activity {
         d.getSize(displaySize);
         boolean isPortrait = displaySize.x < displaySize.y;
 
-        Point defaultWallpaperSize = getDefaultWallpaperSize(getResources(),
-                getWindowManager());
+        Point defaultWallpaperSize = getDefaultWallpaperSize(getResources(), getWindowManager());
         // Get the crop
         RectF cropRect = mCropView.getCrop();
 
@@ -383,7 +371,7 @@ public class WallpaperCropActivity extends Activity {
 
         Matrix rotateMatrix = new Matrix();
         rotateMatrix.setRotate(cropRotation);
-        float[] rotatedInSize = new float[] { inSize.x, inSize.y };
+        float[] rotatedInSize = new float[] {inSize.x, inSize.y};
         rotateMatrix.mapPoints(rotatedInSize);
         rotatedInSize[0] = Math.abs(rotatedInSize[0]);
         rotatedInSize[1] = Math.abs(rotatedInSize[1]);
@@ -424,11 +412,9 @@ public class WallpaperCropActivity extends Activity {
         if (isPortrait) {
             cropRect.bottom = cropRect.top + defaultWallpaperSize.y / cropScale;
         } else { // LANDSCAPE
-            float extraPortraitHeight =
-                    defaultWallpaperSize.y / cropScale - cropRect.height();
+            float extraPortraitHeight = defaultWallpaperSize.y / cropScale - cropRect.height();
             float expandHeight =
-                    Math.min(Math.min(rotatedInSize[1] - cropRect.bottom, cropRect.top),
-                            extraPortraitHeight / 2);
+                    Math.min(Math.min(rotatedInSize[1] - cropRect.bottom, cropRect.top), extraPortraitHeight / 2);
             cropRect.top -= expandHeight;
             cropRect.bottom += expandHeight;
         }
@@ -444,8 +430,8 @@ public class WallpaperCropActivity extends Activity {
                 }
             }
         };
-        BitmapCropTask cropTask = new BitmapCropTask(this, uri,
-                cropRect, cropRotation, outWidth, outHeight, true, false, onEndCrop);
+        BitmapCropTask cropTask =
+                new BitmapCropTask(this, uri, cropRect, cropRotation, outWidth, outHeight, true, false, onEndCrop);
         if (onBitmapCroppedHandler != null) {
             cropTask.setOnBitmapCropped(onBitmapCroppedHandler);
         }
@@ -474,44 +460,36 @@ public class WallpaperCropActivity extends Activity {
         OnBitmapCroppedHandler mOnBitmapCroppedHandler;
         boolean mNoCrop;
 
-        public BitmapCropTask(Context c, String filePath,
-                RectF cropBounds, int rotation, int outWidth, int outHeight,
+        public BitmapCropTask(Context c, String filePath, RectF cropBounds, int rotation, int outWidth, int outHeight,
                 boolean setWallpaper, boolean saveCroppedBitmap, Runnable onEndRunnable) {
             mContext = c;
             mInFilePath = filePath;
-            init(cropBounds, rotation,
-                    outWidth, outHeight, setWallpaper, saveCroppedBitmap, onEndRunnable);
+            init(cropBounds, rotation, outWidth, outHeight, setWallpaper, saveCroppedBitmap, onEndRunnable);
         }
 
-        public BitmapCropTask(byte[] imageBytes,
-                RectF cropBounds, int rotation, int outWidth, int outHeight,
+        public BitmapCropTask(byte[] imageBytes, RectF cropBounds, int rotation, int outWidth, int outHeight,
                 boolean setWallpaper, boolean saveCroppedBitmap, Runnable onEndRunnable) {
             mInImageBytes = imageBytes;
-            init(cropBounds, rotation,
-                    outWidth, outHeight, setWallpaper, saveCroppedBitmap, onEndRunnable);
+            init(cropBounds, rotation, outWidth, outHeight, setWallpaper, saveCroppedBitmap, onEndRunnable);
         }
 
-        public BitmapCropTask(Context c, Uri inUri,
-                RectF cropBounds, int rotation, int outWidth, int outHeight,
+        public BitmapCropTask(Context c, Uri inUri, RectF cropBounds, int rotation, int outWidth, int outHeight,
                 boolean setWallpaper, boolean saveCroppedBitmap, Runnable onEndRunnable) {
             mContext = c;
             mInUri = inUri;
-            init(cropBounds, rotation,
-                    outWidth, outHeight, setWallpaper, saveCroppedBitmap, onEndRunnable);
+            init(cropBounds, rotation, outWidth, outHeight, setWallpaper, saveCroppedBitmap, onEndRunnable);
         }
 
-        public BitmapCropTask(Context c, Resources res, int inResId,
-                RectF cropBounds, int rotation, int outWidth, int outHeight,
-                boolean setWallpaper, boolean saveCroppedBitmap, Runnable onEndRunnable) {
+        public BitmapCropTask(Context c, Resources res, int inResId, RectF cropBounds, int rotation, int outWidth,
+                int outHeight, boolean setWallpaper, boolean saveCroppedBitmap, Runnable onEndRunnable) {
             mContext = c;
             mInResId = inResId;
             mResources = res;
-            init(cropBounds, rotation,
-                    outWidth, outHeight, setWallpaper, saveCroppedBitmap, onEndRunnable);
+            init(cropBounds, rotation, outWidth, outHeight, setWallpaper, saveCroppedBitmap, onEndRunnable);
         }
 
-        private void init(RectF cropBounds, int rotation, int outWidth, int outHeight,
-                boolean setWallpaper, boolean saveCroppedBitmap, Runnable onEndRunnable) {
+        private void init(RectF cropBounds, int rotation, int outWidth, int outHeight, boolean setWallpaper,
+                boolean saveCroppedBitmap, Runnable onEndRunnable) {
             mCropBounds = cropBounds;
             mRotation = rotation;
             mOutWidth = outWidth;
@@ -536,13 +514,11 @@ public class WallpaperCropActivity extends Activity {
         // Helper to setup input stream
         private InputStream regenerateInputStream() {
             if (mInUri == null && mInResId == 0 && mInFilePath == null && mInImageBytes == null) {
-                Log.w(LOGTAG, "cannot read original file, no input URI, resource ID, or " +
-                        "image byte array given");
+                Log.w(LOGTAG, "cannot read original file, no input URI, resource ID, or " + "image byte array given");
             } else {
                 try {
                     if (mInUri != null) {
-                        return new BufferedInputStream(
-                                mContext.getContentResolver().openInputStream(mInUri));
+                        return new BufferedInputStream(mContext.getContentResolver().openInputStream(mInUri));
                     } else if (mInFilePath != null) {
                         return mContext.openFileInput(mInFilePath);
                     } else if (mInImageBytes != null) {
@@ -578,6 +554,7 @@ public class WallpaperCropActivity extends Activity {
         public Bitmap getCroppedBitmap() {
             return mCroppedBitmap;
         }
+
         public boolean cropBitmap() {
             boolean failure = false;
 
@@ -620,14 +597,14 @@ public class WallpaperCropActivity extends Activity {
                         return false;
                     }
 
-                    float[] rotatedBounds = new float[] { bounds.x, bounds.y };
+                    float[] rotatedBounds = new float[] {bounds.x, bounds.y};
                     rotateMatrix.mapPoints(rotatedBounds);
                     rotatedBounds[0] = Math.abs(rotatedBounds[0]);
                     rotatedBounds[1] = Math.abs(rotatedBounds[1]);
 
-                    mCropBounds.offset(-rotatedBounds[0]/2, -rotatedBounds[1]/2);
+                    mCropBounds.offset(-rotatedBounds[0] / 2, -rotatedBounds[1] / 2);
                     inverseRotateMatrix.mapRect(mCropBounds);
-                    mCropBounds.offset(bounds.x/2, bounds.y/2);
+                    mCropBounds.offset(bounds.x / 2, bounds.y / 2);
 
                 }
 
@@ -640,8 +617,9 @@ public class WallpaperCropActivity extends Activity {
                 }
 
                 // See how much we're reducing the size of the image
-                int scaleDownSampleSize = Math.max(1, Math.min(roundedTrueCrop.width() / mOutWidth,
-                        roundedTrueCrop.height() / mOutHeight));
+                int scaleDownSampleSize =
+                        Math.max(1,
+                                Math.min(roundedTrueCrop.width() / mOutWidth, roundedTrueCrop.height() / mOutHeight));
                 // Attempt to open a region decoder
                 BitmapRegionDecoder decoder = null;
                 InputStream is = null;
@@ -657,8 +635,8 @@ public class WallpaperCropActivity extends Activity {
                 } catch (IOException e) {
                     Log.w(LOGTAG, "cannot open region decoder for file: " + mInUri.toString(), e);
                 } finally {
-                   Utils.closeSilently(is);
-                   is = null;
+                    Utils.closeSilently(is);
+                    is = null;
                 }
 
                 Bitmap crop = null;
@@ -700,8 +678,8 @@ public class WallpaperCropActivity extends Activity {
                         }
                         if (roundedTrueCrop.right > fullSize.getWidth()) {
                             // Adjust the left value
-                            int adjustment = roundedTrueCrop.left -
-                                    Math.max(0, roundedTrueCrop.right - roundedTrueCrop.width());
+                            int adjustment =
+                                    roundedTrueCrop.left - Math.max(0, roundedTrueCrop.right - roundedTrueCrop.width());
                             roundedTrueCrop.left -= adjustment;
                             roundedTrueCrop.right -= adjustment;
                         }
@@ -711,15 +689,16 @@ public class WallpaperCropActivity extends Activity {
                         }
                         if (roundedTrueCrop.bottom > fullSize.getHeight()) {
                             // Adjust the top value
-                            int adjustment = roundedTrueCrop.top -
-                                    Math.max(0, roundedTrueCrop.bottom - roundedTrueCrop.height());
+                            int adjustment =
+                                    roundedTrueCrop.top
+                                            - Math.max(0, roundedTrueCrop.bottom - roundedTrueCrop.height());
                             roundedTrueCrop.top -= adjustment;
                             roundedTrueCrop.bottom -= adjustment;
                         }
 
-                        crop = Bitmap.createBitmap(fullSize, roundedTrueCrop.left,
-                                roundedTrueCrop.top, roundedTrueCrop.width(),
-                                roundedTrueCrop.height());
+                        crop =
+                                Bitmap.createBitmap(fullSize, roundedTrueCrop.left, roundedTrueCrop.top,
+                                        roundedTrueCrop.width(), roundedTrueCrop.height());
                     }
                 }
 
@@ -729,7 +708,7 @@ public class WallpaperCropActivity extends Activity {
                     return false;
                 }
                 if (mOutWidth > 0 && mOutHeight > 0 || mRotation > 0) {
-                    float[] dimsAfter = new float[] { crop.getWidth(), crop.getHeight() };
+                    float[] dimsAfter = new float[] {crop.getWidth(), crop.getHeight()};
                     rotateMatrix.mapPoints(dimsAfter);
                     dimsAfter[0] = Math.abs(dimsAfter[0]);
                     dimsAfter[1] = Math.abs(dimsAfter[1]);
@@ -762,8 +741,9 @@ public class WallpaperCropActivity extends Activity {
                         m.setConcat(c2, c1);
                     }
 
-                    Bitmap tmp = Bitmap.createBitmap((int) returnRect.width(),
-                            (int) returnRect.height(), Bitmap.Config.ARGB_8888);
+                    Bitmap tmp =
+                            Bitmap.createBitmap((int) returnRect.width(), (int) returnRect.height(),
+                                    Bitmap.Config.ARGB_8888);
                     if (tmp != null) {
                         Canvas c = new Canvas(tmp);
                         Paint p = new Paint();
@@ -778,8 +758,7 @@ public class WallpaperCropActivity extends Activity {
                 }
 
                 // Get output compression format
-                CompressFormat cf =
-                        convertExtensionToCompressFormat(getFileExtension(mOutputFormat));
+                CompressFormat cf = convertExtensionToCompressFormat(getFileExtension(mOutputFormat));
 
                 // Compress to byte array
                 ByteArrayOutputStream tmpOut = new ByteArrayOutputStream(2048);
@@ -831,14 +810,11 @@ public class WallpaperCropActivity extends Activity {
         }
         editor.commit();
 
-        suggestWallpaperDimension(getResources(),
-                sp, getWindowManager(), WallpaperManager.getInstance(this), true);
+        suggestWallpaperDimension(getResources(), sp, getWindowManager(), WallpaperManager.getInstance(this), true);
     }
 
-    static public void suggestWallpaperDimension(Resources res,
-            final SharedPreferences sharedPrefs,
-            WindowManager windowManager,
-            final WallpaperManager wallpaperManager, boolean fallBackToDefaults) {
+    static public void suggestWallpaperDimension(Resources res, final SharedPreferences sharedPrefs,
+            WindowManager windowManager, final WallpaperManager wallpaperManager, boolean fallBackToDefaults) {
         final Point defaultWallpaperSize = getDefaultWallpaperSize(res, windowManager);
         // If we have saved a wallpaper width/height, use that instead
 
@@ -854,25 +830,24 @@ public class WallpaperCropActivity extends Activity {
             }
         }
 
-        if (savedWidth != wallpaperManager.getDesiredMinimumWidth() ||
-                savedHeight != wallpaperManager.getDesiredMinimumHeight()) {
+        if (savedWidth != wallpaperManager.getDesiredMinimumWidth()
+                || savedHeight != wallpaperManager.getDesiredMinimumHeight()) {
             wallpaperManager.suggestDesiredDimensions(savedWidth, savedHeight);
         }
     }
 
-    protected static RectF getMaxCropRect(
-            int inWidth, int inHeight, int outWidth, int outHeight, boolean leftAligned) {
+    protected static RectF getMaxCropRect(int inWidth, int inHeight, int outWidth, int outHeight, boolean leftAligned) {
         RectF cropRect = new RectF();
         // Get a crop rect that will fit this
         if (inWidth / (float) inHeight > outWidth / (float) outHeight) {
-             cropRect.top = 0;
-             cropRect.bottom = inHeight;
-             cropRect.left = (inWidth - (outWidth / (float) outHeight) * inHeight) / 2;
-             cropRect.right = inWidth - cropRect.left;
-             if (leftAligned) {
-                 cropRect.right -= cropRect.left;
-                 cropRect.left = 0;
-             }
+            cropRect.top = 0;
+            cropRect.bottom = inHeight;
+            cropRect.left = (inWidth - (outWidth / (float) outHeight) * inHeight) / 2;
+            cropRect.right = inWidth - cropRect.left;
+            if (leftAligned) {
+                cropRect.right -= cropRect.left;
+                cropRect.left = 0;
+            }
         } else {
             cropRect.left = 0;
             cropRect.right = inWidth;
@@ -887,12 +862,11 @@ public class WallpaperCropActivity extends Activity {
     }
 
     protected static String getFileExtension(String requestFormat) {
-        String outputFormat = (requestFormat == null)
-                ? "jpg"
-                : requestFormat;
+        String outputFormat = (requestFormat == null) ? "jpg" : requestFormat;
         outputFormat = outputFormat.toLowerCase();
-        return (outputFormat.equals("png") || outputFormat.equals("gif"))
-                ? "png" // We don't support gif compression.
+        return (outputFormat.equals("png") || outputFormat.equals("gif")) ? "png" // We don't
+                                                                                  // support gif
+                                                                                  // compression.
                 : "jpg";
     }
 }

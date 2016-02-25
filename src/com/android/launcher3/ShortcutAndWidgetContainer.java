@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -51,8 +49,7 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
         mWallpaperManager = WallpaperManager.getInstance(context);
     }
 
-    public void setCellDimensions(int cellWidth, int cellHeight, int widthGap, int heightGap,
-            int countX, int countY) {
+    public void setCellDimensions(int cellWidth, int cellHeight, int widthGap, int heightGap, int countX, int countY) {
         mCellWidth = cellWidth;
         mCellHeight = cellHeight;
         mWidthGap = widthGap;
@@ -67,8 +64,7 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
             View child = getChildAt(i);
             CellLayout.LayoutParams lp = (CellLayout.LayoutParams) child.getLayoutParams();
 
-            if ((lp.cellX <= x) && (x < lp.cellX + lp.cellHSpan) &&
-                    (lp.cellY <= y) && (y < lp.cellY + lp.cellVSpan)) {
+            if ((lp.cellX <= x) && (x < lp.cellX + lp.cellHSpan) && (lp.cellY <= y) && (y < lp.cellY + lp.cellVSpan)) {
                 return child;
             }
         }
@@ -77,7 +73,8 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        @SuppressWarnings("all") // suppress dead code warning
+        @SuppressWarnings("all")
+        // suppress dead code warning
         final boolean debug = false;
         if (debug) {
             // Debug drawing for hit space
@@ -98,7 +95,7 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
         int count = getChildCount();
 
         int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
-        int heightSpecSize =  MeasureSpec.getSize(heightMeasureSpec);
+        int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
         setMeasuredDimension(widthSpecSize, heightSpecSize);
 
         for (int i = 0; i < count; i++) {
@@ -110,8 +107,7 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
     }
 
     public void setupLp(CellLayout.LayoutParams lp) {
-        lp.setup(mCellWidth, mCellHeight, mWidthGap, mHeightGap, invertLayoutHorizontally(),
-                mCountX);
+        lp.setup(mCellWidth, mCellHeight, mWidthGap, mHeightGap, invertLayoutHorizontally(), mCountX);
     }
 
     // Set whether or not to invert the layout horizontally if the layout is in RTL mode.
@@ -126,15 +122,13 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
     int getCellContentWidth() {
         final LauncherAppState app = LauncherAppState.getInstance();
         final DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
-        return Math.min(getMeasuredHeight(), mIsHotseatLayout ?
-                grid.hotseatCellWidthPx: grid.cellWidthPx);
+        return Math.min(getMeasuredHeight(), mIsHotseatLayout ? grid.hotseatCellWidthPx : grid.cellWidthPx);
     }
 
     int getCellContentHeight() {
         final LauncherAppState app = LauncherAppState.getInstance();
         final DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
-        return Math.min(getMeasuredHeight(), mIsHotseatLayout ?
-                grid.hotseatCellHeightPx : grid.cellHeightPx);
+        return Math.min(getMeasuredHeight(), mIsHotseatLayout ? grid.hotseatCellHeightPx : grid.cellHeightPx);
     }
 
     public void measureChild(View child) {
@@ -144,8 +138,7 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
         final int cellHeight = mCellHeight;
         CellLayout.LayoutParams lp = (CellLayout.LayoutParams) child.getLayoutParams();
         if (!lp.isFullscreen) {
-            lp.setup(cellWidth, cellHeight, mWidthGap, mHeightGap, invertLayoutHorizontally(),
-                    mCountX);
+            lp.setup(cellWidth, cellHeight, mWidthGap, mHeightGap, invertLayoutHorizontally(), mCountX);
 
             if (child instanceof LauncherAppWidgetHostView) {
                 // Widgets have their own padding, so skip
@@ -163,8 +156,7 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
             lp.height = getMeasuredHeight();
         }
         int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(lp.width, MeasureSpec.EXACTLY);
-        int childheightMeasureSpec = MeasureSpec.makeMeasureSpec(lp.height,
-                MeasureSpec.EXACTLY);
+        int childheightMeasureSpec = MeasureSpec.makeMeasureSpec(lp.height, MeasureSpec.EXACTLY);
         child.measure(childWidthMeasureSpec, childheightMeasureSpec);
     }
 
@@ -192,10 +184,8 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
 
                     final int[] cellXY = mTmpCellXY;
                     getLocationOnScreen(cellXY);
-                    mWallpaperManager.sendWallpaperCommand(getWindowToken(),
-                            WallpaperManager.COMMAND_DROP,
-                            cellXY[0] + childLeft + lp.width / 2,
-                            cellXY[1] + childTop + lp.height / 2, 0, null);
+                    mWallpaperManager.sendWallpaperCommand(getWindowToken(), WallpaperManager.COMMAND_DROP, cellXY[0]
+                            + childLeft + lp.width / 2, cellXY[1] + childTop + lp.height / 2, 0, null);
                 }
             }
         }

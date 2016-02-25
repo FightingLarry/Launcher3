@@ -1,30 +1,18 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3.compat;
-
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.LauncherActivityInfo;
-import android.content.pm.LauncherApps;
-import android.graphics.Rect;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.UserHandle;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,27 +20,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.LauncherActivityInfo;
+import android.content.pm.LauncherApps;
+import android.graphics.Rect;
+import android.os.Bundle;
+import android.os.UserHandle;
+
 public class LauncherAppsCompatVL extends LauncherAppsCompat {
 
     private LauncherApps mLauncherApps;
 
-    private Map<OnAppsChangedCallbackCompat, WrappedCallback> mCallbacks
-            = new HashMap<OnAppsChangedCallbackCompat, WrappedCallback>();
+    private Map<OnAppsChangedCallbackCompat, WrappedCallback> mCallbacks =
+            new HashMap<OnAppsChangedCallbackCompat, WrappedCallback>();
 
     LauncherAppsCompatVL(Context context) {
         super();
         mLauncherApps = (LauncherApps) context.getSystemService("launcherapps");
     }
 
-    public List<LauncherActivityInfoCompat> getActivityList(String packageName,
-            UserHandleCompat user) {
-        List<LauncherActivityInfo> list = mLauncherApps.getActivityList(packageName,
-                user.getUser());
+    public List<LauncherActivityInfoCompat> getActivityList(String packageName, UserHandleCompat user) {
+        List<LauncherActivityInfo> list = mLauncherApps.getActivityList(packageName, user.getUser());
         if (list.size() == 0) {
             return Collections.EMPTY_LIST;
         }
-        ArrayList<LauncherActivityInfoCompat> compatList =
-                new ArrayList<LauncherActivityInfoCompat>(list.size());
+        ArrayList<LauncherActivityInfoCompat> compatList = new ArrayList<LauncherActivityInfoCompat>(list.size());
         for (LauncherActivityInfo info : list) {
             compatList.add(new LauncherActivityInfoCompatVL(info));
         }
@@ -68,8 +62,7 @@ public class LauncherAppsCompatVL extends LauncherAppsCompat {
         }
     }
 
-    public void startActivityForProfile(ComponentName component, UserHandleCompat user,
-            Rect sourceBounds, Bundle opts) {
+    public void startActivityForProfile(ComponentName component, UserHandleCompat user, Rect sourceBounds, Bundle opts) {
         mLauncherApps.startMainActivity(component, user.getUser(), sourceBounds, opts);
     }
 
@@ -85,8 +78,7 @@ public class LauncherAppsCompatVL extends LauncherAppsCompat {
         mLauncherApps.registerCallback(wrappedCallback);
     }
 
-    public void removeOnAppsChangedCallback(
-            LauncherAppsCompat.OnAppsChangedCallbackCompat callback) {
+    public void removeOnAppsChangedCallback(LauncherAppsCompat.OnAppsChangedCallbackCompat callback) {
         WrappedCallback wrappedCallback = null;
         synchronized (mCallbacks) {
             wrappedCallback = mCallbacks.remove(callback);
@@ -127,11 +119,8 @@ public class LauncherAppsCompatVL extends LauncherAppsCompat {
             mCallback.onPackagesAvailable(packageNames, UserHandleCompat.fromUser(user), replacing);
         }
 
-        public void onPackagesUnavailable(String[] packageNames, UserHandle user,
-                boolean replacing) {
-            mCallback.onPackagesUnavailable(packageNames, UserHandleCompat.fromUser(user),
-                    replacing);
+        public void onPackagesUnavailable(String[] packageNames, UserHandle user, boolean replacing) {
+            mCallback.onPackagesUnavailable(packageNames, UserHandleCompat.fromUser(user), replacing);
         }
     }
 }
-

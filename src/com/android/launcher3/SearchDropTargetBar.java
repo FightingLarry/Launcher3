@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -28,8 +26,8 @@ import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
 
 /*
- * Ths bar will manage the transition between the QSB search bar and the delete drop
- * targets so that each of the individual IconDropTargets don't have to.
+ * Ths bar will manage the transition between the QSB search bar and the delete drop targets so that
+ * each of the individual IconDropTargets don't have to.
  */
 public class SearchDropTargetBar extends FrameLayout implements DragController.DragListener {
 
@@ -38,8 +36,7 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
 
     private ObjectAnimator mDropTargetBarAnim;
     private ObjectAnimator mQSBSearchBarAnim;
-    private static final AccelerateInterpolator sAccelerateInterpolator =
-            new AccelerateInterpolator();
+    private static final AccelerateInterpolator sAccelerateInterpolator = new AccelerateInterpolator();
 
     private boolean mIsSearchBarHidden;
     private View mQSBSearchBar;
@@ -71,8 +68,7 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
         mDeleteDropTarget.setLauncher(launcher);
         mQSBSearchBar = launcher.getQsbBar();
         if (mEnableDropDownDropTargets) {
-            mQSBSearchBarAnim = LauncherAnimUtils.ofFloat(mQSBSearchBar, "translationY", 0,
-                    -mBarHeight);
+            mQSBSearchBarAnim = LauncherAnimUtils.ofFloat(mQSBSearchBar, "translationY", 0, -mBarHeight);
         } else {
             mQSBSearchBarAnim = LauncherAnimUtils.ofFloat(mQSBSearchBar, "alpha", 1f, 0f);
         }
@@ -108,8 +104,7 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
         mInfoDropTarget.setSearchDropTargetBar(this);
         mDeleteDropTarget.setSearchDropTargetBar(this);
 
-        mEnableDropDownDropTargets =
-            getResources().getBoolean(R.bool.config_useDropTargetDownTransition);
+        mEnableDropDownDropTargets = getResources().getBoolean(R.bool.config_useDropTargetDownTransition);
 
         // Create the various fade animations
         if (mEnableDropDownDropTargets) {
@@ -117,8 +112,7 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
             DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
             mBarHeight = grid.searchBarSpaceHeightPx;
             mDropTargetBar.setTranslationY(-mBarHeight);
-            mDropTargetBarAnim = LauncherAnimUtils.ofFloat(mDropTargetBar, "translationY",
-                    -mBarHeight, 0f);
+            mDropTargetBarAnim = LauncherAnimUtils.ofFloat(mDropTargetBar, "translationY", -mBarHeight, 0f);
 
         } else {
             mDropTargetBar.setAlpha(0f);
@@ -153,6 +147,7 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
         }
         mIsSearchBarHidden = false;
     }
+
     public void hideSearchBar(boolean animated) {
         boolean needToCancelOngoingAnimation = mQSBSearchBarAnim.isRunning() && !animated;
         if (mIsSearchBarHidden && !needToCancelOngoingAnimation) return;
@@ -176,6 +171,7 @@ public class SearchDropTargetBar extends FrameLayout implements DragController.D
     public int getTransitionInDuration() {
         return sTransitionInDuration;
     }
+
     public int getTransitionOutDuration() {
         return sTransitionOutDuration;
     }

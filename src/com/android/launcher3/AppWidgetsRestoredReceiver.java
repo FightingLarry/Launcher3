@@ -1,5 +1,8 @@
 package com.android.launcher3;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.appwidget.AppWidgetHost;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
@@ -13,9 +16,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.android.launcher3.LauncherSettings.Favorites;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AppWidgetsRestoredReceiver extends BroadcastReceiver {
 
@@ -57,14 +57,14 @@ public class AppWidgetsRestoredReceiver extends BroadcastReceiver {
             values.put(LauncherSettings.Favorites.APPWIDGET_ID, newWidgetIds[i]);
             values.put(LauncherSettings.Favorites.RESTORED, state);
 
-            String[] widgetIdParams = new String[] { Integer.toString(oldWidgetIds[i]) };
+            String[] widgetIdParams = new String[] {Integer.toString(oldWidgetIds[i])};
 
-            int result = cr.update(Favorites.CONTENT_URI, values,
-                    "appWidgetId=? and (restored & 1) = 1", widgetIdParams);
+            int result =
+                    cr.update(Favorites.CONTENT_URI, values, "appWidgetId=? and (restored & 1) = 1", widgetIdParams);
             if (result == 0) {
-                Cursor cursor = cr.query(Favorites.CONTENT_URI,
-                        new String[] {Favorites.APPWIDGET_ID},
-                        "appWidgetId=?", widgetIdParams, null);
+                Cursor cursor =
+                        cr.query(Favorites.CONTENT_URI, new String[] {Favorites.APPWIDGET_ID}, "appWidgetId=?",
+                                widgetIdParams, null);
                 try {
                     if (!cursor.moveToFirst()) {
                         // The widget no long exists.
@@ -78,10 +78,9 @@ public class AppWidgetsRestoredReceiver extends BroadcastReceiver {
         // Unregister the widget IDs which are not present on the workspace. This could happen
         // when a widget place holder is removed from workspace, before this method is called.
         if (!idsToRemove.isEmpty()) {
-            final AppWidgetHost appWidgetHost =
-                    new AppWidgetHost(context, Launcher.APPWIDGET_HOST_ID);
+            final AppWidgetHost appWidgetHost = new AppWidgetHost(context, Launcher.APPWIDGET_HOST_ID);
             new AsyncTask<Void, Void, Void>() {
-                public Void doInBackground(Void ... args) {
+                public Void doInBackground(Void... args) {
                     for (Integer id : idsToRemove) {
                         appWidgetHost.deleteAppWidgetId(id);
                         Log.e(TAG, "Widget no longer present, appWidgetId=" + id);

@@ -1,20 +1,20 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.util.ArrayList;
 
 import android.animation.LayoutTransition;
 import android.content.Context;
@@ -22,8 +22,6 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
-
-import java.util.ArrayList;
 
 public class PageIndicator extends LinearLayout {
     @SuppressWarnings("unused")
@@ -35,8 +33,7 @@ public class PageIndicator extends LinearLayout {
     private int[] mWindowRange = new int[2];
     private int mMaxWindowSize;
 
-    private ArrayList<PageIndicatorMarker> mMarkers =
-            new ArrayList<PageIndicatorMarker>();
+    private ArrayList<PageIndicatorMarker> mMarkers = new ArrayList<PageIndicatorMarker>();
     private int mActiveMarkerIndex;
 
     public static class PageMarkerResources {
@@ -47,6 +44,7 @@ public class PageIndicator extends LinearLayout {
             activeId = R.drawable.ic_pageindicator_current;
             inactiveId = R.drawable.ic_pageindicator_default;
         }
+
         public PageMarkerResources(int aId, int iaId) {
             activeId = aId;
             inactiveId = iaId;
@@ -63,8 +61,7 @@ public class PageIndicator extends LinearLayout {
 
     public PageIndicator(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        TypedArray a = context.obtainStyledAttributes(attrs,
-                R.styleable.PageIndicator, defStyle, 0);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PageIndicator, defStyle, 0);
         mMaxWindowSize = a.getInteger(R.styleable.PageIndicator_windowSize, 15);
         mWindowRange[0] = 0;
         mWindowRange[1] = 0;
@@ -105,8 +102,7 @@ public class PageIndicator extends LinearLayout {
         int windowMid = windowStart + (windowEnd - windowStart) / 2;
         boolean windowAtStart = (windowStart == 0);
         boolean windowAtEnd = (windowEnd == mMarkers.size());
-        boolean windowMoved = (mWindowRange[0] != windowStart) ||
-                (mWindowRange[1] != windowEnd);
+        boolean windowMoved = (mWindowRange[0] != windowStart) || (mWindowRange[1] != windowEnd);
 
         if (!allowAnimations) {
             disableLayoutTransitions();
@@ -141,9 +137,8 @@ public class PageIndicator extends LinearLayout {
                 // Update the marker's alpha
                 float alpha = 1f;
                 if (mMarkers.size() > windowSize) {
-                    if ((windowAtStart && i > hWindowSize) ||
-                        (windowAtEnd && i < (mMarkers.size() - hWindowSize)) ||
-                        (!windowAtStart && !windowAtEnd)) {
+                    if ((windowAtStart && i > hWindowSize) || (windowAtEnd && i < (mMarkers.size() - hWindowSize))
+                            || (!windowAtStart && !windowAtEnd)) {
                         alpha = 1f - Math.abs((i - windowMid) / hfWindowSize);
                     }
                 }
@@ -163,13 +158,13 @@ public class PageIndicator extends LinearLayout {
         index = Math.max(0, Math.min(index, mMarkers.size()));
 
         PageIndicatorMarker m =
-            (PageIndicatorMarker) mLayoutInflater.inflate(R.layout.page_indicator_marker,
-                    this, false);
+                (PageIndicatorMarker) mLayoutInflater.inflate(R.layout.page_indicator_marker, this, false);
         m.setMarkerDrawables(marker.activeId, marker.inactiveId);
 
         mMarkers.add(index, m);
         offsetWindowCenterTo(mActiveMarkerIndex, allowAnimations);
     }
+
     void addMarkers(ArrayList<PageMarkerResources> markers, boolean allowAnimations) {
         for (int i = 0; i < markers.size(); ++i) {
             addMarker(Integer.MAX_VALUE, markers.get(i), allowAnimations);
@@ -188,6 +183,7 @@ public class PageIndicator extends LinearLayout {
             offsetWindowCenterTo(mActiveMarkerIndex, allowAnimations);
         }
     }
+
     void removeAllMarkers(boolean allowAnimations) {
         while (mMarkers.size() > 0) {
             removeMarker(Integer.MAX_VALUE, allowAnimations);

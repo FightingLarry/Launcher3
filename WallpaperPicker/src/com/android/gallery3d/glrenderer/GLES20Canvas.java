@@ -1,19 +1,24 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package com.android.gallery3d.glrenderer;
+
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -24,13 +29,6 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.android.gallery3d.util.IntArray;
-
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class GLES20Canvas implements GLCanvas {
     // ************** Constants **********************
@@ -48,23 +46,12 @@ public class GLES20Canvas implements GLCanvas {
     private static final int OFFSET_DRAW_LINE = OFFSET_FILL_RECT + COUNT_FILL_VERTEX;
     private static final int OFFSET_DRAW_RECT = OFFSET_DRAW_LINE + COUNT_LINE_VERTEX;
 
-    private static final float[] BOX_COORDINATES = {
-            0, 0, // Fill rectangle
-            1, 0,
-            0, 1,
-            1, 1,
-            0, 0, // Draw line
-            1, 1,
-            0, 0, // Draw rectangle outline
-            0, 1,
-            1, 1,
-            1, 0,
-    };
+    private static final float[] BOX_COORDINATES = {0, 0, // Fill rectangle
+            1, 0, 0, 1, 1, 1, 0, 0, // Draw line
+            1, 1, 0, 0, // Draw rectangle outline
+            0, 1, 1, 1, 1, 0,};
 
-    private static final float[] BOUNDS_COORDINATES = {
-        0, 0, 0, 1,
-        1, 1, 0, 1,
-    };
+    private static final float[] BOUNDS_COORDINATES = {0, 0, 0, 1, 1, 1, 0, 1,};
 
     private static final String POSITION_ATTRIBUTE = "aPosition";
     private static final String COLOR_UNIFORM = "uColor";
@@ -74,63 +61,35 @@ public class GLES20Canvas implements GLCanvas {
     private static final String ALPHA_UNIFORM = "uAlpha";
     private static final String TEXTURE_COORD_ATTRIBUTE = "aTextureCoordinate";
 
-    private static final String DRAW_VERTEX_SHADER = ""
-            + "uniform mat4 " + MATRIX_UNIFORM + ";\n"
-            + "attribute vec2 " + POSITION_ATTRIBUTE + ";\n"
-            + "void main() {\n"
-            + "  vec4 pos = vec4(" + POSITION_ATTRIBUTE + ", 0.0, 1.0);\n"
-            + "  gl_Position = " + MATRIX_UNIFORM + " * pos;\n"
-            + "}\n";
+    private static final String DRAW_VERTEX_SHADER = "" + "uniform mat4 " + MATRIX_UNIFORM + ";\n" + "attribute vec2 "
+            + POSITION_ATTRIBUTE + ";\n" + "void main() {\n" + "  vec4 pos = vec4(" + POSITION_ATTRIBUTE
+            + ", 0.0, 1.0);\n" + "  gl_Position = " + MATRIX_UNIFORM + " * pos;\n" + "}\n";
 
-    private static final String DRAW_FRAGMENT_SHADER = ""
-            + "precision mediump float;\n"
-            + "uniform vec4 " + COLOR_UNIFORM + ";\n"
-            + "void main() {\n"
-            + "  gl_FragColor = " + COLOR_UNIFORM + ";\n"
-            + "}\n";
+    private static final String DRAW_FRAGMENT_SHADER = "" + "precision mediump float;\n" + "uniform vec4 "
+            + COLOR_UNIFORM + ";\n" + "void main() {\n" + "  gl_FragColor = " + COLOR_UNIFORM + ";\n" + "}\n";
 
-    private static final String TEXTURE_VERTEX_SHADER = ""
-            + "uniform mat4 " + MATRIX_UNIFORM + ";\n"
-            + "uniform mat4 " + TEXTURE_MATRIX_UNIFORM + ";\n"
-            + "attribute vec2 " + POSITION_ATTRIBUTE + ";\n"
-            + "varying vec2 vTextureCoord;\n"
-            + "void main() {\n"
-            + "  vec4 pos = vec4(" + POSITION_ATTRIBUTE + ", 0.0, 1.0);\n"
-            + "  gl_Position = " + MATRIX_UNIFORM + " * pos;\n"
-            + "  vTextureCoord = (" + TEXTURE_MATRIX_UNIFORM + " * pos).xy;\n"
-            + "}\n";
+    private static final String TEXTURE_VERTEX_SHADER = "" + "uniform mat4 " + MATRIX_UNIFORM + ";\n" + "uniform mat4 "
+            + TEXTURE_MATRIX_UNIFORM + ";\n" + "attribute vec2 " + POSITION_ATTRIBUTE + ";\n"
+            + "varying vec2 vTextureCoord;\n" + "void main() {\n" + "  vec4 pos = vec4(" + POSITION_ATTRIBUTE
+            + ", 0.0, 1.0);\n" + "  gl_Position = " + MATRIX_UNIFORM + " * pos;\n" + "  vTextureCoord = ("
+            + TEXTURE_MATRIX_UNIFORM + " * pos).xy;\n" + "}\n";
 
-    private static final String MESH_VERTEX_SHADER = ""
-            + "uniform mat4 " + MATRIX_UNIFORM + ";\n"
-            + "attribute vec2 " + POSITION_ATTRIBUTE + ";\n"
-            + "attribute vec2 " + TEXTURE_COORD_ATTRIBUTE + ";\n"
-            + "varying vec2 vTextureCoord;\n"
-            + "void main() {\n"
-            + "  vec4 pos = vec4(" + POSITION_ATTRIBUTE + ", 0.0, 1.0);\n"
-            + "  gl_Position = " + MATRIX_UNIFORM + " * pos;\n"
-            + "  vTextureCoord = " + TEXTURE_COORD_ATTRIBUTE + ";\n"
-            + "}\n";
+    private static final String MESH_VERTEX_SHADER = "" + "uniform mat4 " + MATRIX_UNIFORM + ";\n" + "attribute vec2 "
+            + POSITION_ATTRIBUTE + ";\n" + "attribute vec2 " + TEXTURE_COORD_ATTRIBUTE + ";\n"
+            + "varying vec2 vTextureCoord;\n" + "void main() {\n" + "  vec4 pos = vec4(" + POSITION_ATTRIBUTE
+            + ", 0.0, 1.0);\n" + "  gl_Position = " + MATRIX_UNIFORM + " * pos;\n" + "  vTextureCoord = "
+            + TEXTURE_COORD_ATTRIBUTE + ";\n" + "}\n";
 
-    private static final String TEXTURE_FRAGMENT_SHADER = ""
-            + "precision mediump float;\n"
-            + "varying vec2 vTextureCoord;\n"
-            + "uniform float " + ALPHA_UNIFORM + ";\n"
-            + "uniform sampler2D " + TEXTURE_SAMPLER_UNIFORM + ";\n"
-            + "void main() {\n"
-            + "  gl_FragColor = texture2D(" + TEXTURE_SAMPLER_UNIFORM + ", vTextureCoord);\n"
-            + "  gl_FragColor *= " + ALPHA_UNIFORM + ";\n"
-            + "}\n";
+    private static final String TEXTURE_FRAGMENT_SHADER = "" + "precision mediump float;\n"
+            + "varying vec2 vTextureCoord;\n" + "uniform float " + ALPHA_UNIFORM + ";\n" + "uniform sampler2D "
+            + TEXTURE_SAMPLER_UNIFORM + ";\n" + "void main() {\n" + "  gl_FragColor = texture2D("
+            + TEXTURE_SAMPLER_UNIFORM + ", vTextureCoord);\n" + "  gl_FragColor *= " + ALPHA_UNIFORM + ";\n" + "}\n";
 
-    private static final String OES_TEXTURE_FRAGMENT_SHADER = ""
-            + "#extension GL_OES_EGL_image_external : require\n"
-            + "precision mediump float;\n"
-            + "varying vec2 vTextureCoord;\n"
-            + "uniform float " + ALPHA_UNIFORM + ";\n"
-            + "uniform samplerExternalOES " + TEXTURE_SAMPLER_UNIFORM + ";\n"
-            + "void main() {\n"
-            + "  gl_FragColor = texture2D(" + TEXTURE_SAMPLER_UNIFORM + ", vTextureCoord);\n"
-            + "  gl_FragColor *= " + ALPHA_UNIFORM + ";\n"
-            + "}\n";
+    private static final String OES_TEXTURE_FRAGMENT_SHADER = "" + "#extension GL_OES_EGL_image_external : require\n"
+            + "precision mediump float;\n" + "varying vec2 vTextureCoord;\n" + "uniform float " + ALPHA_UNIFORM + ";\n"
+            + "uniform samplerExternalOES " + TEXTURE_SAMPLER_UNIFORM + ";\n" + "void main() {\n"
+            + "  gl_FragColor = texture2D(" + TEXTURE_SAMPLER_UNIFORM + ", vTextureCoord);\n" + "  gl_FragColor *= "
+            + ALPHA_UNIFORM + ";\n" + "}\n";
 
     private static final int INITIAL_RESTORE_STATE_SIZE = 8;
     private static final int MATRIX_SIZE = 16;
@@ -213,27 +172,23 @@ public class GLES20Canvas implements GLCanvas {
         }
     }
 
-    ShaderParameter[] mDrawParameters = {
-            new AttributeShaderParameter(POSITION_ATTRIBUTE), // INDEX_POSITION
+    ShaderParameter[] mDrawParameters = {new AttributeShaderParameter(POSITION_ATTRIBUTE), // INDEX_POSITION
             new UniformShaderParameter(MATRIX_UNIFORM), // INDEX_MATRIX
             new UniformShaderParameter(COLOR_UNIFORM), // INDEX_COLOR
     };
-    ShaderParameter[] mTextureParameters = {
-            new AttributeShaderParameter(POSITION_ATTRIBUTE), // INDEX_POSITION
+    ShaderParameter[] mTextureParameters = {new AttributeShaderParameter(POSITION_ATTRIBUTE), // INDEX_POSITION
             new UniformShaderParameter(MATRIX_UNIFORM), // INDEX_MATRIX
             new UniformShaderParameter(TEXTURE_MATRIX_UNIFORM), // INDEX_TEXTURE_MATRIX
             new UniformShaderParameter(TEXTURE_SAMPLER_UNIFORM), // INDEX_TEXTURE_SAMPLER
             new UniformShaderParameter(ALPHA_UNIFORM), // INDEX_ALPHA
     };
-    ShaderParameter[] mOesTextureParameters = {
-            new AttributeShaderParameter(POSITION_ATTRIBUTE), // INDEX_POSITION
+    ShaderParameter[] mOesTextureParameters = {new AttributeShaderParameter(POSITION_ATTRIBUTE), // INDEX_POSITION
             new UniformShaderParameter(MATRIX_UNIFORM), // INDEX_MATRIX
             new UniformShaderParameter(TEXTURE_MATRIX_UNIFORM), // INDEX_TEXTURE_MATRIX
             new UniformShaderParameter(TEXTURE_SAMPLER_UNIFORM), // INDEX_TEXTURE_SAMPLER
             new UniformShaderParameter(ALPHA_UNIFORM), // INDEX_ALPHA
     };
-    ShaderParameter[] mMeshParameters = {
-            new AttributeShaderParameter(POSITION_ATTRIBUTE), // INDEX_POSITION
+    ShaderParameter[] mMeshParameters = {new AttributeShaderParameter(POSITION_ATTRIBUTE), // INDEX_POSITION
             new UniformShaderParameter(MATRIX_UNIFORM), // INDEX_MATRIX
             new AttributeShaderParameter(TEXTURE_COORD_ATTRIBUTE), // INDEX_TEXTURE_COORD
             new UniformShaderParameter(TEXTURE_SAMPLER_UNIFORM), // INDEX_TEXTURE_SAMPLER
@@ -280,14 +235,11 @@ public class GLES20Canvas implements GLCanvas {
         int meshVertexShader = loadShader(GLES20.GL_VERTEX_SHADER, MESH_VERTEX_SHADER);
         int drawFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, DRAW_FRAGMENT_SHADER);
         int textureFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, TEXTURE_FRAGMENT_SHADER);
-        int oesTextureFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER,
-                OES_TEXTURE_FRAGMENT_SHADER);
+        int oesTextureFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, OES_TEXTURE_FRAGMENT_SHADER);
 
         mDrawProgram = assembleProgram(drawVertexShader, drawFragmentShader, mDrawParameters);
-        mTextureProgram = assembleProgram(textureVertexShader, textureFragmentShader,
-                mTextureParameters);
-        mOesTextureProgram = assembleProgram(textureVertexShader, oesTextureFragmentShader,
-                mOesTextureParameters);
+        mTextureProgram = assembleProgram(textureVertexShader, textureFragmentShader, mTextureParameters);
+        mOesTextureProgram = assembleProgram(textureVertexShader, oesTextureFragmentShader, mOesTextureParameters);
         mMeshProgram = assembleProgram(meshVertexShader, textureFragmentShader, mMeshParameters);
         GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
         checkError();
@@ -296,8 +248,7 @@ public class GLES20Canvas implements GLCanvas {
     private static FloatBuffer createBuffer(float[] values) {
         // First create an nio buffer, then create a VBO from it.
         int size = values.length * FLOAT_SIZE;
-        FloatBuffer buffer = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
+        FloatBuffer buffer = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder()).asFloatBuffer();
         buffer.put(values, 0, values.length).position(0);
         return buffer;
     }
@@ -477,8 +428,7 @@ public class GLES20Canvas implements GLCanvas {
 
     @Override
     public void drawLine(float x1, float y1, float x2, float y2, GLPaint paint) {
-        draw(GLES20.GL_LINE_STRIP, OFFSET_DRAW_LINE, COUNT_LINE_VERTEX, x1, y1, x2 - x1, y2 - y1,
-                paint);
+        draw(GLES20.GL_LINE_STRIP, OFFSET_DRAW_LINE, COUNT_LINE_VERTEX, x1, y1, x2 - x1, y2 - y1, paint);
         mCountDrawLine++;
     }
 
@@ -488,13 +438,12 @@ public class GLES20Canvas implements GLCanvas {
         mCountDrawLine++;
     }
 
-    private void draw(int type, int offset, int count, float x, float y, float width, float height,
-            GLPaint paint) {
+    private void draw(int type, int offset, int count, float x, float y, float width, float height, GLPaint paint) {
         draw(type, offset, count, x, y, width, height, paint.getColor(), paint.getLineWidth());
     }
 
-    private void draw(int type, int offset, int count, float x, float y, float width, float height,
-            int color, float lineWidth) {
+    private void draw(int type, int offset, int count, float x, float y, float width, float height, int color,
+            float lineWidth) {
         prepareDraw(offset, color, lineWidth);
         draw(mDrawParameters, type, count, x, y, width, height);
     }
@@ -544,15 +493,14 @@ public class GLES20Canvas implements GLCanvas {
     private void setPosition(ShaderParameter[] params, int offset) {
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mBoxCoordinates);
         checkError();
-        GLES20.glVertexAttribPointer(params[INDEX_POSITION].handle, COORDS_PER_VERTEX,
-                GLES20.GL_FLOAT, false, VERTEX_STRIDE, offset * VERTEX_STRIDE);
+        GLES20.glVertexAttribPointer(params[INDEX_POSITION].handle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false,
+                VERTEX_STRIDE, offset * VERTEX_STRIDE);
         checkError();
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
         checkError();
     }
 
-    private void draw(ShaderParameter[] params, int type, int count, float x, float y, float width,
-            float height) {
+    private void draw(ShaderParameter[] params, int type, int count, float x, float y, float width, float height) {
         setMatrix(params, x, y, width, height);
         int positionHandle = params[INDEX_POSITION].handle;
         GLES20.glEnableVertexAttribArray(positionHandle);
@@ -573,8 +521,7 @@ public class GLES20Canvas implements GLCanvas {
 
     @Override
     public void fillRect(float x, float y, float width, float height, int color) {
-        draw(GLES20.GL_TRIANGLE_STRIP, OFFSET_FILL_RECT, COUNT_FILL_VERTEX, x, y, width, height,
-                color, 0f);
+        draw(GLES20.GL_TRIANGLE_STRIP, OFFSET_FILL_RECT, COUNT_FILL_VERTEX, x, y, width, height, color, 0f);
         mCountFillRect++;
     }
 
@@ -616,8 +563,7 @@ public class GLES20Canvas implements GLCanvas {
     }
 
     @Override
-    public void drawTexture(BasicTexture texture, float[] textureTransform, int x, int y, int w,
-            int h) {
+    public void drawTexture(BasicTexture texture, float[] textureTransform, int x, int y, int w, int h) {
         if (w <= 0 || h <= 0) {
             return;
         }
@@ -675,8 +621,8 @@ public class GLES20Canvas implements GLCanvas {
             scale(1, -1, 1);
             translate(0, -target.centerY());
         }
-        draw(params, GLES20.GL_TRIANGLE_STRIP, COUNT_FILL_VERTEX, target.left, target.top,
-                target.width(), target.height());
+        draw(params, GLES20.GL_TRIANGLE_STRIP, COUNT_FILL_VERTEX, target.left, target.top, target.width(),
+                target.height());
         if (texture.isFlippedVertically()) {
             restore();
         }
@@ -713,8 +659,7 @@ public class GLES20Canvas implements GLCanvas {
     }
 
     @Override
-    public void drawMesh(BasicTexture texture, int x, int y, int xyBuffer, int uvBuffer,
-            int indexBuffer, int indexCount) {
+    public void drawMesh(BasicTexture texture, int x, int y, int xyBuffer, int uvBuffer, int indexBuffer, int indexCount) {
         prepareTexture(texture, mMeshProgram, mMeshParameters);
 
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
@@ -723,15 +668,13 @@ public class GLES20Canvas implements GLCanvas {
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, xyBuffer);
         checkError();
         int positionHandle = mMeshParameters[INDEX_POSITION].handle;
-        GLES20.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false,
-                VERTEX_STRIDE, 0);
+        GLES20.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, VERTEX_STRIDE, 0);
         checkError();
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, uvBuffer);
         checkError();
         int texCoordHandle = mMeshParameters[INDEX_TEXTURE_COORD].handle;
-        GLES20.glVertexAttribPointer(texCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
-                false, VERTEX_STRIDE, 0);
+        GLES20.glVertexAttribPointer(texCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, VERTEX_STRIDE, 0);
         checkError();
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
         checkError();
@@ -819,8 +762,9 @@ public class GLES20Canvas implements GLCanvas {
 
     @Override
     public void dumpStatisticsAndClear() {
-        String line = String.format("MESH:%d, TEX_RECT:%d, FILL_RECT:%d, LINE:%d", mCountDrawMesh,
-                mCountTextureRect, mCountFillRect, mCountDrawLine);
+        String line =
+                String.format("MESH:%d, TEX_RECT:%d, FILL_RECT:%d, LINE:%d", mCountDrawMesh, mCountTextureRect,
+                        mCountFillRect, mCountDrawLine);
         mCountDrawMesh = 0;
         mCountTextureRect = 0;
         mCountFillRect = 0;
@@ -870,8 +814,8 @@ public class GLES20Canvas implements GLCanvas {
                 texture.prepare(this);
             }
 
-            GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
-                    texture.getTarget(), texture.getId(), 0);
+            GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, texture.getTarget(),
+                    texture.getId(), 0);
             checkError();
 
             checkFramebufferStatus();
@@ -930,8 +874,7 @@ public class GLES20Canvas implements GLCanvas {
     }
 
     @Override
-    public void texSubImage2D(BasicTexture texture, int xOffset, int yOffset, Bitmap bitmap,
-            int format, int type) {
+    public void texSubImage2D(BasicTexture texture, int xOffset, int yOffset, Bitmap bitmap, int format, int type) {
         int target = texture.getTarget();
         GLES20.glBindTexture(target, texture.getId());
         checkError();
@@ -954,8 +897,7 @@ public class GLES20Canvas implements GLCanvas {
         int bufferId = mTempIntArray[0];
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, bufferId);
         checkError();
-        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, buffer.capacity() * elementSize, buffer,
-                GLES20.GL_STATIC_DRAW);
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, buffer.capacity() * elementSize, buffer, GLES20.GL_STATIC_DRAW);
         checkError();
         return bufferId;
     }

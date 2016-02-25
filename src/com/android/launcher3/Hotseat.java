@@ -1,20 +1,20 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.util.ArrayList;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,8 +29,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
-import java.util.ArrayList;
 
 public class Hotseat extends FrameLayout {
     private static final String TAG = "Hotseat";
@@ -56,10 +54,8 @@ public class Hotseat extends FrameLayout {
         super(context, attrs, defStyle);
 
         Resources r = context.getResources();
-        mTransposeLayoutWithOrientation = 
-                r.getBoolean(R.bool.hotseat_transpose_layout_with_orientation);
-        mIsLandscape = context.getResources().getConfiguration().orientation ==
-            Configuration.ORIENTATION_LANDSCAPE;
+        mTransposeLayoutWithOrientation = r.getBoolean(R.bool.hotseat_transpose_layout_with_orientation);
+        mIsLandscape = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     public void setup(Launcher launcher) {
@@ -77,7 +73,7 @@ public class Hotseat extends FrameLayout {
     public void setOnLongClickListener(OnLongClickListener l) {
         mContent.setOnLongClickListener(l);
     }
-  
+
     private boolean hasVerticalHotseat() {
         return (mIsLandscape && mTransposeLayoutWithOrientation);
     }
@@ -86,13 +82,16 @@ public class Hotseat extends FrameLayout {
     int getOrderInHotseat(int x, int y) {
         return hasVerticalHotseat() ? (mContent.getCountY() - y - 1) : x;
     }
+
     /* Get the orientation specific coordinates given an invariant order in the hotseat. */
     int getCellXFromOrder(int rank) {
         return hasVerticalHotseat() ? 0 : rank;
     }
+
     int getCellYFromOrder(int rank) {
         return hasVerticalHotseat() ? (mContent.getCountY() - (rank + 1)) : 0;
     }
+
     public boolean isAllAppsButtonRank(int rank) {
         if (LauncherAppState.isDisableAllApps()) {
             return false;
@@ -106,8 +105,7 @@ public class Hotseat extends FrameLayout {
         Rect coords = new Rect();
         mContent.cellToRect(cellX, cellY, 1, 1, coords);
         int[] hotseatInParent = new int[2];
-        Utilities.getDescendantCoordRelativeToParent(this, mLauncher.getDragLayer(),
-                hotseatInParent, false);
+        Utilities.getDescendantCoordRelativeToParent(this, mLauncher.getDragLayer(), hotseatInParent, false);
         coords.offset(hotseatInParent[0], hotseatInParent[1]);
 
         // Center the icon
@@ -146,8 +144,7 @@ public class Hotseat extends FrameLayout {
             Context context = getContext();
 
             LayoutInflater inflater = LayoutInflater.from(context);
-            TextView allAppsButton = (TextView)
-                    inflater.inflate(R.layout.all_apps_button, mContent, false);
+            TextView allAppsButton = (TextView) inflater.inflate(R.layout.all_apps_button, mContent, false);
             Drawable d = context.getResources().getDrawable(R.drawable.all_apps_button_icon);
 
             Utilities.resizeIconDrawable(d);
@@ -166,7 +163,7 @@ public class Hotseat extends FrameLayout {
             // the hotseat in order regardless of which orientation they were added
             int x = getCellXFromOrder(mAllAppsButtonRank);
             int y = getCellYFromOrder(mAllAppsButtonRank);
-            CellLayout.LayoutParams lp = new CellLayout.LayoutParams(x,y,1,1);
+            CellLayout.LayoutParams lp = new CellLayout.LayoutParams(x, y, 1, 1);
             lp.canReorder = false;
             mContent.addViewToCellLayout(allAppsButton, -1, allAppsButton.getId(), lp, true);
         }
@@ -182,8 +179,7 @@ public class Hotseat extends FrameLayout {
         return false;
     }
 
-    void addAllAppsFolder(IconCache iconCache,
-            ArrayList<AppInfo> allApps, ArrayList<ComponentName> onWorkspace,
+    void addAllAppsFolder(IconCache iconCache, ArrayList<AppInfo> allApps, ArrayList<ComponentName> onWorkspace,
             Launcher launcher, Workspace workspace) {
         if (LauncherAppState.isDisableAllApps()) {
             FolderInfo fi = new FolderInfo();
@@ -196,14 +192,11 @@ public class Hotseat extends FrameLayout {
             fi.screenId = mAllAppsButtonRank;
             fi.itemType = LauncherSettings.Favorites.ITEM_TYPE_FOLDER;
             fi.title = "More Apps";
-            LauncherModel.addItemToDatabase(launcher, fi, fi.container, fi.screenId, fi.cellX,
-                    fi.cellY, false);
-            FolderIcon folder = FolderIcon.fromXml(R.layout.folder_icon, launcher,
-                    getLayout(), fi, iconCache);
-            workspace.addInScreen(folder, fi.container, fi.screenId, fi.cellX, fi.cellY,
-                    fi.spanX, fi.spanY);
+            LauncherModel.addItemToDatabase(launcher, fi, fi.container, fi.screenId, fi.cellX, fi.cellY, false);
+            FolderIcon folder = FolderIcon.fromXml(R.layout.folder_icon, launcher, getLayout(), fi, iconCache);
+            workspace.addInScreen(folder, fi.container, fi.screenId, fi.cellX, fi.cellY, fi.spanX, fi.spanY);
 
-            for (AppInfo info: allApps) {
+            for (AppInfo info : allApps) {
                 ComponentName cn = info.intent.getComponent();
                 if (!onWorkspace.contains(cn)) {
                     Log.d(TAG, "Adding to 'more apps': " + info.intent);
@@ -226,7 +219,7 @@ public class Hotseat extends FrameLayout {
             }
 
             FolderInfo info = fi.getFolderInfo();
-            for (AppInfo a: apps) {
+            for (AppInfo a : apps) {
                 ShortcutInfo si = a.makeShortcut();
                 info.add(si);
             }

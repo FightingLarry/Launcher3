@@ -1,37 +1,32 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.android.launcher3.compat.LauncherActivityInfoCompat;
-import com.android.launcher3.compat.UserManagerCompat;
 import com.android.launcher3.compat.UserHandleCompat;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import com.android.launcher3.compat.UserManagerCompat;
 
 /**
  * Represents an app in AllAppsView.
@@ -76,8 +71,8 @@ public class AppInfo extends ItemInfo {
     /**
      * Must not hold the Context.
      */
-    public AppInfo(Context context, LauncherActivityInfoCompat info, UserHandleCompat user,
-            IconCache iconCache, HashMap<Object, CharSequence> labelCache) {
+    public AppInfo(Context context, LauncherActivityInfoCompat info, UserHandleCompat user, IconCache iconCache,
+            HashMap<Object, CharSequence> labelCache) {
         this.componentName = info.getComponentName();
         this.container = ItemInfo.NO_ID;
 
@@ -118,18 +113,16 @@ public class AppInfo extends ItemInfo {
 
     @Override
     public String toString() {
-        return "ApplicationInfo(title=" + title.toString() + " id=" + this.id
-                + " type=" + this.itemType + " container=" + this.container
-                + " screen=" + screenId + " cellX=" + cellX + " cellY=" + cellY
-                + " spanX=" + spanX + " spanY=" + spanY + " dropPos=" + Arrays.toString(dropPos)
-                + " user=" + user + ")";
+        return "ApplicationInfo(title=" + title.toString() + " id=" + this.id + " type=" + this.itemType
+                + " container=" + this.container + " screen=" + screenId + " cellX=" + cellX + " cellY=" + cellY
+                + " spanX=" + spanX + " spanY=" + spanY + " dropPos=" + Arrays.toString(dropPos) + " user=" + user
+                + ")";
     }
 
     public static void dumpApplicationInfoList(String tag, String label, ArrayList<AppInfo> list) {
         Log.d(tag, label + " size=" + list.size());
-        for (AppInfo info: list) {
-            Log.d(tag, "   title=\"" + info.title + "\" iconBitmap="
-                    + info.iconBitmap + " firstInstallTime="
+        for (AppInfo info : list) {
+            Log.d(tag, "   title=\"" + info.title + "\" iconBitmap=" + info.iconBitmap + " firstInstallTime="
                     + info.firstInstallTime);
         }
     }

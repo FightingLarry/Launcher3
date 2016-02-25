@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
 **
 ** Copyright 2013, The Android Open Source Project
@@ -22,10 +21,12 @@
     android:id="@+id/wallpaper_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <com.android.launcher3.CropView
         android:id="@+id/cropView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
     <ProgressBar
         android:id="@+id/loading"
         style="@android:style/Widget.Holo.ProgressBar.Large"

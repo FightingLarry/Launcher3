@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
 * Copyright (C) 2008 The Android Open Source Project
 *
@@ -32,10 +31,9 @@
         <item name="android:fontFamily">sans-serif-condensed</item>
     </style>
 
-    <style name="WorkspaceIcon.Portrait">
-    </style>
-    <style name="WorkspaceIcon.Landscape">
-    </style>
+    <style name="WorkspaceIcon.Portrait"></style>
+
+    <style name="WorkspaceIcon.Landscape"></style>
 
     <style name="WorkspaceIcon.AppsCustomize">
         <item name="android:background">@null</item>
@@ -52,14 +50,15 @@
         <item name="customShadows">false</item>
     </style>
 
-    <style name="SearchDropTargetBar">
-    </style>
-    <style name="SearchButton">
-    </style>
+    <style name="SearchDropTargetBar"></style>
+
+    <style name="SearchButton"></style>
+
     <style name="DropTargetButtonContainer">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
     </style>
+
     <style name="DropTargetButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">match_parent</item>
@@ -92,6 +91,7 @@
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">end</item>
     </style>
+
     <style name="TabIndicator.AppsCustomize">
         <!-- Overridden in values-land -->
     </style>
@@ -101,7 +101,9 @@
         <item name="android:paddingRight">5dp</item>
         <item name="android:textColor">@color/workspace_all_apps_and_delete_zone_text_color</item>
         <item name="android:textSize">18sp</item>
-        <item name="android:shadowColor">@color/workspace_all_apps_and_delete_zone_text_shadow_color</item>
+        <item name="android:shadowColor">
+            @color/workspace_all_apps_and_delete_zone_text_shadow_color
+        </item>
         <item name="android:shadowDx">0.0</item>
         <item name="android:shadowDy">0.0</item>
         <item name="android:shadowRadius">2.0</item>
@@ -123,6 +125,7 @@
     <style name="PagedViewWidgetImageView">
         <item name="android:paddingLeft">@dimen/app_widget_preview_padding_left</item>
     </style>
+
     <style name="SearchButton.WithPaddingStart">
         <item name="android:paddingLeft">8dp</item>
     </style>

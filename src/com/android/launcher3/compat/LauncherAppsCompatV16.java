@@ -1,20 +1,21 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3.compat;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -32,36 +33,30 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Version of {@link LauncherAppsCompat} for devices with API level 16.
- * Devices Pre-L don't support multiple profiles in one launcher so
- * user parameters are ignored and all methods operate on the current user.
+ * Version of {@link LauncherAppsCompat} for devices with API level 16. Devices Pre-L don't support
+ * multiple profiles in one launcher so user parameters are ignored and all methods operate on the
+ * current user.
  */
 public class LauncherAppsCompatV16 extends LauncherAppsCompat {
 
     private PackageManager mPm;
     private Context mContext;
-    private List<OnAppsChangedCallbackCompat> mCallbacks
-            = new ArrayList<OnAppsChangedCallbackCompat>();
+    private List<OnAppsChangedCallbackCompat> mCallbacks = new ArrayList<OnAppsChangedCallbackCompat>();
     private PackageMonitor mPackageMonitor;
 
     LauncherAppsCompatV16(Context context) {
         mPm = context.getPackageManager();
         mContext = context;
         mPackageMonitor = new PackageMonitor();
-   }
+    }
 
-    public List<LauncherActivityInfoCompat> getActivityList(String packageName,
-            UserHandleCompat user) {
+    public List<LauncherActivityInfoCompat> getActivityList(String packageName, UserHandleCompat user) {
         final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         mainIntent.setPackage(packageName);
         List<ResolveInfo> infos = mPm.queryIntentActivities(mainIntent, 0);
-        List<LauncherActivityInfoCompat> list =
-                new ArrayList<LauncherActivityInfoCompat>(infos.size());
+        List<LauncherActivityInfoCompat> list = new ArrayList<LauncherActivityInfoCompat>(infos.size());
         for (ResolveInfo info : infos) {
             list.add(new LauncherActivityInfoCompatV16(mContext, info));
         }
@@ -76,8 +71,7 @@ public class LauncherAppsCompatV16 extends LauncherAppsCompat {
         return null;
     }
 
-    public void startActivityForProfile(ComponentName component, UserHandleCompat user,
-            Rect sourceBounds, Bundle opts) {
+    public void startActivityForProfile(ComponentName component, UserHandleCompat user, Rect sourceBounds, Bundle opts) {
         Intent launchIntent = new Intent(Intent.ACTION_MAIN);
         launchIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         launchIntent.setComponent(component);
@@ -88,10 +82,10 @@ public class LauncherAppsCompatV16 extends LauncherAppsCompat {
 
     public void showAppDetailsForProfile(ComponentName component, UserHandleCompat user) {
         String packageName = component.getPackageName();
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                Uri.fromParts("package", packageName, null));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        Intent intent =
+                new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         mContext.startActivity(intent, null);
     }
 
@@ -154,8 +148,7 @@ public class LauncherAppsCompatV16 extends LauncherAppsCompat {
             final String action = intent.getAction();
             final UserHandleCompat user = UserHandleCompat.myUserHandle();
 
-            if (Intent.ACTION_PACKAGE_CHANGED.equals(action)
-                    || Intent.ACTION_PACKAGE_REMOVED.equals(action)
+            if (Intent.ACTION_PACKAGE_CHANGED.equals(action) || Intent.ACTION_PACKAGE_REMOVED.equals(action)
                     || Intent.ACTION_PACKAGE_ADDED.equals(action)) {
                 final String packageName = intent.getData().getSchemeSpecificPart();
                 final boolean replacing = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false);
@@ -191,15 +184,17 @@ public class LauncherAppsCompatV16 extends LauncherAppsCompat {
                 // EXTRA_REPLACING is available Kitkat onwards. For lower devices, it is broadcasted
                 // when moving a package or mounting/un-mounting external storage. Assume that
                 // it is a replacing operation.
-                final boolean replacing = intent.getBooleanExtra(Intent.EXTRA_REPLACING,
-                        Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT);
+                final boolean replacing =
+                        intent.getBooleanExtra(Intent.EXTRA_REPLACING,
+                                Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT);
                 String[] packages = intent.getStringArrayExtra(Intent.EXTRA_CHANGED_PACKAGE_LIST);
                 for (OnAppsChangedCallbackCompat callback : getCallbacks()) {
                     callback.onPackagesAvailable(packages, user, replacing);
                 }
             } else if (Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE.equals(action)) {
-                final boolean replacing = intent.getBooleanExtra(Intent.EXTRA_REPLACING,
-                        Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT);
+                final boolean replacing =
+                        intent.getBooleanExtra(Intent.EXTRA_REPLACING,
+                                Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT);
                 String[] packages = intent.getStringArrayExtra(Intent.EXTRA_CHANGED_PACKAGE_LIST);
                 for (OnAppsChangedCallbackCompat callback : getCallbacks()) {
                     callback.onPackagesUnavailable(packages, user, replacing);

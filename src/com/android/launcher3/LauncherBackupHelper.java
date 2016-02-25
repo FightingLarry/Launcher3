@@ -1,35 +1,29 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package com.android.launcher3;
 
-import com.google.protobuf.nano.InvalidProtocolBufferNanoException;
-import com.google.protobuf.nano.MessageNano;
-
-import com.android.launcher3.LauncherSettings.Favorites;
-import com.android.launcher3.LauncherSettings.WorkspaceScreens;
-import com.android.launcher3.backup.BackupProtos;
-import com.android.launcher3.backup.BackupProtos.CheckedMessage;
-import com.android.launcher3.backup.BackupProtos.Favorite;
-import com.android.launcher3.backup.BackupProtos.Journal;
-import com.android.launcher3.backup.BackupProtos.Key;
-import com.android.launcher3.backup.BackupProtos.Resource;
-import com.android.launcher3.backup.BackupProtos.Screen;
-import com.android.launcher3.backup.BackupProtos.Widget;
-import com.android.launcher3.compat.UserManagerCompat;
-import com.android.launcher3.compat.UserHandleCompat;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.zip.CRC32;
 
 import android.app.backup.BackupDataInputStream;
 import android.app.backup.BackupDataOutput;
@@ -51,17 +45,20 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.zip.CRC32;
+import com.android.launcher3.LauncherSettings.Favorites;
+import com.android.launcher3.LauncherSettings.WorkspaceScreens;
+import com.android.launcher3.backup.BackupProtos;
+import com.android.launcher3.backup.BackupProtos.CheckedMessage;
+import com.android.launcher3.backup.BackupProtos.Favorite;
+import com.android.launcher3.backup.BackupProtos.Journal;
+import com.android.launcher3.backup.BackupProtos.Key;
+import com.android.launcher3.backup.BackupProtos.Resource;
+import com.android.launcher3.backup.BackupProtos.Screen;
+import com.android.launcher3.backup.BackupProtos.Widget;
+import com.android.launcher3.compat.UserHandleCompat;
+import com.android.launcher3.compat.UserManagerCompat;
+import com.google.protobuf.nano.InvalidProtocolBufferNanoException;
+import com.google.protobuf.nano.MessageNano;
 
 /**
  * Persist the launcher home state across calamities.
@@ -87,30 +84,28 @@ public class LauncherBackupHelper implements BackupHelper {
 
     public static final String LAUNCHER_PREFS_PREFIX = "LP";
 
-    private static final Bitmap.CompressFormat IMAGE_FORMAT =
-            android.graphics.Bitmap.CompressFormat.PNG;
+    private static final Bitmap.CompressFormat IMAGE_FORMAT = android.graphics.Bitmap.CompressFormat.PNG;
 
     private static BackupManager sBackupManager;
 
-    private static final String[] FAVORITE_PROJECTION = {
-            Favorites._ID,                     // 0
-            Favorites.MODIFIED,                // 1
-            Favorites.INTENT,                  // 2
-            Favorites.APPWIDGET_PROVIDER,      // 3
-            Favorites.APPWIDGET_ID,            // 4
-            Favorites.CELLX,                   // 5
-            Favorites.CELLY,                   // 6
-            Favorites.CONTAINER,               // 7
-            Favorites.ICON,                    // 8
-            Favorites.ICON_PACKAGE,            // 9
-            Favorites.ICON_RESOURCE,           // 10
-            Favorites.ICON_TYPE,               // 11
-            Favorites.ITEM_TYPE,               // 12
-            Favorites.SCREEN,                  // 13
-            Favorites.SPANX,                   // 14
-            Favorites.SPANY,                   // 15
-            Favorites.TITLE,                   // 16
-            Favorites.PROFILE_ID,              // 17
+    private static final String[] FAVORITE_PROJECTION = {Favorites._ID, // 0
+            Favorites.MODIFIED, // 1
+            Favorites.INTENT, // 2
+            Favorites.APPWIDGET_PROVIDER, // 3
+            Favorites.APPWIDGET_ID, // 4
+            Favorites.CELLX, // 5
+            Favorites.CELLY, // 6
+            Favorites.CONTAINER, // 7
+            Favorites.ICON, // 8
+            Favorites.ICON_PACKAGE, // 9
+            Favorites.ICON_RESOURCE, // 10
+            Favorites.ICON_TYPE, // 11
+            Favorites.ITEM_TYPE, // 12
+            Favorites.SCREEN, // 13
+            Favorites.SPANX, // 14
+            Favorites.SPANY, // 15
+            Favorites.TITLE, // 16
+            Favorites.PROFILE_ID, // 17
     };
 
     private static final int ID_INDEX = 0;
@@ -132,11 +127,10 @@ public class LauncherBackupHelper implements BackupHelper {
     private static final int TITLE_INDEX = 16;
     private static final int PROFILE_ID_INDEX = 17;
 
-    private static final String[] SCREEN_PROJECTION = {
-            WorkspaceScreens._ID,              // 0
-            WorkspaceScreens.MODIFIED,         // 1
-            WorkspaceScreens.SCREEN_RANK       // 2
-    };
+    private static final String[] SCREEN_PROJECTION = {WorkspaceScreens._ID, // 0
+            WorkspaceScreens.MODIFIED, // 1
+            WorkspaceScreens.SCREEN_RANK // 2
+            };
 
     private static final int SCREEN_RANK_INDEX = 2;
 
@@ -166,9 +160,11 @@ public class LauncherBackupHelper implements BackupHelper {
     /**
      * Back up launcher data so we can restore the user's state on a new device.
      *
-     * <P>The journal is a timestamp and a list of keys that were saved as of that time.
+     * <P>
+     * The journal is a timestamp and a list of keys that were saved as of that time.
      *
-     * <P>Keys may come back in any order, so each key/value is one complete row of the database.
+     * <P>
+     * Keys may come back in any order, so each key/value is one complete row of the database.
      *
      * @param oldState notes from the last backup
      * @param data incremental key/value pairs to persist off-device
@@ -176,8 +172,7 @@ public class LauncherBackupHelper implements BackupHelper {
      * @throws IOException
      */
     @Override
-    public void performBackup(ParcelFileDescriptor oldState, BackupDataOutput data,
-            ParcelFileDescriptor newState) {
+    public void performBackup(ParcelFileDescriptor oldState, BackupDataOutput data, ParcelFileDescriptor newState) {
         if (VERBOSE) Log.v(TAG, "onBackup");
 
         Journal in = readJournal(oldState);
@@ -212,7 +207,8 @@ public class LauncherBackupHelper implements BackupHelper {
     /**
      * Restore launcher configuration from the restored data stream.
      *
-     * <P>Keys may arrive in any order.
+     * <P>
+     * Keys may arrive in any order.
      *
      * @param data the key/value pair from the server
      */
@@ -220,12 +216,12 @@ public class LauncherBackupHelper implements BackupHelper {
     public void restoreEntity(BackupDataInputStream data) {
         if (VERBOSE) Log.v(TAG, "restoreEntity");
         byte[] buffer = new byte[512];
-            String backupKey = data.getKey();
-            int dataSize = data.size();
-            if (buffer.length < dataSize) {
-                buffer = new byte[dataSize];
-            }
-            Key key = null;
+        String backupKey = data.getKey();
+        int dataSize = data.size();
+        if (buffer.length < dataSize) {
+            buffer = new byte[dataSize];
+        }
+        Key key = null;
         int bytesRead = 0;
         try {
             bytesRead = data.read(buffer, 0, dataSize);
@@ -290,8 +286,7 @@ public class LauncherBackupHelper implements BackupHelper {
      * @param keys keys to mark as clean in the notes for next backup
      * @throws IOException
      */
-    private void backupFavorites(Journal in, BackupDataOutput data, Journal out,
-            ArrayList<Key> keys)
+    private void backupFavorites(Journal in, BackupDataOutput data, Journal out, ArrayList<Key> keys)
             throws IOException {
         // read the old ID set
         Set<String> savedIds = getSavedIdsByType(Key.FAVORITE, in);
@@ -300,12 +295,11 @@ public class LauncherBackupHelper implements BackupHelper {
         // persist things that have changed since the last backup
         ContentResolver cr = mContext.getContentResolver();
         // Don't backup apps in other profiles for now.
-        Cursor cursor = cr.query(Favorites.CONTENT_URI, FAVORITE_PROJECTION,
-                getUserSelectionArg(), null, null);
+        Cursor cursor = cr.query(Favorites.CONTENT_URI, FAVORITE_PROJECTION, getUserSelectionArg(), null, null);
         Set<String> currentIds = new HashSet<String>(cursor.getCount());
         try {
             cursor.moveToPosition(-1);
-            while(cursor.moveToNext()) {
+            while (cursor.moveToNext()) {
                 final long id = cursor.getLong(ID_INDEX);
                 final long updateTime = cursor.getLong(ID_MODIFIED);
                 Key key = getKey(Key.FAVORITE, id);
@@ -332,7 +326,8 @@ public class LauncherBackupHelper implements BackupHelper {
     /**
      * Read a favorite from the stream.
      *
-     * <P>Keys arrive in any order, so screens and containers may not exist yet.
+     * <P>
+     * Keys arrive in any order, so screens and containers may not exist yet.
      *
      * @param key identifier for the row
      * @param buffer the serialized proto from the stream, may be larger than dataSize
@@ -341,8 +336,8 @@ public class LauncherBackupHelper implements BackupHelper {
      */
     private void restoreFavorite(Key key, byte[] buffer, int dataSize, ArrayList<Key> keys) {
         if (VERBOSE) Log.v(TAG, "unpacking favorite " + key.id);
-        if (DEBUG) Log.d(TAG, "read (" + buffer.length + "): " +
-                Base64.encodeToString(buffer, 0, dataSize, Base64.NO_WRAP));
+        if (DEBUG)
+            Log.d(TAG, "read (" + buffer.length + "): " + Base64.encodeToString(buffer, 0, dataSize, Base64.NO_WRAP));
 
         if (!mRestoreEnabled) {
             if (VERBOSE) Log.v(TAG, "restore not enabled: skipping database mutation");
@@ -368,22 +363,19 @@ public class LauncherBackupHelper implements BackupHelper {
      * @param keys keys to mark as clean in the notes for next backup
      * @throws IOException
      */
-    private void backupScreens(Journal in, BackupDataOutput data, Journal out,
-            ArrayList<Key> keys)
-            throws IOException {
+    private void backupScreens(Journal in, BackupDataOutput data, Journal out, ArrayList<Key> keys) throws IOException {
         // read the old ID set
         Set<String> savedIds = getSavedIdsByType(Key.SCREEN, in);
         if (DEBUG) Log.d(TAG, "screen savedIds.size()=" + savedIds.size());
 
         // persist things that have changed since the last backup
         ContentResolver cr = mContext.getContentResolver();
-        Cursor cursor = cr.query(WorkspaceScreens.CONTENT_URI, SCREEN_PROJECTION,
-                null, null, null);
+        Cursor cursor = cr.query(WorkspaceScreens.CONTENT_URI, SCREEN_PROJECTION, null, null, null);
         Set<String> currentIds = new HashSet<String>(cursor.getCount());
         try {
             cursor.moveToPosition(-1);
             if (DEBUG) Log.d(TAG, "dumping screens after: " + in.t);
-            while(cursor.moveToNext()) {
+            while (cursor.moveToNext()) {
                 final long id = cursor.getLong(ID_INDEX);
                 final long updateTime = cursor.getLong(ID_MODIFIED);
                 Key key = getKey(Key.SCREEN, id);
@@ -410,7 +402,8 @@ public class LauncherBackupHelper implements BackupHelper {
     /**
      * Read a screen from the stream.
      *
-     * <P>Keys arrive in any order, so children of this screen may already exist.
+     * <P>
+     * Keys arrive in any order, so children of this screen may already exist.
      *
      * @param key identifier for the row
      * @param buffer the serialized proto from the stream, may be larger than dataSize
@@ -419,8 +412,8 @@ public class LauncherBackupHelper implements BackupHelper {
      */
     private void restoreScreen(Key key, byte[] buffer, int dataSize, ArrayList<Key> keys) {
         if (VERBOSE) Log.v(TAG, "unpacking screen " + key.id);
-        if (DEBUG) Log.d(TAG, "read (" + buffer.length + "): " +
-                Base64.encodeToString(buffer, 0, dataSize, Base64.NO_WRAP));
+        if (DEBUG)
+            Log.d(TAG, "read (" + buffer.length + "): " + Base64.encodeToString(buffer, 0, dataSize, Base64.NO_WRAP));
 
         if (!mRestoreEnabled) {
             if (VERBOSE) Log.v(TAG, "restore not enabled: skipping database mutation");
@@ -438,8 +431,8 @@ public class LauncherBackupHelper implements BackupHelper {
     }
 
     /**
-     * Write all the static icon resources we need to render placeholders
-     * for a package that is not installed.
+     * Write all the static icon resources we need to render placeholders for a package that is not
+     * installed.
      *
      * @param in notes from last backup
      * @param data output stream for key/value pairs
@@ -447,8 +440,7 @@ public class LauncherBackupHelper implements BackupHelper {
      * @param keys keys to mark as clean in the notes for next backup
      * @throws IOException
      */
-    private void backupIcons(Journal in, BackupDataOutput data, Journal out,
-            ArrayList<Key> keys) throws IOException {
+    private void backupIcons(Journal in, BackupDataOutput data, Journal out, ArrayList<Key> keys) throws IOException {
         // persist icons that haven't been persisted yet
         if (!initializeIconCache()) {
             dataChanged(); // try again later
@@ -467,15 +459,14 @@ public class LauncherBackupHelper implements BackupHelper {
         int startRows = out.rows;
         if (DEBUG) Log.d(TAG, "starting here: " + startRows);
 
-        String where = "(" + Favorites.ITEM_TYPE + "=" + Favorites.ITEM_TYPE_APPLICATION + " OR " +
-                Favorites.ITEM_TYPE + "=" + Favorites.ITEM_TYPE_SHORTCUT + ") AND " +
-                getUserSelectionArg();
-        Cursor cursor = cr.query(Favorites.CONTENT_URI, FAVORITE_PROJECTION,
-                where, null, null);
+        String where =
+                "(" + Favorites.ITEM_TYPE + "=" + Favorites.ITEM_TYPE_APPLICATION + " OR " + Favorites.ITEM_TYPE + "="
+                        + Favorites.ITEM_TYPE_SHORTCUT + ") AND " + getUserSelectionArg();
+        Cursor cursor = cr.query(Favorites.CONTENT_URI, FAVORITE_PROJECTION, where, null, null);
         Set<String> currentIds = new HashSet<String>(cursor.getCount());
         try {
             cursor.moveToPosition(-1);
-            while(cursor.moveToNext()) {
+            while (cursor.moveToNext()) {
                 final long id = cursor.getLong(ID_INDEX);
                 final String intentDescription = cursor.getString(INTENT_INDEX);
                 try {
@@ -531,7 +522,8 @@ public class LauncherBackupHelper implements BackupHelper {
     /**
      * Read an icon from the stream.
      *
-     * <P>Keys arrive in any order, so shortcuts that use this icon may already exist.
+     * <P>
+     * Keys arrive in any order, so shortcuts that use this icon may already exist.
      *
      * @param key identifier for the row
      * @param buffer the serialized proto from the stream, may be larger than dataSize
@@ -540,8 +532,8 @@ public class LauncherBackupHelper implements BackupHelper {
      */
     private void restoreIcon(Key key, byte[] buffer, int dataSize, ArrayList<Key> keys) {
         if (VERBOSE) Log.v(TAG, "unpacking icon " + key.id);
-        if (DEBUG) Log.d(TAG, "read (" + buffer.length + "): " +
-                Base64.encodeToString(buffer, 0, dataSize, Base64.NO_WRAP));
+        if (DEBUG)
+            Log.d(TAG, "read (" + buffer.length + "): " + Base64.encodeToString(buffer, 0, dataSize, Base64.NO_WRAP));
 
         try {
             Resource res = unpackIcon(buffer, 0, dataSize);
@@ -549,9 +541,7 @@ public class LauncherBackupHelper implements BackupHelper {
                 Log.d(TAG, "unpacked " + res.dpi + " dpi icon");
             }
             if (DEBUG_PAYLOAD) {
-                Log.d(TAG, "read " +
-                        Base64.encodeToString(res.data, 0, res.data.length,
-                                Base64.NO_WRAP));
+                Log.d(TAG, "read " + Base64.encodeToString(res.data, 0, res.data.length, Base64.NO_WRAP));
             }
             Bitmap icon = BitmapFactory.decodeByteArray(res.data, 0, res.data.length);
             if (icon == null) {
@@ -565,8 +555,7 @@ public class LauncherBackupHelper implements BackupHelper {
                 return;
             } else {
                 if (VERBOSE) Log.v(TAG, "saving restored icon as: " + key.name);
-                IconCache.preloadIcon(mContext, ComponentName.unflattenFromString(key.name),
-                        icon, res.dpi);
+                IconCache.preloadIcon(mContext, ComponentName.unflattenFromString(key.name), icon, res.dpi);
             }
         } catch (IOException e) {
             Log.d(TAG, "failed to save restored icon for: " + key.name, e);
@@ -574,8 +563,8 @@ public class LauncherBackupHelper implements BackupHelper {
     }
 
     /**
-     * Write all the static widget resources we need to render placeholders
-     * for a package that is not installed.
+     * Write all the static widget resources we need to render placeholders for a package that is
+     * not installed.
      *
      * @param in notes from last backup
      * @param data output stream for key/value pairs
@@ -583,8 +572,7 @@ public class LauncherBackupHelper implements BackupHelper {
      * @param keys keys to mark as clean in the notes for next backup
      * @throws IOException
      */
-    private void backupWidgets(Journal in, BackupDataOutput data, Journal out,
-            ArrayList<Key> keys) throws IOException {
+    private void backupWidgets(Journal in, BackupDataOutput data, Journal out, ArrayList<Key> keys) throws IOException {
         // persist static widget info that hasn't been persisted yet
         final LauncherAppState appState = LauncherAppState.getInstanceNoCreate();
         if (appState == null || !initializeIconCache()) {
@@ -604,14 +592,12 @@ public class LauncherBackupHelper implements BackupHelper {
 
         int startRows = out.rows;
         if (DEBUG) Log.d(TAG, "starting here: " + startRows);
-        String where = Favorites.ITEM_TYPE + "=" + Favorites.ITEM_TYPE_APPWIDGET + " AND "
-                + getUserSelectionArg();
-        Cursor cursor = cr.query(Favorites.CONTENT_URI, FAVORITE_PROJECTION,
-                where, null, null);
+        String where = Favorites.ITEM_TYPE + "=" + Favorites.ITEM_TYPE_APPWIDGET + " AND " + getUserSelectionArg();
+        Cursor cursor = cr.query(Favorites.CONTENT_URI, FAVORITE_PROJECTION, where, null, null);
         Set<String> currentIds = new HashSet<String>(cursor.getCount());
         try {
             cursor.moveToPosition(-1);
-            while(cursor.moveToNext()) {
+            while (cursor.moveToNext()) {
                 final long id = cursor.getLong(ID_INDEX);
                 final String providerName = cursor.getString(APPWIDGET_PROVIDER_INDEX);
                 final int spanX = cursor.getInt(SPANX_INDEX);
@@ -635,8 +621,8 @@ public class LauncherBackupHelper implements BackupHelper {
                     if (DEBUG) Log.d(TAG, "I can count this high: " + out.rows);
                     if ((out.rows - startRows) < MAX_WIDGETS_PER_PASS) {
                         if (VERBOSE) Log.v(TAG, "saving widget " + backupKey);
-                        previewLoader.setPreviewSize(spanX * profile.cellWidthPx,
-                                spanY * profile.cellHeightPx, widgetSpacingLayout);
+                        previewLoader.setPreviewSize(spanX * profile.cellWidthPx, spanY * profile.cellHeightPx,
+                                widgetSpacingLayout);
                         byte[] blob = packWidget(dpi, previewLoader, mIconCache, provider);
                         keys.add(key);
                         writeRowToBackup(key, blob, out, data);
@@ -661,7 +647,8 @@ public class LauncherBackupHelper implements BackupHelper {
     /**
      * Read a widget from the stream.
      *
-     * <P>Keys arrive in any order, so widgets that use this data may already exist.
+     * <P>
+     * Keys arrive in any order, so widgets that use this data may already exist.
      *
      * @param key identifier for the row
      * @param buffer the serialized proto from the stream, may be larger than dataSize
@@ -670,19 +657,18 @@ public class LauncherBackupHelper implements BackupHelper {
      */
     private void restoreWidget(Key key, byte[] buffer, int dataSize, ArrayList<Key> keys) {
         if (VERBOSE) Log.v(TAG, "unpacking widget " + key.id);
-        if (DEBUG) Log.d(TAG, "read (" + buffer.length + "): " +
-                Base64.encodeToString(buffer, 0, dataSize, Base64.NO_WRAP));
+        if (DEBUG)
+            Log.d(TAG, "read (" + buffer.length + "): " + Base64.encodeToString(buffer, 0, dataSize, Base64.NO_WRAP));
         try {
             Widget widget = unpackWidget(buffer, 0, dataSize);
             if (DEBUG) Log.d(TAG, "unpacked " + widget.provider);
-            if (widget.icon.data != null)  {
-                Bitmap icon = BitmapFactory
-                        .decodeByteArray(widget.icon.data, 0, widget.icon.data.length);
+            if (widget.icon.data != null) {
+                Bitmap icon = BitmapFactory.decodeByteArray(widget.icon.data, 0, widget.icon.data.length);
                 if (icon == null) {
                     Log.w(TAG, "failed to unpack widget icon for " + key.name);
                 } else {
-                    IconCache.preloadIcon(mContext, ComponentName.unflattenFromString(widget.provider),
-                            icon, widget.icon.dpi);
+                    IconCache.preloadIcon(mContext, ComponentName.unflattenFromString(widget.provider), icon,
+                            widget.icon.dpi);
                 }
             }
 
@@ -697,10 +683,11 @@ public class LauncherBackupHelper implements BackupHelper {
         }
     }
 
-    /** create a new key, with an integer ID.
+    /**
+     * create a new key, with an integer ID.
      *
-     * <P> Keys contain their own checksum instead of using
-     * the heavy-weight CheckedMessage wrapper.
+     * <P>
+     * Keys contain their own checksum instead of using the heavy-weight CheckedMessage wrapper.
      */
     private Key getKey(int type, long id) {
         Key key = new Key();
@@ -710,10 +697,11 @@ public class LauncherBackupHelper implements BackupHelper {
         return key;
     }
 
-    /** create a new key for a named object.
+    /**
+     * create a new key for a named object.
      *
-     * <P> Keys contain their own checksum instead of using
-     * the heavy-weight CheckedMessage wrapper.
+     * <P>
+     * Keys contain their own checksum instead of using the heavy-weight CheckedMessage wrapper.
      */
     private Key getKey(int type, String name) {
         Key key = new Key();
@@ -819,7 +807,7 @@ public class LauncherBackupHelper implements BackupHelper {
                 favorite.intent = intent.toUri(0);
             } catch (URISyntaxException e) {
                 Log.e(TAG, "Invalid intent", e);
-           }
+            }
         }
         favorite.itemType = c.getInt(ITEM_TYPE_INDEX);
         if (favorite.itemType == Favorites.ITEM_TYPE_APPWIDGET) {
@@ -838,8 +826,9 @@ public class LauncherBackupHelper implements BackupHelper {
             throws InvalidProtocolBufferNanoException {
         Favorite favorite = new Favorite();
         MessageNano.mergeFrom(favorite, readCheckedBytes(buffer, offset, dataSize));
-        if (VERBOSE) Log.v(TAG, "unpacked favorite " + favorite.itemType + ", " +
-                (TextUtils.isEmpty(favorite.title) ? favorite.id : favorite.title));
+        if (VERBOSE)
+            Log.v(TAG, "unpacked favorite " + favorite.itemType + ", "
+                    + (TextUtils.isEmpty(favorite.title) ? favorite.id : favorite.title));
         ContentValues values = new ContentValues();
         values.put(Favorites._ID, favorite.id);
         values.put(Favorites.SCREEN, favorite.screen);
@@ -867,8 +856,7 @@ public class LauncherBackupHelper implements BackupHelper {
         values.put(Favorites.ITEM_TYPE, favorite.itemType);
 
         UserHandleCompat myUserHandle = UserHandleCompat.myUserHandle();
-        long userSerialNumber =
-                UserManagerCompat.getInstance(mContext).getSerialNumberForUser(myUserHandle);
+        long userSerialNumber = UserManagerCompat.getInstance(mContext).getSerialNumberForUser(myUserHandle);
         values.put(LauncherSettings.Favorites.PROFILE_ID, userSerialNumber);
 
         if (favorite.itemType == Favorites.ITEM_TYPE_APPWIDGET) {
@@ -876,10 +864,8 @@ public class LauncherBackupHelper implements BackupHelper {
                 values.put(Favorites.APPWIDGET_PROVIDER, favorite.appWidgetProvider);
             }
             values.put(Favorites.APPWIDGET_ID, favorite.appWidgetId);
-            values.put(LauncherSettings.Favorites.RESTORED,
-                    LauncherAppWidgetInfo.FLAG_ID_NOT_VALID |
-                    LauncherAppWidgetInfo.FLAG_PROVIDER_NOT_READY |
-                    LauncherAppWidgetInfo.FLAG_UI_NOT_READY);
+            values.put(LauncherSettings.Favorites.RESTORED, LauncherAppWidgetInfo.FLAG_ID_NOT_VALID
+                    | LauncherAppWidgetInfo.FLAG_PROVIDER_NOT_READY | LauncherAppWidgetInfo.FLAG_UI_NOT_READY);
         } else {
             // Let LauncherModel know we've been here.
             values.put(LauncherSettings.Favorites.RESTORED, 1);
@@ -930,8 +916,7 @@ public class LauncherBackupHelper implements BackupHelper {
     }
 
     /** Serialize a widget for persistence, including a checksum wrapper. */
-    private byte[] packWidget(int dpi, WidgetPreviewLoader previewLoader, IconCache iconCache,
-            ComponentName provider) {
+    private byte[] packWidget(int dpi, WidgetPreviewLoader previewLoader, IconCache iconCache, ComponentName provider) {
         final AppWidgetProviderInfo info = findAppWidgetProviderInfo(provider);
         Widget widget = new Widget();
         widget.provider = provider.flattenToShortString();
@@ -960,8 +945,7 @@ public class LauncherBackupHelper implements BackupHelper {
     }
 
     /** Deserialize a widget from persistence, after verifying checksum wrapper. */
-    private Widget unpackWidget(byte[] buffer, int offset, int dataSize)
-            throws InvalidProtocolBufferNanoException {
+    private Widget unpackWidget(byte[] buffer, int offset, int dataSize) throws InvalidProtocolBufferNanoException {
         Widget widget = new Widget();
         MessageNano.mergeFrom(widget, readCheckedBytes(buffer, offset, dataSize));
         if (VERBOSE) Log.v(TAG, "unpacked widget " + widget.provider);
@@ -971,8 +955,8 @@ public class LauncherBackupHelper implements BackupHelper {
     /**
      * Read the old journal from the input file.
      *
-     * In the event of any error, just pretend we didn't have a journal,
-     * in that case, do a full backup.
+     * In the event of any error, just pretend we didn't have a journal, in that case, do a full
+     * backup.
      *
      * @param oldState the read-0only file descriptor pointing to the old journal
      * @return a Journal protocol buffer
@@ -1044,16 +1028,15 @@ public class LauncherBackupHelper implements BackupHelper {
         return journal;
     }
 
-    private void writeRowToBackup(Key key, byte[] blob, Journal out,
-            BackupDataOutput data) throws IOException {
+    private void writeRowToBackup(Key key, byte[] blob, Journal out, BackupDataOutput data) throws IOException {
         String backupKey = keyToBackupKey(key);
         data.writeEntityHeader(backupKey, blob.length);
         data.writeEntityData(blob, blob.length);
         out.rows++;
         out.bytes += blob.length;
-        if (VERBOSE) Log.v(TAG, "saving " + geKeyType(key) + " " + backupKey + ": " +
-                getKeyName(key) + "/" + blob.length);
-        if(DEBUG_PAYLOAD) {
+        if (VERBOSE)
+            Log.v(TAG, "saving " + geKeyType(key) + " " + backupKey + ": " + getKeyName(key) + "/" + blob.length);
+        if (DEBUG_PAYLOAD) {
             String encoded = Base64.encodeToString(blob, 0, blob.length, Base64.NO_WRAP);
             final int chunkSize = 1024;
             for (int offset = 0; offset < encoded.length(); offset += chunkSize) {
@@ -1066,7 +1049,7 @@ public class LauncherBackupHelper implements BackupHelper {
 
     private Set<String> getSavedIdsByType(int type, Journal in) {
         Set<String> savedIds = new HashSet<String>();
-        for(int i = 0; i < in.key.length; i++) {
+        for (int i = 0; i < in.key.length; i++) {
             Key key = in.key[i];
             if (key.type == type) {
                 savedIds.add(keyToBackupKey(key));
@@ -1075,10 +1058,9 @@ public class LauncherBackupHelper implements BackupHelper {
         return savedIds;
     }
 
-    private int removeDeletedKeysFromBackup(Set<String> deletedIds, BackupDataOutput data)
-            throws IOException {
+    private int removeDeletedKeysFromBackup(Set<String> deletedIds, BackupDataOutput data) throws IOException {
         int rows = 0;
-        for(String deleted: deletedIds) {
+        for (String deleted : deletedIds) {
             if (VERBOSE) Log.v(TAG, "dropping deleted item " + deleted);
             data.writeEntityHeader(deleted, -1);
             rows++;
@@ -1089,9 +1071,9 @@ public class LauncherBackupHelper implements BackupHelper {
     /**
      * Write the new journal to the output file.
      *
-     * In the event of any error, just pretend we didn't have a journal,
-     * in that case, do a full backup.
-
+     * In the event of any error, just pretend we didn't have a journal, in that case, do a full
+     * backup.
+     * 
      * @param newState the write-only file descriptor pointing to the new journal
      * @param journal a Journal protocol buffer
      */
@@ -1133,8 +1115,7 @@ public class LauncherBackupHelper implements BackupHelper {
 
     private AppWidgetProviderInfo findAppWidgetProviderInfo(ComponentName component) {
         if (mWidgetMap == null) {
-            List<AppWidgetProviderInfo> widgets =
-                    AppWidgetManager.getInstance(mContext).getInstalledProviders();
+            List<AppWidgetProviderInfo> widgets = AppWidgetManager.getInstance(mContext).getInstalledProviders();
             mWidgetMap = new HashMap<ComponentName, AppWidgetProviderInfo>(widgets.size());
             for (AppWidgetProviderInfo info : widgets) {
                 mWidgetMap.put(info.provider, info);
@@ -1161,7 +1142,7 @@ public class LauncherBackupHelper implements BackupHelper {
     }
 
 
-   // check if the launcher is in a state to support backup
+    // check if the launcher is in a state to support backup
     private boolean launcherIsReady() {
         ContentResolver cr = mContext.getContentResolver();
         Cursor cursor = cr.query(Favorites.CONTENT_URI, FAVORITE_PROJECTION, null, null, null);
@@ -1181,8 +1162,8 @@ public class LauncherBackupHelper implements BackupHelper {
     }
 
     private String getUserSelectionArg() {
-        return Favorites.PROFILE_ID + '=' + UserManagerCompat.getInstance(mContext)
-                .getSerialNumberForUser(UserHandleCompat.myUserHandle());
+        return Favorites.PROFILE_ID + '='
+                + UserManagerCompat.getInstance(mContext).getSerialNumberForUser(UserHandleCompat.myUserHandle());
     }
 
     private class KeyParsingException extends Throwable {

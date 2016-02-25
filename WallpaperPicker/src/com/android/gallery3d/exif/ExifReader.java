@@ -1,29 +1,26 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.gallery3d.exif;
 
-import android.util.Log;
-
 import java.io.IOException;
 import java.io.InputStream;
 
+import android.util.Log;
+
 /**
- * This class reads the EXIF header of a JPEG file and stores it in
- * {@link ExifData}.
+ * This class reads the EXIF header of a JPEG file and stores it in {@link ExifData}.
  */
 class ExifReader {
     private static final String TAG = "ExifReader";
@@ -35,14 +32,12 @@ class ExifReader {
     }
 
     /**
-     * Parses the inputStream and and returns the EXIF data in an
-     * {@link ExifData}.
+     * Parses the inputStream and and returns the EXIF data in an {@link ExifData}.
      *
      * @throws ExifInvalidFormatException
      * @throws IOException
      */
-    protected ExifData read(InputStream inputStream) throws ExifInvalidFormatException,
-            IOException {
+    protected ExifData read(InputStream inputStream) throws ExifInvalidFormatException, IOException {
         ExifParser parser = ExifParser.parse(inputStream, mInterface);
         ExifData exifData = new ExifData(parser.getByteOrder());
         ExifTag tag = null;

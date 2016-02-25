@@ -71,8 +71,8 @@ public class AppWidgetResizeFrame extends FrameLayout {
 
     private Launcher mLauncher;
 
-    public AppWidgetResizeFrame(Context context,
-            LauncherAppWidgetHostView widgetView, CellLayout cellLayout, DragLayer dragLayer) {
+    public AppWidgetResizeFrame(Context context, LauncherAppWidgetHostView widgetView, CellLayout cellLayout,
+            DragLayer dragLayer) {
 
         super(context);
         mLauncher = (Launcher) context;
@@ -92,30 +92,33 @@ public class AppWidgetResizeFrame extends FrameLayout {
         LayoutParams lp;
         mLeftHandle = new ImageView(context);
         mLeftHandle.setImageResource(R.drawable.widget_resize_handle_left);
-        lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 
-                Gravity.LEFT | Gravity.CENTER_VERTICAL);
+        lp =
+                new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.LEFT
+                        | Gravity.CENTER_VERTICAL);
         addView(mLeftHandle, lp);
 
         mRightHandle = new ImageView(context);
         mRightHandle.setImageResource(R.drawable.widget_resize_handle_right);
-        lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 
-                Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+        lp =
+                new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.RIGHT
+                        | Gravity.CENTER_VERTICAL);
         addView(mRightHandle, lp);
 
         mTopHandle = new ImageView(context);
         mTopHandle.setImageResource(R.drawable.widget_resize_handle_top);
-        lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 
-                Gravity.CENTER_HORIZONTAL | Gravity.TOP);
+        lp =
+                new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL
+                        | Gravity.TOP);
         addView(mTopHandle, lp);
 
         mBottomHandle = new ImageView(context);
         mBottomHandle.setImageResource(R.drawable.widget_resize_handle_bottom);
-        lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 
-                Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
+        lp =
+                new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL
+                        | Gravity.BOTTOM);
         addView(mBottomHandle, lp);
 
-        Rect p = AppWidgetHostView.getDefaultPaddingForWidget(context,
-                widgetView.getAppWidgetInfo().provider, null);
+        Rect p = AppWidgetHostView.getDefaultPaddingForWidget(context, widgetView.getAppWidgetInfo().provider, null);
         mWidgetPaddingLeft = p.left;
         mWidgetPaddingTop = p.top;
         mWidgetPaddingRight = p.right;
@@ -146,11 +149,9 @@ public class AppWidgetResizeFrame extends FrameLayout {
         mLeftBorderActive = (x < mTouchTargetWidth) && horizontalActive;
         mRightBorderActive = (x > getWidth() - mTouchTargetWidth) && horizontalActive;
         mTopBorderActive = (y < mTouchTargetWidth + mTopTouchRegionAdjustment) && verticalActive;
-        mBottomBorderActive = (y > getHeight() - mTouchTargetWidth + mBottomTouchRegionAdjustment)
-                && verticalActive;
+        mBottomBorderActive = (y > getHeight() - mTouchTargetWidth + mBottomTouchRegionAdjustment) && verticalActive;
 
-        boolean anyBordersActive = mLeftBorderActive || mRightBorderActive
-                || mTopBorderActive || mBottomBorderActive;
+        boolean anyBordersActive = mLeftBorderActive || mRightBorderActive || mTopBorderActive || mBottomBorderActive;
 
         mBaselineWidth = getMeasuredWidth();
         mBaselineHeight = getMeasuredHeight();
@@ -159,7 +160,7 @@ public class AppWidgetResizeFrame extends FrameLayout {
 
         if (anyBordersActive) {
             mLeftHandle.setAlpha(mLeftBorderActive ? 1.0f : DIMMED_HANDLE_ALPHA);
-            mRightHandle.setAlpha(mRightBorderActive ? 1.0f :DIMMED_HANDLE_ALPHA);
+            mRightHandle.setAlpha(mRightBorderActive ? 1.0f : DIMMED_HANDLE_ALPHA);
             mTopHandle.setAlpha(mTopBorderActive ? 1.0f : DIMMED_HANDLE_ALPHA);
             mBottomHandle.setAlpha(mBottomBorderActive ? 1.0f : DIMMED_HANDLE_ALPHA);
         }
@@ -167,12 +168,12 @@ public class AppWidgetResizeFrame extends FrameLayout {
     }
 
     /**
-     *  Here we bound the deltas such that the frame cannot be stretched beyond the extents
-     *  of the CellLayout, and such that the frame's borders can't cross.
+     * Here we bound the deltas such that the frame cannot be stretched beyond the extents of the
+     * CellLayout, and such that the frame's borders can't cross.
      */
     public void updateDeltas(int deltaX, int deltaY) {
         if (mLeftBorderActive) {
-            mDeltaX = Math.max(-mBaselineX, deltaX); 
+            mDeltaX = Math.max(-mBaselineX, deltaX);
             mDeltaX = Math.min(mBaselineWidth - 2 * mTouchTargetWidth, mDeltaX);
         } else if (mRightBorderActive) {
             mDeltaX = Math.min(mDragLayer.getWidth() - (mBaselineX + mBaselineWidth), deltaX);
@@ -193,7 +194,7 @@ public class AppWidgetResizeFrame extends FrameLayout {
     }
 
     /**
-     *  Based on the deltas, we resize the frame, and, if needed, we resize the widget.
+     * Based on the deltas, we resize the frame, and, if needed, we resize the widget.
      */
     private void visualizeResizeForDelta(int deltaX, int deltaY, boolean onDismiss) {
         updateDeltas(deltaX, deltaY);
@@ -218,7 +219,7 @@ public class AppWidgetResizeFrame extends FrameLayout {
     }
 
     /**
-     *  Based on the current deltas, we determine if and how to resize the widget.
+     * Based on the current deltas, we determine if and how to resize the widget.
      */
     private void resizeWidgetIfNeeded(boolean onDismiss) {
         int xThreshold = mCellLayout.getCellWidth() + mCellLayout.getWidthGap();
@@ -318,8 +319,7 @@ public class AppWidgetResizeFrame extends FrameLayout {
             mLastDirectionVector[1] = mDirectionVector[1];
         }
 
-        if (mCellLayout.createAreaForResize(cellX, cellY, spanX, spanY, mWidgetView,
-                mDirectionVector, onDismiss)) {
+        if (mCellLayout.createAreaForResize(cellX, cellY, spanX, spanY, mWidgetView, mDirectionVector, onDismiss)) {
             lp.tmpCellX = cellX;
             lp.tmpCellY = cellY;
             lp.cellHSpan = spanX;
@@ -333,12 +333,10 @@ public class AppWidgetResizeFrame extends FrameLayout {
         mWidgetView.requestLayout();
     }
 
-    static void updateWidgetSizeRanges(AppWidgetHostView widgetView, Launcher launcher,
-            int spanX, int spanY) {
+    static void updateWidgetSizeRanges(AppWidgetHostView widgetView, Launcher launcher, int spanX, int spanY) {
 
         getWidgetSizeRanges(launcher, spanX, spanY, mTmpRect);
-        widgetView.updateAppWidgetSize(null, mTmpRect.left, mTmpRect.top,
-                mTmpRect.right, mTmpRect.bottom);
+        widgetView.updateAppWidgetSize(null, mTmpRect.left, mTmpRect.top, mTmpRect.right, mTmpRect.bottom);
     }
 
     static Rect getWidgetSizeRanges(Launcher launcher, int spanX, int spanY, Rect rect) {
@@ -369,8 +367,8 @@ public class AppWidgetResizeFrame extends FrameLayout {
     }
 
     /**
-     * This is the final step of the resize. Here we save the new widget size and position
-     * to LauncherModel and animate the resize frame.
+     * This is the final step of the resize. Here we save the new widget size and position to
+     * LauncherModel and animate the resize frame.
      */
     public void commitResize() {
         resizeWidgetIfNeeded(true);
@@ -381,8 +379,8 @@ public class AppWidgetResizeFrame extends FrameLayout {
         int xThreshold = mCellLayout.getCellWidth() + mCellLayout.getWidthGap();
         int yThreshold = mCellLayout.getCellHeight() + mCellLayout.getHeightGap();
 
-        mDeltaXAddOn = mRunningHInc * xThreshold; 
-        mDeltaYAddOn = mRunningVInc * yThreshold; 
+        mDeltaXAddOn = mRunningHInc * xThreshold;
+        mDeltaYAddOn = mRunningVInc * yThreshold;
         mDeltaX = 0;
         mDeltaY = 0;
 
@@ -396,10 +394,8 @@ public class AppWidgetResizeFrame extends FrameLayout {
 
     public void snapToWidget(boolean animate) {
         final DragLayer.LayoutParams lp = (DragLayer.LayoutParams) getLayoutParams();
-        int newWidth = mWidgetView.getWidth() + 2 * mBackgroundPadding - mWidgetPaddingLeft -
-                mWidgetPaddingRight;
-        int newHeight = mWidgetView.getHeight() + 2 * mBackgroundPadding - mWidgetPaddingTop -
-                mWidgetPaddingBottom;
+        int newWidth = mWidgetView.getWidth() + 2 * mBackgroundPadding - mWidgetPaddingLeft - mWidgetPaddingRight;
+        int newHeight = mWidgetView.getHeight() + 2 * mBackgroundPadding - mWidgetPaddingTop - mWidgetPaddingBottom;
 
         mTmpPt[0] = mWidgetView.getLeft();
         mTmpPt[1] = mWidgetView.getTop();
@@ -408,7 +404,7 @@ public class AppWidgetResizeFrame extends FrameLayout {
         int newX = mTmpPt[0] - mBackgroundPadding + mWidgetPaddingLeft;
         int newY = mTmpPt[1] - mBackgroundPadding + mWidgetPaddingTop;
 
-        // We need to make sure the frame's touchable regions lie fully within the bounds of the 
+        // We need to make sure the frame's touchable regions lie fully within the bounds of the
         // DragLayer. We allow the actual handles to be clipped, but we shift the touch regions
         // down accordingly to provide a proper touch target.
         if (newY < 0) {
@@ -436,12 +432,10 @@ public class AppWidgetResizeFrame extends FrameLayout {
             requestLayout();
         } else {
             PropertyValuesHolder width = PropertyValuesHolder.ofInt("width", lp.width, newWidth);
-            PropertyValuesHolder height = PropertyValuesHolder.ofInt("height", lp.height,
-                    newHeight);
+            PropertyValuesHolder height = PropertyValuesHolder.ofInt("height", lp.height, newHeight);
             PropertyValuesHolder x = PropertyValuesHolder.ofInt("x", lp.x, newX);
             PropertyValuesHolder y = PropertyValuesHolder.ofInt("y", lp.y, newY);
-            ObjectAnimator oa =
-                    LauncherAnimUtils.ofPropertyValuesHolder(lp, this, width, height, x, y);
+            ObjectAnimator oa = LauncherAnimUtils.ofPropertyValuesHolder(lp, this, width, height, x, y);
             ObjectAnimator leftOa = LauncherAnimUtils.ofFloat(mLeftHandle, "alpha", 1.0f);
             ObjectAnimator rightOa = LauncherAnimUtils.ofFloat(mRightHandle, "alpha", 1.0f);
             ObjectAnimator topOa = LauncherAnimUtils.ofFloat(mTopHandle, "alpha", 1.0f);

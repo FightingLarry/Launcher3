@@ -1,22 +1,18 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.gallery3d.exif;
-
-import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteOrder;
@@ -24,24 +20,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import android.util.Log;
+
 /**
- * This class stores the EXIF header in IFDs according to the JPEG
- * specification. It is the result produced by {@link ExifReader}.
+ * This class stores the EXIF header in IFDs according to the JPEG specification. It is the result
+ * produced by {@link ExifReader}.
  *
  * @see ExifReader
  * @see IfdData
  */
 class ExifData {
     private static final String TAG = "ExifData";
-    private static final byte[] USER_COMMENT_ASCII = {
-            0x41, 0x53, 0x43, 0x49, 0x49, 0x00, 0x00, 0x00
-    };
-    private static final byte[] USER_COMMENT_JIS = {
-            0x4A, 0x49, 0x53, 0x00, 0x00, 0x00, 0x00, 0x00
-    };
-    private static final byte[] USER_COMMENT_UNICODE = {
-            0x55, 0x4E, 0x49, 0x43, 0x4F, 0x44, 0x45, 0x00
-    };
+    private static final byte[] USER_COMMENT_ASCII = {0x41, 0x53, 0x43, 0x49, 0x49, 0x00, 0x00, 0x00};
+    private static final byte[] USER_COMMENT_JIS = {0x4A, 0x49, 0x53, 0x00, 0x00, 0x00, 0x00, 0x00};
+    private static final byte[] USER_COMMENT_UNICODE = {0x55, 0x4E, 0x49, 0x43, 0x4F, 0x44, 0x45, 0x00};
 
     private final IfdData[] mIfdDatas = new IfdData[IfdId.TYPE_IFD_COUNT];
     private byte[] mThumbnail;
@@ -53,8 +45,7 @@ class ExifData {
     }
 
     /**
-     * Gets the compressed thumbnail. Returns null if there is no compressed
-     * thumbnail.
+     * Gets the compressed thumbnail. Returns null if there is no compressed thumbnail.
      *
      * @see #hasCompressedThumbnail()
      */
@@ -121,8 +112,7 @@ class ExifData {
     }
 
     /**
-     * Returns the {@link IfdData} object corresponding to a given IFD if it
-     * exists or null.
+     * Returns the {@link IfdData} object corresponding to a given IFD if it exists or null.
      */
     protected IfdData getIfdData(int ifdId) {
         if (ExifTag.isValidIfd(ifdId)) {
@@ -132,16 +122,16 @@ class ExifData {
     }
 
     /**
-     * Adds IFD data. If IFD data of the same type already exists, it will be
-     * replaced by the new data.
+     * Adds IFD data. If IFD data of the same type already exists, it will be replaced by the new
+     * data.
      */
     protected void addIfdData(IfdData data) {
         mIfdDatas[data.getId()] = data;
     }
 
     /**
-     * Returns the {@link IfdData} object corresponding to a given IFD or
-     * generates one if none exist.
+     * Returns the {@link IfdData} object corresponding to a given IFD or generates one if none
+     * exist.
      */
     protected IfdData getOrCreateIfdData(int ifdId) {
         IfdData ifdData = mIfdDatas[ifdId];
@@ -153,8 +143,7 @@ class ExifData {
     }
 
     /**
-     * Returns the tag with a given TID in the given IFD if the tag exists.
-     * Otherwise returns null.
+     * Returns the tag with a given TID in the given IFD if the tag exists. Otherwise returns null.
      */
     protected ExifTag getTag(short tag, int ifd) {
         IfdData ifdData = mIfdDatas[ifd];
@@ -162,8 +151,8 @@ class ExifData {
     }
 
     /**
-     * Adds the given ExifTag to its default IFD and returns an existing ExifTag
-     * with the same TID or null if none exist.
+     * Adds the given ExifTag to its default IFD and returns an existing ExifTag with the same TID
+     * or null if none exist.
      */
     protected ExifTag addTag(ExifTag tag) {
         if (tag != null) {
@@ -174,8 +163,8 @@ class ExifData {
     }
 
     /**
-     * Adds the given ExifTag to the given IFD and returns an existing ExifTag
-     * with the same TID or null if none exist.
+     * Adds the given ExifTag to the given IFD and returns an existing ExifTag with the same TID or
+     * null if none exist.
      */
     protected ExifTag addTag(ExifTag tag, int ifdId) {
         if (tag != null && ExifTag.isValidIfd(ifdId)) {
@@ -210,8 +199,8 @@ class ExifData {
     }
 
     /**
-     * Decodes the user comment tag into string as specified in the EXIF
-     * standard. Returns null if decoding failed.
+     * Decodes the user comment tag into string as specified in the EXIF standard. Returns null if
+     * decoding failed.
      */
     protected String getUserComment() {
         IfdData ifdData = mIfdDatas[IfdId.TYPE_IFD_0];
@@ -249,8 +238,7 @@ class ExifData {
     }
 
     /**
-     * Returns a list of all {@link ExifTag}s in the ExifData or null if there
-     * are none.
+     * Returns a list of all {@link ExifTag}s in the ExifData or null if there are none.
      */
     protected List<ExifTag> getAllTags() {
         ArrayList<ExifTag> ret = new ArrayList<ExifTag>();
@@ -271,8 +259,7 @@ class ExifData {
     }
 
     /**
-     * Returns a list of all {@link ExifTag}s in a given IFD or null if there
-     * are none.
+     * Returns a list of all {@link ExifTag}s in a given IFD or null if there are none.
      */
     protected List<ExifTag> getAllTagsForIfd(int ifd) {
         IfdData d = mIfdDatas[ifd];
@@ -294,8 +281,7 @@ class ExifData {
     }
 
     /**
-     * Returns a list of all {@link ExifTag}s with a given TID or null if there
-     * are none.
+     * Returns a list of all {@link ExifTag}s with a given TID or null if there are none.
      */
     protected List<ExifTag> getAllTagsForTagId(short tag) {
         ArrayList<ExifTag> ret = new ArrayList<ExifTag>();
@@ -323,9 +309,8 @@ class ExifData {
         }
         if (obj instanceof ExifData) {
             ExifData data = (ExifData) obj;
-            if (data.mByteOrder != mByteOrder ||
-                    data.mStripBytes.size() != mStripBytes.size() ||
-                    !Arrays.equals(data.mThumbnail, mThumbnail)) {
+            if (data.mByteOrder != mByteOrder || data.mStripBytes.size() != mStripBytes.size()
+                    || !Arrays.equals(data.mThumbnail, mThumbnail)) {
                 return false;
             }
             for (int i = 0; i < mStripBytes.size(); i++) {

@@ -1,20 +1,21 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
@@ -22,22 +23,11 @@ import android.animation.TimeInterpolator;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-
 public class LauncherViewPropertyAnimator extends Animator implements AnimatorListener {
     enum Properties {
-            TRANSLATION_X,
-            TRANSLATION_Y,
-            SCALE_X,
-            SCALE_Y,
-            ROTATION_Y,
-            ALPHA,
-            START_DELAY,
-            DURATION,
-            INTERPOLATOR,
-            WITH_LAYER
+        TRANSLATION_X, TRANSLATION_Y, SCALE_X, SCALE_Y, ROTATION_Y, ALPHA, START_DELAY, DURATION, INTERPOLATOR, WITH_LAYER
     }
+
     EnumSet<Properties> mPropertiesToSet = EnumSet.noneOf(Properties.class);
     ViewPropertyAnimator mViewPropertyAnimator;
     View mTarget;
@@ -186,8 +176,7 @@ public class LauncherViewPropertyAnimator extends Animator implements AnimatorLi
     }
 
     @Override
-    public void setupStartValues() {
-    }
+    public void setupStartValues() {}
 
     @Override
     public void start() {

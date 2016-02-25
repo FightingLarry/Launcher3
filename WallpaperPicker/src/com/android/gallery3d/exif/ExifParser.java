@@ -1,22 +1,18 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.gallery3d.exif;
-
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,13 +21,13 @@ import java.nio.charset.Charset;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import android.util.Log;
+
 /**
- * This class provides a low-level EXIF parsing API. Given a JPEG format
- * InputStream, the caller can request which IFD's to read via
- * {@link #parse(InputStream, int)} with given options.
+ * This class provides a low-level EXIF parsing API. Given a JPEG format InputStream, the caller can
+ * request which IFD's to read via {@link #parse(InputStream, int)} with given options.
  * <p>
- * Below is an example of getting EXIF data from IFD 0 and EXIF IFD using the
- * parser.
+ * Below is an example of getting EXIF data from IFD 0 and EXIF IFD using the parser.
  *
  * <pre>
  * void parse() {
@@ -70,19 +66,18 @@ class ExifParser {
     private static final boolean LOGV = false;
     private static final String TAG = "ExifParser";
     /**
-     * When the parser reaches a new IFD area. Call {@link #getCurrentIfd()} to
-     * know which IFD we are in.
+     * When the parser reaches a new IFD area. Call {@link #getCurrentIfd()} to know which IFD we
+     * are in.
      */
     public static final int EVENT_START_OF_IFD = 0;
     /**
-     * When the parser reaches a new tag. Call {@link #getTag()}to get the
-     * corresponding tag.
+     * When the parser reaches a new tag. Call {@link #getTag()}to get the corresponding tag.
      */
     public static final int EVENT_NEW_TAG = 1;
     /**
      * When the parser reaches the value area of tag that is registered by
-     * {@link #registerForTagValue(ExifTag)} previously. Call {@link #getTag()}
-     * to get the corresponding tag.
+     * {@link #registerForTagValue(ExifTag)} previously. Call {@link #getTag()} to get the
+     * corresponding tag.
      */
     public static final int EVENT_VALUE_OF_REGISTERED_TAG = 2;
 
@@ -91,8 +86,8 @@ class ExifParser {
      */
     public static final int EVENT_COMPRESSED_IMAGE = 3;
     /**
-     * When the parser reaches the uncompressed image strip. Call
-     * {@link #getStripIndex()} to get the index of the strip.
+     * When the parser reaches the uncompressed image strip. Call {@link #getStripIndex()} to get
+     * the index of the strip.
      *
      * @see #getStripIndex()
      * @see #getStripCount()
@@ -162,8 +157,7 @@ class ExifParser {
     private int mTiffStartPosition;
     private final ExifInterface mInterface;
 
-    private static final short TAG_EXIF_IFD = ExifInterface
-            .getTrueTagKey(ExifInterface.TAG_EXIF_IFD);
+    private static final short TAG_EXIF_IFD = ExifInterface.getTrueTagKey(ExifInterface.TAG_EXIF_IFD);
     private static final short TAG_GPS_IFD = ExifInterface.getTrueTagKey(ExifInterface.TAG_GPS_IFD);
     private static final short TAG_INTEROPERABILITY_IFD = ExifInterface
             .getTrueTagKey(ExifInterface.TAG_INTEROPERABILITY_IFD);
@@ -171,10 +165,8 @@ class ExifParser {
             .getTrueTagKey(ExifInterface.TAG_JPEG_INTERCHANGE_FORMAT);
     private static final short TAG_JPEG_INTERCHANGE_FORMAT_LENGTH = ExifInterface
             .getTrueTagKey(ExifInterface.TAG_JPEG_INTERCHANGE_FORMAT_LENGTH);
-    private static final short TAG_STRIP_OFFSETS = ExifInterface
-            .getTrueTagKey(ExifInterface.TAG_STRIP_OFFSETS);
-    private static final short TAG_STRIP_BYTE_COUNTS = ExifInterface
-            .getTrueTagKey(ExifInterface.TAG_STRIP_BYTE_COUNTS);
+    private static final short TAG_STRIP_OFFSETS = ExifInterface.getTrueTagKey(ExifInterface.TAG_STRIP_OFFSETS);
+    private static final short TAG_STRIP_BYTE_COUNTS = ExifInterface.getTrueTagKey(ExifInterface.TAG_STRIP_BYTE_COUNTS);
 
     private final TreeMap<Integer, Object> mCorrespondingEvent = new TreeMap<Integer, Object>();
 
@@ -198,8 +190,8 @@ class ExifParser {
         return (mOptions & OPTION_THUMBNAIL) != 0;
     }
 
-    private ExifParser(InputStream inputStream, int options, ExifInterface iRef)
-            throws IOException, ExifInvalidFormatException {
+    private ExifParser(InputStream inputStream, int options, ExifInterface iRef) throws IOException,
+            ExifInvalidFormatException {
         if (inputStream == null) {
             throw new IOException("Null argument inputStream to ExifParser");
         }
@@ -236,24 +228,23 @@ class ExifParser {
      * @exception IOException
      * @exception ExifInvalidFormatException
      */
-    protected static ExifParser parse(InputStream inputStream, int options, ExifInterface iRef)
-            throws IOException, ExifInvalidFormatException {
+    protected static ExifParser parse(InputStream inputStream, int options, ExifInterface iRef) throws IOException,
+            ExifInvalidFormatException {
         return new ExifParser(inputStream, options, iRef);
     }
 
     /**
-     * Parses the the given InputStream with default options; that is, every IFD
-     * and thumbnaill will be parsed.
+     * Parses the the given InputStream with default options; that is, every IFD and thumbnaill will
+     * be parsed.
      *
      * @exception IOException
      * @exception ExifInvalidFormatException
      * @see #parse(InputStream, int)
      */
-    protected static ExifParser parse(InputStream inputStream, ExifInterface iRef)
-            throws IOException, ExifInvalidFormatException {
-        return new ExifParser(inputStream, OPTION_IFD_0 | OPTION_IFD_1
-                | OPTION_IFD_EXIF | OPTION_IFD_GPS | OPTION_IFD_INTEROPERABILITY
-                | OPTION_THUMBNAIL, iRef);
+    protected static ExifParser parse(InputStream inputStream, ExifInterface iRef) throws IOException,
+            ExifInvalidFormatException {
+        return new ExifParser(inputStream, OPTION_IFD_0 | OPTION_IFD_1 | OPTION_IFD_EXIF | OPTION_IFD_GPS
+                | OPTION_IFD_INTEROPERABILITY | OPTION_THUMBNAIL, iRef);
     }
 
     /**
@@ -296,8 +287,7 @@ class ExifParser {
                 int offsetSize = 4;
                 // Some camera models use invalid length of the offset
                 if (mCorrespondingEvent.size() > 0) {
-                    offsetSize = mCorrespondingEvent.firstEntry().getKey() -
-                            mTiffStream.getReadByteCount();
+                    offsetSize = mCorrespondingEvent.firstEntry().getKey() - mTiffStream.getReadByteCount();
                 }
                 if (offsetSize < 4) {
                     Log.w(TAG, "Invalid size of link to next IFD: " + offsetSize);
@@ -315,8 +305,8 @@ class ExifParser {
             try {
                 skipTo(entry.getKey());
             } catch (IOException e) {
-                Log.w(TAG, "Failed to skip to data at: " + entry.getKey() +
-                        " for " + event.getClass().getName() + ", the file may be broken.");
+                Log.w(TAG, "Failed to skip to data at: " + entry.getKey() + " for " + event.getClass().getName()
+                        + ", the file may be broken.");
                 continue;
             }
             if (event instanceof IfdEvent) {
@@ -354,8 +344,8 @@ class ExifParser {
     }
 
     /**
-     * Skips the tags area of current IFD, if the parser is not in the tag area,
-     * nothing will happen.
+     * Skips the tags area of current IFD, if the parser is not in the tag area, nothing will
+     * happen.
      *
      * @throws IOException
      * @throws ExifInvalidFormatException
@@ -380,8 +370,7 @@ class ExifParser {
         }
         long ifdOffset = readUnsignedLong();
         // For ifd0, there is a link to ifd1 in the end of all tags
-        if (mIfdType == IfdId.TYPE_IFD_0
-                && (isIfdRequested(IfdId.TYPE_IFD_1) || isThumbnailRequested())) {
+        if (mIfdType == IfdId.TYPE_IFD_0 && (isIfdRequested(IfdId.TYPE_IFD_1) || isThumbnailRequested())) {
             if (ifdOffset > 0) {
                 registerIfd(IfdId.TYPE_IFD_1, ifdOffset);
             }
@@ -392,8 +381,7 @@ class ExifParser {
         switch (mIfdType) {
             case IfdId.TYPE_IFD_0:
                 return isIfdRequested(IfdId.TYPE_IFD_EXIF) || isIfdRequested(IfdId.TYPE_IFD_GPS)
-                        || isIfdRequested(IfdId.TYPE_IFD_INTEROPERABILITY)
-                        || isIfdRequested(IfdId.TYPE_IFD_1);
+                        || isIfdRequested(IfdId.TYPE_IFD_INTEROPERABILITY) || isIfdRequested(IfdId.TYPE_IFD_1);
             case IfdId.TYPE_IFD_1:
                 return isThumbnailRequested();
             case IfdId.TYPE_IFD_EXIF:
@@ -405,20 +393,17 @@ class ExifParser {
     }
 
     /**
-     * If {@link #next()} return {@link #EVENT_NEW_TAG} or
-     * {@link #EVENT_VALUE_OF_REGISTERED_TAG}, call this function to get the
-     * corresponding tag.
+     * If {@link #next()} return {@link #EVENT_NEW_TAG} or {@link #EVENT_VALUE_OF_REGISTERED_TAG},
+     * call this function to get the corresponding tag.
      * <p>
-     * For {@link #EVENT_NEW_TAG}, the tag may not contain the value if the size
-     * of the value is greater than 4 bytes. One should call
-     * {@link ExifTag#hasValue()} to check if the tag contains value. If there
-     * is no value,call {@link #registerForTagValue(ExifTag)} to have the parser
-     * emit {@link #EVENT_VALUE_OF_REGISTERED_TAG} when it reaches the area
-     * pointed by the offset.
+     * For {@link #EVENT_NEW_TAG}, the tag may not contain the value if the size of the value is
+     * greater than 4 bytes. One should call {@link ExifTag#hasValue()} to check if the tag contains
+     * value. If there is no value,call {@link #registerForTagValue(ExifTag)} to have the parser
+     * emit {@link #EVENT_VALUE_OF_REGISTERED_TAG} when it reaches the area pointed by the offset.
      * <p>
-     * When {@link #EVENT_VALUE_OF_REGISTERED_TAG} is emitted, the value of the
-     * tag will have already been read except for tags of undefined type. For
-     * tags of undefined type, call one of the read methods to get the value.
+     * When {@link #EVENT_VALUE_OF_REGISTERED_TAG} is emitted, the value of the tag will have
+     * already been read except for tags of undefined type. For tags of undefined type, call one of
+     * the read methods to get the value.
      *
      * @see #registerForTagValue(ExifTag)
      * @see #read(byte[])
@@ -453,8 +438,8 @@ class ExifParser {
     }
 
     /**
-     * When receiving {@link #EVENT_UNCOMPRESSED_STRIP}, call this function to
-     * get the index of this strip.
+     * When receiving {@link #EVENT_UNCOMPRESSED_STRIP}, call this function to get the index of this
+     * strip.
      *
      * @see #getStripCount()
      */
@@ -463,8 +448,8 @@ class ExifParser {
     }
 
     /**
-     * When receiving {@link #EVENT_UNCOMPRESSED_STRIP}, call this function to
-     * get the number of strip data.
+     * When receiving {@link #EVENT_UNCOMPRESSED_STRIP}, call this function to get the number of
+     * strip data.
      *
      * @see #getStripIndex()
      */
@@ -473,18 +458,16 @@ class ExifParser {
     }
 
     /**
-     * When receiving {@link #EVENT_UNCOMPRESSED_STRIP}, call this function to
-     * get the strip size.
+     * When receiving {@link #EVENT_UNCOMPRESSED_STRIP}, call this function to get the strip size.
      */
     protected int getStripSize() {
-        if (mStripSizeTag == null)
-            return 0;
+        if (mStripSizeTag == null) return 0;
         return (int) mStripSizeTag.getValueAt(0);
     }
 
     /**
-     * When receiving {@link #EVENT_COMPRESSED_IMAGE}, call this function to get
-     * the image data size.
+     * When receiving {@link #EVENT_COMPRESSED_IMAGE}, call this function to get the image data
+     * size.
      */
     protected int getCompressedImageSize() {
         if (mJpegSizeTag == null) {
@@ -501,11 +484,10 @@ class ExifParser {
     }
 
     /**
-     * When getting {@link #EVENT_NEW_TAG} in the tag area of IFD, the tag may
-     * not contain the value if the size of the value is greater than 4 bytes.
-     * When the value is not available here, call this method so that the parser
-     * will emit {@link #EVENT_VALUE_OF_REGISTERED_TAG} when it reaches the area
-     * where the value is located.
+     * When getting {@link #EVENT_NEW_TAG} in the tag area of IFD, the tag may not contain the value
+     * if the size of the value is greater than 4 bytes. When the value is not available here, call
+     * this method so that the parser will emit {@link #EVENT_VALUE_OF_REGISTERED_TAG} when it
+     * reaches the area where the value is located.
      *
      * @see #EVENT_VALUE_OF_REGISTERED_TAG
      */
@@ -526,8 +508,7 @@ class ExifParser {
     }
 
     private void registerUncompressedStrip(int stripIndex, long offset) {
-        mCorrespondingEvent.put((int) offset, new ImageEvent(EVENT_UNCOMPRESSED_STRIP
-                , stripIndex));
+        mCorrespondingEvent.put((int) offset, new ImageEvent(EVENT_UNCOMPRESSED_STRIP, stripIndex));
     }
 
     private ExifTag readTag() throws IOException, ExifInvalidFormatException {
@@ -535,8 +516,7 @@ class ExifParser {
         short dataFormat = mTiffStream.readShort();
         long numOfComp = mTiffStream.readUnsignedInt();
         if (numOfComp > Integer.MAX_VALUE) {
-            throw new ExifInvalidFormatException(
-                    "Number of component is larger then Integer.MAX_VALUE");
+            throw new ExifInvalidFormatException("Number of component is larger then Integer.MAX_VALUE");
         }
         // Some invalid image file contains invalid data type. Ignore those tags
         if (!ExifTag.isValidType(dataFormat)) {
@@ -545,21 +525,19 @@ class ExifParser {
             return null;
         }
         // TODO: handle numOfComp overflow
-        ExifTag tag = new ExifTag(tagId, dataFormat, (int) numOfComp, mIfdType,
-                ((int) numOfComp) != ExifTag.SIZE_UNDEFINED);
+        ExifTag tag =
+                new ExifTag(tagId, dataFormat, (int) numOfComp, mIfdType, ((int) numOfComp) != ExifTag.SIZE_UNDEFINED);
         int dataSize = tag.getDataSize();
         if (dataSize > 4) {
             long offset = mTiffStream.readUnsignedInt();
             if (offset > Integer.MAX_VALUE) {
-                throw new ExifInvalidFormatException(
-                        "offset is larger then Integer.MAX_VALUE");
+                throw new ExifInvalidFormatException("offset is larger then Integer.MAX_VALUE");
             }
             // Some invalid images put some undefined data before IFD0.
             // Read the data here.
             if ((offset < mIfd0Position) && (dataFormat == ExifTag.TYPE_UNDEFINED)) {
                 byte[] buf = new byte[(int) numOfComp];
-                System.arraycopy(mDataAboveIfd0, (int) offset - DEFAULT_IFD0_OFFSET,
-                        buf, 0, (int) numOfComp);
+                System.arraycopy(mDataAboveIfd0, (int) offset - DEFAULT_IFD0_OFFSET, buf, 0, (int) numOfComp);
                 tag.setValue(buf);
             } else {
                 tag.setOffset((int) offset);
@@ -579,8 +557,8 @@ class ExifParser {
     }
 
     /**
-     * Check the tag, if the tag is one of the offset tag that points to the IFD
-     * or image the caller is interested in, register the IFD or image.
+     * Check the tag, if the tag is one of the offset tag that points to the IFD or image the caller
+     * is interested in, register the IFD or image.
      */
     private void checkOffsetOrImageTag(ExifTag tag) {
         // Some invalid formattd image contains tag with 0 size.
@@ -590,21 +568,18 @@ class ExifParser {
         short tid = tag.getTagId();
         int ifd = tag.getIfd();
         if (tid == TAG_EXIF_IFD && checkAllowed(ifd, ExifInterface.TAG_EXIF_IFD)) {
-            if (isIfdRequested(IfdId.TYPE_IFD_EXIF)
-                    || isIfdRequested(IfdId.TYPE_IFD_INTEROPERABILITY)) {
+            if (isIfdRequested(IfdId.TYPE_IFD_EXIF) || isIfdRequested(IfdId.TYPE_IFD_INTEROPERABILITY)) {
                 registerIfd(IfdId.TYPE_IFD_EXIF, tag.getValueAt(0));
             }
         } else if (tid == TAG_GPS_IFD && checkAllowed(ifd, ExifInterface.TAG_GPS_IFD)) {
             if (isIfdRequested(IfdId.TYPE_IFD_GPS)) {
                 registerIfd(IfdId.TYPE_IFD_GPS, tag.getValueAt(0));
             }
-        } else if (tid == TAG_INTEROPERABILITY_IFD
-                && checkAllowed(ifd, ExifInterface.TAG_INTEROPERABILITY_IFD)) {
+        } else if (tid == TAG_INTEROPERABILITY_IFD && checkAllowed(ifd, ExifInterface.TAG_INTEROPERABILITY_IFD)) {
             if (isIfdRequested(IfdId.TYPE_IFD_INTEROPERABILITY)) {
                 registerIfd(IfdId.TYPE_IFD_INTEROPERABILITY, tag.getValueAt(0));
             }
-        } else if (tid == TAG_JPEG_INTERCHANGE_FORMAT
-                && checkAllowed(ifd, ExifInterface.TAG_JPEG_INTERCHANGE_FORMAT)) {
+        } else if (tid == TAG_JPEG_INTERCHANGE_FORMAT && checkAllowed(ifd, ExifInterface.TAG_JPEG_INTERCHANGE_FORMAT)) {
             if (isThumbnailRequested()) {
                 registerCompressedImage(tag.getValueAt(0));
             }
@@ -627,9 +602,8 @@ class ExifParser {
                     mCorrespondingEvent.put(tag.getOffset(), new ExifTagEvent(tag, false));
                 }
             }
-        } else if (tid == TAG_STRIP_BYTE_COUNTS
-                && checkAllowed(ifd, ExifInterface.TAG_STRIP_BYTE_COUNTS)
-                &&isThumbnailRequested() && tag.hasValue()) {
+        } else if (tid == TAG_STRIP_BYTE_COUNTS && checkAllowed(ifd, ExifInterface.TAG_STRIP_BYTE_COUNTS)
+                && isThumbnailRequested() && tag.hasValue()) {
             mStripSizeTag = tag;
         }
     }
@@ -645,12 +619,10 @@ class ExifParser {
     protected void readFullTagValue(ExifTag tag) throws IOException {
         // Some invalid images contains tags with wrong size, check it here
         short type = tag.getDataType();
-        if (type == ExifTag.TYPE_ASCII || type == ExifTag.TYPE_UNDEFINED ||
-                type == ExifTag.TYPE_UNSIGNED_BYTE) {
+        if (type == ExifTag.TYPE_ASCII || type == ExifTag.TYPE_UNDEFINED || type == ExifTag.TYPE_UNSIGNED_BYTE) {
             int size = tag.getComponentCount();
             if (mCorrespondingEvent.size() > 0) {
-                if (mCorrespondingEvent.firstEntry().getKey() < mTiffStream.getReadByteCount()
-                        + size) {
+                if (mCorrespondingEvent.firstEntry().getKey() < mTiffStream.getReadByteCount() + size) {
                     Object event = mCorrespondingEvent.firstEntry().getValue();
                     if (event instanceof ImageEvent) {
                         // Tag value overlaps thumbnail, ignore thumbnail.
@@ -660,17 +632,13 @@ class ExifParser {
                     } else {
                         // Tag value overlaps another tag, shorten count
                         if (event instanceof IfdEvent) {
-                            Log.w(TAG, "Ifd " + ((IfdEvent) event).ifd
-                                    + " overlaps value for tag: \n" + tag.toString());
+                            Log.w(TAG, "Ifd " + ((IfdEvent) event).ifd + " overlaps value for tag: \n" + tag.toString());
                         } else if (event instanceof ExifTagEvent) {
-                            Log.w(TAG, "Tag value for tag: \n"
-                                    + ((ExifTagEvent) event).tag.toString()
+                            Log.w(TAG, "Tag value for tag: \n" + ((ExifTagEvent) event).tag.toString()
                                     + " overlaps value for tag: \n" + tag.toString());
                         }
-                        size = mCorrespondingEvent.firstEntry().getKey()
-                                - mTiffStream.getReadByteCount();
-                        Log.w(TAG, "Invalid size of tag: \n" + tag.toString()
-                                + " setting count to: " + size);
+                        size = mCorrespondingEvent.firstEntry().getKey() - mTiffStream.getReadByteCount();
+                        Log.w(TAG, "Invalid size of tag: \n" + tag.toString() + " setting count to: " + size);
                         tag.forceSetComponentCount(size);
                     }
                 }
@@ -733,8 +701,7 @@ class ExifParser {
         }
     }
 
-    private void parseTiffHeader() throws IOException,
-            ExifInvalidFormatException {
+    private void parseTiffHeader() throws IOException, ExifInvalidFormatException {
         short byteOrder = mTiffStream.readShort();
         if (LITTLE_ENDIAN_TAG == byteOrder) {
             mTiffStream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
@@ -749,16 +716,14 @@ class ExifParser {
         }
     }
 
-    private boolean seekTiffData(InputStream inputStream) throws IOException,
-            ExifInvalidFormatException {
+    private boolean seekTiffData(InputStream inputStream) throws IOException, ExifInvalidFormatException {
         CountedDataInputStream dataStream = new CountedDataInputStream(inputStream);
         if (dataStream.readShort() != JpegHeader.SOI) {
             throw new ExifInvalidFormatException("Invalid JPEG format");
         }
 
         short marker = dataStream.readShort();
-        while (marker != JpegHeader.EOI
-                && !JpegHeader.isSofMarker(marker)) {
+        while (marker != JpegHeader.EOI && !JpegHeader.isSofMarker(marker)) {
             int length = dataStream.readUnsignedShort();
             // Some invalid formatted image contains multiple APP1,
             // try to find the one with Exif data.
@@ -809,18 +774,17 @@ class ExifParser {
     }
 
     /**
-     * Reads a String from the InputStream with US-ASCII charset. The parser
-     * will read n bytes and convert it to ascii string. This is used for
-     * reading values of type {@link ExifTag#TYPE_ASCII}.
+     * Reads a String from the InputStream with US-ASCII charset. The parser will read n bytes and
+     * convert it to ascii string. This is used for reading values of type
+     * {@link ExifTag#TYPE_ASCII}.
      */
     protected String readString(int n) throws IOException {
         return readString(n, US_ASCII);
     }
 
     /**
-     * Reads a String from the InputStream with the given charset. The parser
-     * will read n bytes and convert it to string. This is used for reading
-     * values of type {@link ExifTag#TYPE_ASCII}.
+     * Reads a String from the InputStream with the given charset. The parser will read n bytes and
+     * convert it to string. This is used for reading values of type {@link ExifTag#TYPE_ASCII}.
      */
     protected String readString(int n, Charset charset) throws IOException {
         if (n > 0) {
@@ -831,24 +795,21 @@ class ExifParser {
     }
 
     /**
-     * Reads value of type {@link ExifTag#TYPE_UNSIGNED_SHORT} from the
-     * InputStream.
+     * Reads value of type {@link ExifTag#TYPE_UNSIGNED_SHORT} from the InputStream.
      */
     protected int readUnsignedShort() throws IOException {
         return mTiffStream.readShort() & 0xffff;
     }
 
     /**
-     * Reads value of type {@link ExifTag#TYPE_UNSIGNED_LONG} from the
-     * InputStream.
+     * Reads value of type {@link ExifTag#TYPE_UNSIGNED_LONG} from the InputStream.
      */
     protected long readUnsignedLong() throws IOException {
         return readLong() & 0xffffffffL;
     }
 
     /**
-     * Reads value of type {@link ExifTag#TYPE_UNSIGNED_RATIONAL} from the
-     * InputStream.
+     * Reads value of type {@link ExifTag#TYPE_UNSIGNED_RATIONAL} from the InputStream.
      */
     protected Rational readUnsignedRational() throws IOException {
         long nomi = readUnsignedLong();

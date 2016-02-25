@@ -1,20 +1,25 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import android.appwidget.AppWidgetHost;
 import android.appwidget.AppWidgetManager;
@@ -39,32 +44,23 @@ import com.android.launcher3.LauncherProvider.SqlArguments;
 import com.android.launcher3.LauncherProvider.WorkspaceLoader;
 import com.android.launcher3.LauncherSettings.Favorites;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 /**
  * This class contains contains duplication of functionality as found in
- * LauncherProvider#DatabaseHelper. It has been isolated and differentiated in order
- * to cleanly and separately represent AutoInstall default layout format and policy.
+ * LauncherProvider#DatabaseHelper. It has been isolated and differentiated in order to cleanly and
+ * separately represent AutoInstall default layout format and policy.
  */
 public class AutoInstallsLayout implements WorkspaceLoader {
     private static final String TAG = "AutoInstalls";
     private static final boolean LOGD = true;
 
     /** Marker action used to discover a package which defines launcher customization */
-    static final String ACTION_LAUNCHER_CUSTOMIZATION =
-            "android.autoinstalls.config.action.PLAY_AUTO_INSTALL";
+    static final String ACTION_LAUNCHER_CUSTOMIZATION = "android.autoinstalls.config.action.PLAY_AUTO_INSTALL";
 
     private static final String LAYOUT_RES = "default_layout";
 
-    static AutoInstallsLayout get(Context context, AppWidgetHost appWidgetHost,
-            LayoutParserCallback callback) {
-        Pair<String, Resources> customizationApkInfo = Utilities.findSystemApk(
-                ACTION_LAUNCHER_CUSTOMIZATION, context.getPackageManager());
+    static AutoInstallsLayout get(Context context, AppWidgetHost appWidgetHost, LayoutParserCallback callback) {
+        Pair<String, Resources> customizationApkInfo =
+                Utilities.findSystemApk(ACTION_LAUNCHER_CUSTOMIZATION, context.getPackageManager());
         if (customizationApkInfo == null) {
             return null;
         }
@@ -106,8 +102,7 @@ public class AutoInstallsLayout implements WorkspaceLoader {
     private static final String ATTR_KEY = "key";
     private static final String ATTR_VALUE = "value";
 
-    private static final String HOTSEAT_CONTAINER_NAME =
-            Favorites.containerToString(Favorites.CONTAINER_HOTSEAT);
+    private static final String HOTSEAT_CONTAINER_NAME = Favorites.containerToString(Favorites.CONTAINER_HOTSEAT);
 
     private static final String ACTION_APPWIDGET_DEFAULT_WORKSPACE_CONFIGURE =
             "com.android.launcher.action.APPWIDGET_DEFAULT_WORKSPACE_CONFIGURE";
@@ -124,8 +119,8 @@ public class AutoInstallsLayout implements WorkspaceLoader {
 
     private SQLiteDatabase mDb;
 
-    public AutoInstallsLayout(Context context, AppWidgetHost appWidgetHost,
-            LayoutParserCallback callback, String packageName, Resources res, int layoutId) {
+    public AutoInstallsLayout(Context context, AppWidgetHost appWidgetHost, LayoutParserCallback callback,
+            String packageName, Resources res, int layoutId) {
         mContext = context;
         mAppWidgetHost = appWidgetHost;
         mCallback = callback;
@@ -148,10 +143,10 @@ public class AutoInstallsLayout implements WorkspaceLoader {
         }
     }
 
-    private int parseLayout(Resources res, int layoutId, ArrayList<Long> screenIds)
-            throws XmlPullParserException, IOException {
-        final int hotseatAllAppsRank = LauncherAppState.getInstance()
-                .getDynamicGrid().getDeviceProfile().hotseatAllAppsRank;
+    private int parseLayout(Resources res, int layoutId, ArrayList<Long> screenIds) throws XmlPullParserException,
+            IOException {
+        final int hotseatAllAppsRank =
+                LauncherAppState.getInstance().getDynamicGrid().getDeviceProfile().hotseatAllAppsRank;
 
         XmlResourceParser parser = res.getXml(layoutId);
         beginDocument(parser, TAG_WORKSPACE);
@@ -160,8 +155,8 @@ public class AutoInstallsLayout implements WorkspaceLoader {
         HashMap<String, TagParser> tagParserMap = getLayoutElementsMap();
         int count = 0;
 
-        while (((type = parser.next()) != XmlPullParser.END_TAG ||
-                parser.getDepth() > depth) && type != XmlPullParser.END_DOCUMENT) {
+        while (((type = parser.next()) != XmlPullParser.END_TAG || parser.getDepth() > depth)
+                && type != XmlPullParser.END_DOCUMENT) {
             if (type != XmlPullParser.START_TAG) {
                 continue;
             }
@@ -196,8 +191,7 @@ public class AutoInstallsLayout implements WorkspaceLoader {
             long newElementId = tagParser.parseAndAdd(parser, res);
             if (newElementId >= 0) {
                 // Keep track of the set of screens which need to be added to the db.
-                if (!screenIds.contains(screenId) &&
-                        container == Favorites.CONTAINER_DESKTOP) {
+                if (!screenIds.contains(screenId) && container == Favorites.CONTAINER_DESKTOP) {
                     screenIds.add(screenId);
                 }
                 count++;
@@ -242,10 +236,10 @@ public class AutoInstallsLayout implements WorkspaceLoader {
     private interface TagParser {
         /**
          * Parses the tag and adds to the db
+         * 
          * @return the id of the row added or -1;
          */
-        long parseAndAdd(XmlResourceParser parser, Resources res)
-                throws XmlPullParserException, IOException;
+        long parseAndAdd(XmlResourceParser parser, Resources res) throws XmlPullParserException, IOException;
     }
 
     private class AppShortcutParser implements TagParser {
@@ -263,19 +257,18 @@ public class AutoInstallsLayout implements WorkspaceLoader {
                         cn = new ComponentName(packageName, className);
                         info = mPackageManager.getActivityInfo(cn, 0);
                     } catch (PackageManager.NameNotFoundException nnfe) {
-                        String[] packages = mPackageManager.currentToCanonicalPackageNames(
-                                new String[] { packageName });
+                        String[] packages = mPackageManager.currentToCanonicalPackageNames(new String[] {packageName});
                         cn = new ComponentName(packages[0], className);
                         info = mPackageManager.getActivityInfo(cn, 0);
                     }
-                    final Intent intent = new Intent(Intent.ACTION_MAIN, null)
-                        .addCategory(Intent.CATEGORY_LAUNCHER)
-                        .setComponent(cn)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                                Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                    final Intent intent =
+                            new Intent(Intent.ACTION_MAIN, null)
+                                    .addCategory(Intent.CATEGORY_LAUNCHER)
+                                    .setComponent(cn)
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 
-                    return addShortcut(info.loadLabel(mPackageManager).toString(),
-                            intent, Favorites.ITEM_TYPE_APPLICATION);
+                    return addShortcut(info.loadLabel(mPackageManager).toString(), intent,
+                            Favorites.ITEM_TYPE_APPLICATION);
                 } catch (PackageManager.NameNotFoundException e) {
                     Log.w(TAG, "Unable to add favorite: " + packageName + "/" + className, e);
                 }
@@ -299,11 +292,10 @@ public class AutoInstallsLayout implements WorkspaceLoader {
             }
 
             mValues.put(Favorites.RESTORED, ShortcutInfo.FLAG_AUTOINTALL_ICON);
-            final Intent intent = new Intent(Intent.ACTION_MAIN, null)
-                .addCategory(Intent.CATEGORY_LAUNCHER)
-                .setComponent(new ComponentName(packageName, className))
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                        Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            final Intent intent =
+                    new Intent(Intent.ACTION_MAIN, null).addCategory(Intent.CATEGORY_LAUNCHER)
+                            .setComponent(new ComponentName(packageName, className))
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
             return addShortcut(mContext.getString(R.string.package_state_unknown), intent,
                     Favorites.ITEM_TYPE_APPLICATION);
         }
@@ -333,10 +325,9 @@ public class AutoInstallsLayout implements WorkspaceLoader {
             }
 
             ItemInfo.writeBitmap(mValues, Utilities.createIconBitmap(icon, mContext));
-            final Intent intent = new Intent(Intent.ACTION_VIEW, null)
-                .setData(Uri.parse(url))
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                        Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            final Intent intent =
+                    new Intent(Intent.ACTION_VIEW, null).setData(Uri.parse(url)).setFlags(
+                            Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
             return addShortcut(res.getString(titleResId), intent, Favorites.ITEM_TYPE_SHORTCUT);
         }
     }
@@ -344,8 +335,7 @@ public class AutoInstallsLayout implements WorkspaceLoader {
     private class AppWidgetParser implements TagParser {
 
         @Override
-        public long parseAndAdd(XmlResourceParser parser, Resources res)
-                throws XmlPullParserException, IOException {
+        public long parseAndAdd(XmlResourceParser parser, Resources res) throws XmlPullParserException, IOException {
             final String packageName = getAttributeValue(parser, ATTR_PACKAGE_NAME);
             final String className = getAttributeValue(parser, ATTR_CLASS_NAME);
             if (TextUtils.isEmpty(packageName) || TextUtils.isEmpty(className)) {
@@ -357,8 +347,7 @@ public class AutoInstallsLayout implements WorkspaceLoader {
             try {
                 mPackageManager.getReceiverInfo(cn, 0);
             } catch (Exception e) {
-                String[] packages = mPackageManager.currentToCanonicalPackageNames(
-                        new String[] { packageName });
+                String[] packages = mPackageManager.currentToCanonicalPackageNames(new String[] {packageName});
                 cn = new ComponentName(packages[0], className);
                 try {
                     mPackageManager.getReceiverInfo(cn, 0);
@@ -375,8 +364,7 @@ public class AutoInstallsLayout implements WorkspaceLoader {
             Bundle extras = new Bundle();
             int widgetDepth = parser.getDepth();
             int type;
-            while ((type = parser.next()) != XmlPullParser.END_TAG ||
-                    parser.getDepth() > widgetDepth) {
+            while ((type = parser.next()) != XmlPullParser.END_TAG || parser.getDepth() > widgetDepth) {
                 if (type != XmlPullParser.START_TAG) {
                     continue;
                 }
@@ -433,8 +421,7 @@ public class AutoInstallsLayout implements WorkspaceLoader {
         private final HashMap<String, TagParser> mFolderElements = getFolderElementsMap();
 
         @Override
-        public long parseAndAdd(XmlResourceParser parser, Resources res)
-                throws XmlPullParserException, IOException {
+        public long parseAndAdd(XmlResourceParser parser, Resources res) throws XmlPullParserException, IOException {
             final String title;
             final int titleResId = getAttributeResourceValue(parser, ATTR_TITLE, 0);
             if (titleResId != 0) {
@@ -459,8 +446,7 @@ public class AutoInstallsLayout implements WorkspaceLoader {
 
             int type;
             int folderDepth = parser.getDepth();
-            while ((type = parser.next()) != XmlPullParser.END_TAG ||
-                    parser.getDepth() > folderDepth) {
+            while ((type = parser.next()) != XmlPullParser.END_TAG || parser.getDepth() > folderDepth) {
                 if (type != XmlPullParser.START_TAG) {
                     continue;
                 }
@@ -500,8 +486,7 @@ public class AutoInstallsLayout implements WorkspaceLoader {
                     copyInteger(myValues, childValues, Favorites.CELLY);
 
                     addedId = folderItems.get(0);
-                    mDb.update(LauncherProvider.TABLE_FAVORITES, childValues,
-                            Favorites._ID + "=" + addedId, null);
+                    mDb.update(LauncherProvider.TABLE_FAVORITES, childValues, Favorites._ID + "=" + addedId, null);
                 }
             }
             return addedId;
@@ -511,26 +496,25 @@ public class AutoInstallsLayout implements WorkspaceLoader {
     private static final void beginDocument(XmlPullParser parser, String firstElementName)
             throws XmlPullParserException, IOException {
         int type;
-        while ((type = parser.next()) != XmlPullParser.START_TAG
-                && type != XmlPullParser.END_DOCUMENT);
+        while ((type = parser.next()) != XmlPullParser.START_TAG && type != XmlPullParser.END_DOCUMENT);
 
         if (type != XmlPullParser.START_TAG) {
             throw new XmlPullParserException("No start tag found");
         }
 
         if (!parser.getName().equals(firstElementName)) {
-            throw new XmlPullParserException("Unexpected start tag: found " + parser.getName() +
-                    ", expected " + firstElementName);
+            throw new XmlPullParserException("Unexpected start tag: found " + parser.getName() + ", expected "
+                    + firstElementName);
         }
     }
 
     /**
-     * Return attribute value, attempting launcher-specific namespace first
-     * before falling back to anonymous attribute.
+     * Return attribute value, attempting launcher-specific namespace first before falling back to
+     * anonymous attribute.
      */
     private static String getAttributeValue(XmlResourceParser parser, String attribute) {
-        String value = parser.getAttributeValue(
-                "http://schemas.android.com/apk/res-auto/com.android.launcher3", attribute);
+        String value =
+                parser.getAttributeValue("http://schemas.android.com/apk/res-auto/com.android.launcher3", attribute);
         if (value == null) {
             value = parser.getAttributeValue(null, attribute);
         }
@@ -538,14 +522,13 @@ public class AutoInstallsLayout implements WorkspaceLoader {
     }
 
     /**
-     * Return attribute resource value, attempting launcher-specific namespace
-     * first before falling back to anonymous attribute.
+     * Return attribute resource value, attempting launcher-specific namespace first before falling
+     * back to anonymous attribute.
      */
-    private static int getAttributeResourceValue(XmlResourceParser parser, String attribute,
-            int defaultValue) {
-        int value = parser.getAttributeResourceValue(
-                "http://schemas.android.com/apk/res-auto/com.android.launcher3", attribute,
-                defaultValue);
+    private static int getAttributeResourceValue(XmlResourceParser parser, String attribute, int defaultValue) {
+        int value =
+                parser.getAttributeResourceValue("http://schemas.android.com/apk/res-auto/com.android.launcher3",
+                        attribute, defaultValue);
         if (value == defaultValue) {
             value = parser.getAttributeResourceValue(null, attribute, defaultValue);
         }

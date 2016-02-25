@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -22,17 +20,18 @@ import android.view.MotionEvent;
 import android.view.View;
 
 
-/* Class that does most of the work of enabling dragging items out of a PagedView by performing a
- * vertical drag. Used by both CustomizePagedView and AllAppsPagedView.
- * Subclasses must do the following:
- *   * call setDragSlopeThreshold after making an instance of the PagedViewWithDraggableItems
- *   * call child.setOnLongClickListener(this) and child.setOnTouchListener(this) on all children
- *       (good place to do it is in syncPageItems)
- *   * override beginDragging(View) (but be careful to call super.beginDragging(View)
- *
+/*
+ * Class that does most of the work of enabling dragging items out of a PagedView by performing a
+ * vertical drag. Used by both CustomizePagedView and AllAppsPagedView. Subclasses must do the
+ * following: * call setDragSlopeThreshold after making an instance of the
+ * PagedViewWithDraggableItems * call child.setOnLongClickListener(this) and
+ * child.setOnTouchListener(this) on all children (good place to do it is in syncPageItems) *
+ * override beginDragging(View) (but be careful to call super.beginDragging(View)
  */
 public abstract class PagedViewWithDraggableItems extends PagedView
-    implements View.OnLongClickListener, View.OnTouchListener {
+        implements
+            View.OnLongClickListener,
+            View.OnTouchListener {
     private View mLastTouchedItem;
     private boolean mIsDragging;
     private boolean mIsDragEnabled;
@@ -105,8 +104,7 @@ public abstract class PagedViewWithDraggableItems extends PagedView
         // Return early if we are still animating the pages
         if (mNextPage != INVALID_PAGE) return false;
         // When we have exited all apps or are in transition, disregard long clicks
-        if (!mLauncher.isAllAppsVisible() ||
-                mLauncher.getWorkspace().isSwitchingState()) return false;
+        if (!mLauncher.isAllAppsVisible() || mLauncher.getWorkspace().isSwitchingState()) return false;
         // Return if global dragging is not enabled
         if (!mLauncher.isDraggingEnabled()) return false;
 
@@ -114,21 +112,20 @@ public abstract class PagedViewWithDraggableItems extends PagedView
     }
 
     /*
-     * Determines if we should change the touch state to start scrolling after the
-     * user moves their touch point too far.
+     * Determines if we should change the touch state to start scrolling after the user moves their
+     * touch point too far.
      */
     protected void determineScrollingStart(MotionEvent ev) {
         if (!mIsDragging) super.determineScrollingStart(ev);
     }
 
     /*
-     * Determines if we should change the touch state to start dragging after the
-     * user moves their touch point far enough.
+     * Determines if we should change the touch state to start dragging after the user moves their
+     * touch point far enough.
      */
     protected void determineDraggingStart(MotionEvent ev) {
         /*
-         * Locally do absolute value. mLastMotionX is set to the y value
-         * of the down event.
+         * Locally do absolute value. mLastMotionX is set to the y value of the down event.
          */
         final int pointerIndex = ev.findPointerIndex(mActivePointerId);
         final float x = ev.getX(pointerIndex);

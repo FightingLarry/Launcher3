@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
 * Copyright (C) 2008 The Android Open Source Project
 *
@@ -18,13 +17,14 @@
 -->
 
 <resources>
-<!-- Search Bar -->
-    <style name="SearchButton">
-    </style>
+    <!-- Search Bar -->
+    <style name="SearchButton"></style>
+
     <style name="DropTargetButtonContainer">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
+
     <style name="DropTargetButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -40,7 +40,7 @@
         <item name="android:shadowRadius">4.0</item>
     </style>
 
-<!-- AppsCustomize -->
+    <!-- AppsCustomize -->
     <style name="TabIndicator.AppsCustomize">
         <item name="android:maxWidth">200dp</item>
     </style>

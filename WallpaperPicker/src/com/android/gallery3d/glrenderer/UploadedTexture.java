@@ -1,30 +1,28 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.gallery3d.glrenderer;
 
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.opengl.GLUtils;
-
-import junit.framework.Assert;
-
 import java.util.HashMap;
 
 import javax.microedition.khronos.opengles.GL11;
+
+import junit.framework.Assert;
+
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.opengl.GLUtils;
 
 // UploadedTextures use a Bitmap for the content of the texture.
 //
@@ -44,8 +42,7 @@ public abstract class UploadedTexture extends BasicTexture {
 
     // To prevent keeping allocation the borders, we store those used borders here.
     // Since the length will be power of two, it won't use too much memory.
-    private static HashMap<BorderKey, Bitmap> sBorderLines =
-            new HashMap<BorderKey, Bitmap>();
+    private static HashMap<BorderKey, Bitmap> sBorderLines = new HashMap<BorderKey, Bitmap>();
     private static BorderKey sBorderKey = new BorderKey();
 
     @SuppressWarnings("unused")
@@ -97,8 +94,7 @@ public abstract class UploadedTexture extends BasicTexture {
         public boolean equals(Object object) {
             if (!(object instanceof BorderKey)) return false;
             BorderKey o = (BorderKey) object;
-            return vertical == o.vertical
-                    && config == o.config && length == o.length;
+            return vertical == o.vertical && config == o.config && length == o.length;
         }
 
         @Override
@@ -115,17 +111,14 @@ public abstract class UploadedTexture extends BasicTexture {
         mThrottled = throttled;
     }
 
-    private static Bitmap getBorderLine(
-            boolean vertical, Config config, int length) {
+    private static Bitmap getBorderLine(boolean vertical, Config config, int length) {
         BorderKey key = sBorderKey;
         key.vertical = vertical;
         key.config = config;
         key.length = length;
         Bitmap bitmap = sBorderLines.get(key);
         if (bitmap == null) {
-            bitmap = vertical
-                    ? Bitmap.createBitmap(1, length, config)
-                    : Bitmap.createBitmap(length, 1, config);
+            bitmap = vertical ? Bitmap.createBitmap(1, length, config) : Bitmap.createBitmap(length, 1, config);
             sBorderLines.put(key.clone(), bitmap);
         }
         return bitmap;
@@ -181,6 +174,7 @@ public abstract class UploadedTexture extends BasicTexture {
 
     /**
      * Updates the content on GPU's memory.
+     * 
      * @param canvas
      */
     public void updateContent(GLCanvas canvas) {

@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -64,14 +62,8 @@ public class PageIndicatorMarker extends FrameLayout {
             mInactiveMarker.animate().cancel();
             mInactiveMarker.setAlpha(0f);
         } else {
-            mActiveMarker.animate()
-                    .alpha(1f)
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(MARKER_FADE_DURATION).start();
-            mInactiveMarker.animate()
-                    .alpha(0f)
-                    .setDuration(MARKER_FADE_DURATION).start();
+            mActiveMarker.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(MARKER_FADE_DURATION).start();
+            mInactiveMarker.animate().alpha(0f).setDuration(MARKER_FADE_DURATION).start();
         }
         mIsActive = true;
     }
@@ -85,13 +77,8 @@ public class PageIndicatorMarker extends FrameLayout {
             mActiveMarker.setScaleX(0.5f);
             mActiveMarker.setScaleY(0.5f);
         } else {
-            mInactiveMarker.animate().alpha(1f)
-                    .setDuration(MARKER_FADE_DURATION).start();
-            mActiveMarker.animate()
-                    .alpha(0f)
-                    .scaleX(0.5f)
-                    .scaleY(0.5f)
-                    .setDuration(MARKER_FADE_DURATION).start();
+            mInactiveMarker.animate().alpha(1f).setDuration(MARKER_FADE_DURATION).start();
+            mActiveMarker.animate().alpha(0f).scaleX(0.5f).scaleY(0.5f).setDuration(MARKER_FADE_DURATION).start();
         }
         mIsActive = false;
     }

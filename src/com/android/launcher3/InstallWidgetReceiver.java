@@ -1,20 +1,20 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.util.List;
 
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.ClipData;
@@ -31,27 +31,23 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import java.util.List;
-
 
 /**
  * We will likely flesh this out later, to handle allow external apps to place widgets, but for now,
  * we just want to expose the action around for checking elsewhere.
  */
 public class InstallWidgetReceiver {
-    public static final String ACTION_INSTALL_WIDGET =
-            "com.android.launcher3.action.INSTALL_WIDGET";
+    public static final String ACTION_INSTALL_WIDGET = "com.android.launcher3.action.INSTALL_WIDGET";
     public static final String ACTION_SUPPORTS_CLIPDATA_MIMETYPE =
             "com.android.launcher3.action.SUPPORTS_CLIPDATA_MIMETYPE";
 
-    // Currently not exposed.  Put into Intent when we want to make it public.
+    // Currently not exposed. Put into Intent when we want to make it public.
     // TEMP: Should we call this "EXTRA_APPWIDGET_PROVIDER"?
-    public static final String EXTRA_APPWIDGET_COMPONENT =
-        "com.android.launcher3.extra.widget.COMPONENT";
+    public static final String EXTRA_APPWIDGET_COMPONENT = "com.android.launcher3.extra.widget.COMPONENT";
     public static final String EXTRA_APPWIDGET_CONFIGURATION_DATA_MIME_TYPE =
-        "com.android.launcher3.extra.widget.CONFIGURATION_DATA_MIME_TYPE";
+            "com.android.launcher3.extra.widget.CONFIGURATION_DATA_MIME_TYPE";
     public static final String EXTRA_APPWIDGET_CONFIGURATION_DATA =
-        "com.android.launcher3.extra.widget.CONFIGURATION_DATA";
+            "com.android.launcher3.extra.widget.CONFIGURATION_DATA";
 
     /**
      * A simple data class that contains per-item information that the adapter below can reference.
@@ -78,8 +74,8 @@ public class InstallWidgetReceiver {
         private int mTargetLayoutScreen;
         private int[] mTargetLayoutPos;
 
-        public WidgetListAdapter(Launcher l, String mimeType, ClipData data,
-                List<WidgetMimeTypeHandlerData> list, int targetScreen, int[] targetPos) {
+        public WidgetListAdapter(Launcher l, String mimeType, ClipData data, List<WidgetMimeTypeHandlerData> list,
+                int targetScreen, int[] targetPos) {
             mLauncher = l;
             mMimeType = mimeType;
             mClipData = data;
@@ -89,12 +85,10 @@ public class InstallWidgetReceiver {
         }
 
         @Override
-        public void registerDataSetObserver(DataSetObserver observer) {
-        }
+        public void registerDataSetObserver(DataSetObserver observer) {}
 
         @Override
-        public void unregisterDataSetObserver(DataSetObserver observer) {
-        }
+        public void unregisterDataSetObserver(DataSetObserver observer) {}
 
         @Override
         public int getCount() {
@@ -128,8 +122,7 @@ public class InstallWidgetReceiver {
 
             // Use the convert-view where possible
             if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.external_widget_drop_list_item, parent,
-                        false);
+                convertView = mInflater.inflate(R.layout.external_widget_drop_list_item, parent, false);
             }
 
             final WidgetMimeTypeHandlerData data = mActivities.get(position);
@@ -146,8 +139,8 @@ public class InstallWidgetReceiver {
             final int[] widgetSpan = new int[2];
             CellLayout.rectToCell(widgetInfo.minWidth, widgetInfo.minHeight, widgetSpan);
             TextView t = (TextView) convertView.findViewById(R.id.provider);
-            t.setText(context.getString(R.string.external_drop_widget_pick_format,
-                    component, widgetSpan[0], widgetSpan[1]));
+            t.setText(context.getString(R.string.external_drop_widget_pick_format, component, widgetSpan[0],
+                    widgetSpan[1]));
 
             return convertView;
         }
@@ -181,8 +174,7 @@ public class InstallWidgetReceiver {
         public void onClick(DialogInterface dialog, int which) {
             final AppWidgetProviderInfo widgetInfo = mActivities.get(which).widgetInfo;
 
-            final PendingAddWidgetInfo createInfo = new PendingAddWidgetInfo(widgetInfo, mMimeType,
-                    mClipData);
+            final PendingAddWidgetInfo createInfo = new PendingAddWidgetInfo(widgetInfo, mMimeType, mClipData);
             mLauncher.addAppWidgetFromDrop(createInfo, LauncherSettings.Favorites.CONTAINER_DESKTOP,
                     mTargetLayoutScreen, null, null, mTargetLayoutPos);
         }

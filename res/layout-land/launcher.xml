@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2007 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2007 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,8 +14,7 @@
 -->
 
 <!-- Full screen view projects under the status bar and contains the background -->
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:launcher="http://schemas.android.com/apk/res-auto/com.android.launcher3"
 
     android:id="@+id/launcher"
@@ -43,7 +41,8 @@
             android:layout_gravity="center"
             launcher:defaultScreen="@integer/config_workspaceDefaultScreen" />
 
-        <include layout="@layout/hotseat"
+        <include
+            layout="@layout/hotseat"
             android:id="@+id/hotseat"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -53,11 +52,13 @@
             android:id="@+id/search_drop_target_bar"
             layout="@layout/search_drop_target_bar" />
 
-        <include layout="@layout/overview_panel"
+        <include
+            layout="@layout/overview_panel"
             android:id="@+id/overview_panel"
             android:visibility="gone" />
 
-        <include layout="@layout/apps_customize_pane"
+        <include
+            layout="@layout/apps_customize_pane"
             android:id="@+id/apps_customize_pane"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

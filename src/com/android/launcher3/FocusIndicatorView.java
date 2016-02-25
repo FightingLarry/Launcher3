@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -90,12 +88,7 @@ public class FocusIndicatorView extends View implements View.OnFocusChangeListen
             float y = mTargetViewPos[1] - mIndicatorPos[1] - (1 - scaleY) * indicatorHeight / 2;
 
             if (getAlpha() > MIN_VISIBLE_ALPHA) {
-                animate()
-                .translationX(x)
-                .translationY(y)
-                .scaleX(scaleX)
-                .scaleY(scaleY)
-                .alpha(1);
+                animate().translationX(x).translationY(y).scaleX(scaleX).scaleY(scaleY).alpha(1);
             } else {
                 setTranslationX(x);
                 setTranslationY(y);
@@ -120,8 +113,8 @@ public class FocusIndicatorView extends View implements View.OnFocusChangeListen
     }
 
     /**
-     * Gets the location of a view relative in the window, off-setting any shift due to
-     * page view scroll
+     * Gets the location of a view relative in the window, off-setting any shift due to page view
+     * scroll
      */
     private static void getLocationRelativeToParentPagedView(View v, int[] pos) {
         getPagedViewScrollShift(v, sTempShift);

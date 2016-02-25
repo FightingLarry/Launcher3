@@ -1,5 +1,5 @@
 <resources>
-<!-- Dynamic Grid -->
+    <!-- Dynamic Grid -->
     <integer name="config_dynamic_grid_max_long_edge_cell_count">6</integer>
     <integer name="config_dynamic_grid_max_short_edge_cell_count">5</integer>
     <integer name="config_dynamic_grid_min_edge_cell_count">3</integer>
@@ -8,7 +8,7 @@
     <!-- Out of 100, the percent to shrink the workspace during overview mode. -->
     <integer name="config_dynamic_grid_overview_scale_percentage">80</integer>
 
-<!-- Miscellaneous -->
+    <!-- Miscellaneous -->
     <bool name="config_largeHeap">false</bool>
     <bool name="is_tablet">false</bool>
     <bool name="is_large_tablet">false</bool>
@@ -21,10 +21,10 @@
          http://developer.android.com/guide/topics/data/backup.html#BackupKey -->
     <bool name="enable_backup">false</bool>
 
-<!-- DragController -->
+    <!-- DragController -->
     <integer name="config_flingToDeleteMinVelocity">-1500</integer>
 
-<!-- AllApps/Customize/AppsCustomize -->
+    <!-- AllApps/Customize/AppsCustomize -->
     <!-- The alpha of the AppsCustomize bg in spring loaded mode -->
     <integer name="config_workspaceScrimAlpha">55</integer>
     <integer name="config_workspaceUnshrinkTime">300</integer>
@@ -59,7 +59,7 @@
          AppsCustomize (y / x * 100%)  -->
     <integer name="config_appsCustomizeDragSlopeThreshold">150</integer>
 
-<!-- Workspace -->
+    <!-- Workspace -->
     <!-- Whether or not the drop targets drop down as opposed to fade in -->
     <bool name="config_useDropTargetDownTransition">false</bool>
 
@@ -93,7 +93,7 @@
     <!-- Camera distance for the overscroll effect -->
     <integer name="config_cameraDistance">8000</integer>
 
-<!-- Hotseat -->
+    <!-- Hotseat -->
     <bool name="hotseat_transpose_layout_with_orientation">true</bool>
 
     <!-- Memory debugging, including a memory dump icon -->

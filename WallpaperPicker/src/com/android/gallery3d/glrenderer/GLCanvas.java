@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.gallery3d.glrenderer;
@@ -90,31 +88,27 @@ public interface GLCanvas {
     public abstract void fillRect(float x, float y, float width, float height, int color);
 
     // Draws a texture to the specified rectangle.
-    public abstract void drawTexture(
-            BasicTexture texture, int x, int y, int width, int height);
+    public abstract void drawTexture(BasicTexture texture, int x, int y, int width, int height);
 
-    public abstract void drawMesh(BasicTexture tex, int x, int y, int xyBuffer,
-            int uvBuffer, int indexBuffer, int indexCount);
+    public abstract void drawMesh(BasicTexture tex, int x, int y, int xyBuffer, int uvBuffer, int indexBuffer,
+            int indexCount);
 
     // Draws the source rectangle part of the texture to the target rectangle.
     public abstract void drawTexture(BasicTexture texture, RectF source, RectF target);
 
     // Draw a texture with a specified texture transform.
-    public abstract void drawTexture(BasicTexture texture, float[] mTextureTransform,
-                int x, int y, int w, int h);
+    public abstract void drawTexture(BasicTexture texture, float[] mTextureTransform, int x, int y, int w, int h);
 
     // Draw two textures to the specified rectangle. The actual texture used is
     // from * (1 - ratio) + to * ratio
     // The two textures must have the same size.
-    public abstract void drawMixed(BasicTexture from, int toColor,
-            float ratio, int x, int y, int w, int h);
+    public abstract void drawMixed(BasicTexture from, int toColor, float ratio, int x, int y, int w, int h);
 
     // Draw a region of a texture and a specified color to the specified
     // rectangle. The actual color used is from * (1 - ratio) + to * ratio.
     // The region of the texture is defined by parameter "src". The target
     // rectangle is specified by parameter "target".
-    public abstract void drawMixed(BasicTexture from, int toColor,
-            float ratio, RectF src, RectF target);
+    public abstract void drawMixed(BasicTexture from, int toColor, float ratio, RectF src, RectF target);
 
     // Unloads the specified texture from the canvas. The resource allocated
     // to draw the texture will be released. The specified texture will return
@@ -137,10 +131,9 @@ public interface GLCanvas {
     public abstract void endRenderTarget();
 
     /**
-     * Sets texture parameters to use GL_CLAMP_TO_EDGE for both
-     * GL_TEXTURE_WRAP_S and GL_TEXTURE_WRAP_T. Sets texture parameters to be
-     * GL_LINEAR for GL_TEXTURE_MIN_FILTER and GL_TEXTURE_MAG_FILTER.
-     * bindTexture() must be called prior to this.
+     * Sets texture parameters to use GL_CLAMP_TO_EDGE for both GL_TEXTURE_WRAP_S and
+     * GL_TEXTURE_WRAP_T. Sets texture parameters to be GL_LINEAR for GL_TEXTURE_MIN_FILTER and
+     * GL_TEXTURE_MAG_FILTER. bindTexture() must be called prior to this.
      *
      * @param texture The texture to set parameters on.
      */
@@ -167,16 +160,13 @@ public interface GLCanvas {
      * Calls glTexSubImage2D to upload a bitmap to the texture.
      *
      * @param texture The target texture to write to.
-     * @param xOffset Specifies a texel offset in the x direction within the
-     *            texture array.
-     * @param yOffset Specifies a texel offset in the y direction within the
-     *            texture array.
+     * @param xOffset Specifies a texel offset in the x direction within the texture array.
+     * @param yOffset Specifies a texel offset in the y direction within the texture array.
      * @param format The texture format (e.g. GL_RGBA)
      * @param type The texture type (e.g. GL_UNSIGNED_BYTE)
      */
-    public abstract void texSubImage2D(BasicTexture texture, int xOffset, int yOffset,
-            Bitmap bitmap,
-            int format, int type);
+    public abstract void texSubImage2D(BasicTexture texture, int xOffset, int yOffset, Bitmap bitmap, int format,
+            int type);
 
     /**
      * Generates buffers and uploads the buffer data.
@@ -195,15 +185,15 @@ public interface GLCanvas {
     public abstract int uploadBuffer(java.nio.ByteBuffer buffer);
 
     /**
-     * After LightCycle makes GL calls, this method is called to restore the GL
-     * configuration to the one expected by GLCanvas.
+     * After LightCycle makes GL calls, this method is called to restore the GL configuration to the
+     * one expected by GLCanvas.
      */
     public abstract void recoverFromLightCycle();
 
     /**
-     * Gets the bounds given by x, y, width, and height as well as the internal
-     * matrix state. There is no special handling for non-90-degree rotations.
-     * It only considers the lower-left and upper-right corners as the bounds.
+     * Gets the bounds given by x, y, width, and height as well as the internal matrix state. There
+     * is no special handling for non-90-degree rotations. It only considers the lower-left and
+     * upper-right corners as the bounds.
      *
      * @param bounds The output bounds to write to.
      * @param x The left side of the input rectangle.

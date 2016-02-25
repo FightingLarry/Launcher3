@@ -1,34 +1,28 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 
 import com.android.launcher3.compat.LauncherActivityInfoCompat;
 import com.android.launcher3.compat.LauncherAppsCompat;
 import com.android.launcher3.compat.UserHandleCompat;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -38,11 +32,9 @@ class AllAppsList {
     public static final int DEFAULT_APPLICATIONS_NUMBER = 42;
 
     /** The list off all apps. */
-    public ArrayList<AppInfo> data =
-            new ArrayList<AppInfo>(DEFAULT_APPLICATIONS_NUMBER);
+    public ArrayList<AppInfo> data = new ArrayList<AppInfo>(DEFAULT_APPLICATIONS_NUMBER);
     /** The list of apps that have been added since the last notify() call. */
-    public ArrayList<AppInfo> added =
-            new ArrayList<AppInfo>(DEFAULT_APPLICATIONS_NUMBER);
+    public ArrayList<AppInfo> added = new ArrayList<AppInfo>(DEFAULT_APPLICATIONS_NUMBER);
     /** The list of apps that have been removed since the last notify() call. */
     public ArrayList<AppInfo> removed = new ArrayList<AppInfo>();
     /** The list of apps that have been modified since the last notify() call. */
@@ -61,8 +53,8 @@ class AllAppsList {
     }
 
     /**
-     * Add the supplied ApplicationInfo objects to the list, and enqueue it into the
-     * list to broadcast when notify() is called.
+     * Add the supplied ApplicationInfo objects to the list, and enqueue it into the list to
+     * broadcast when notify() is called.
      *
      * If the app is already in the list, doesn't add it.
      */
@@ -98,8 +90,7 @@ class AllAppsList {
      */
     public void addPackage(Context context, String packageName, UserHandleCompat user) {
         final LauncherAppsCompat launcherApps = LauncherAppsCompat.getInstance(context);
-        final List<LauncherActivityInfoCompat> matches = launcherApps.getActivityList(packageName,
-                user);
+        final List<LauncherActivityInfoCompat> matches = launcherApps.getActivityList(packageName, user);
 
         if (matches.size() > 0) {
             for (LauncherActivityInfoCompat info : matches) {
@@ -129,16 +120,14 @@ class AllAppsList {
      */
     public void updatePackage(Context context, String packageName, UserHandleCompat user) {
         final LauncherAppsCompat launcherApps = LauncherAppsCompat.getInstance(context);
-        final List<LauncherActivityInfoCompat> matches = launcherApps.getActivityList(packageName,
-                user);
+        final List<LauncherActivityInfoCompat> matches = launcherApps.getActivityList(packageName, user);
         if (matches.size() > 0) {
             // Find disabled/removed activities and remove them from data and add them
             // to the removed list.
             for (int i = data.size() - 1; i >= 0; i--) {
                 final AppInfo applicationInfo = data.get(i);
                 final ComponentName component = applicationInfo.intent.getComponent();
-                if (user.equals(applicationInfo.user)
-                        && packageName.equals(component.getPackageName())) {
+                if (user.equals(applicationInfo.user) && packageName.equals(component.getPackageName())) {
                     if (!findActivity(matches, component)) {
                         removed.add(applicationInfo);
                         mIconCache.remove(component, user);
@@ -152,9 +141,9 @@ class AllAppsList {
             int count = matches.size();
             for (int i = 0; i < count; i++) {
                 final LauncherActivityInfoCompat info = matches.get(i);
-                AppInfo applicationInfo = findApplicationInfoLocked(
-                        info.getComponentName().getPackageName(), user,
-                        info.getComponentName().getClassName());
+                AppInfo applicationInfo =
+                        findApplicationInfoLocked(info.getComponentName().getPackageName(), user, info
+                                .getComponentName().getClassName());
                 if (applicationInfo == null) {
                     add(new AppInfo(context, info, user, mIconCache, null));
                 } else {
@@ -168,8 +157,7 @@ class AllAppsList {
             for (int i = data.size() - 1; i >= 0; i--) {
                 final AppInfo applicationInfo = data.get(i);
                 final ComponentName component = applicationInfo.intent.getComponent();
-                if (user.equals(applicationInfo.user)
-                        && packageName.equals(component.getPackageName())) {
+                if (user.equals(applicationInfo.user) && packageName.equals(component.getPackageName())) {
                     removed.add(applicationInfo);
                     mIconCache.remove(component, user);
                     data.remove(i);
@@ -182,8 +170,7 @@ class AllAppsList {
     /**
      * Returns whether <em>apps</em> contains <em>component</em>.
      */
-    private static boolean findActivity(List<LauncherActivityInfoCompat> apps,
-            ComponentName component) {
+    private static boolean findActivity(List<LauncherActivityInfoCompat> apps, ComponentName component) {
         for (LauncherActivityInfoCompat info : apps) {
             if (info.getComponentName().equals(component)) {
                 return true;
@@ -193,11 +180,10 @@ class AllAppsList {
     }
 
     /**
-     * Query the launcher apps service for whether the supplied package has
-     * MAIN/LAUNCHER activities in the supplied package.
+     * Query the launcher apps service for whether the supplied package has MAIN/LAUNCHER activities
+     * in the supplied package.
      */
-    static boolean packageHasActivities(Context context, String packageName,
-            UserHandleCompat user) {
+    static boolean packageHasActivities(Context context, String packageName, UserHandleCompat user) {
         final LauncherAppsCompat launcherApps = LauncherAppsCompat.getInstance(context);
         return launcherApps.getActivityList(packageName, user).size() > 0;
     }
@@ -205,8 +191,7 @@ class AllAppsList {
     /**
      * Returns whether <em>apps</em> contains <em>component</em>.
      */
-    private static boolean findActivity(ArrayList<AppInfo> apps, ComponentName component,
-            UserHandleCompat user) {
+    private static boolean findActivity(ArrayList<AppInfo> apps, ComponentName component, UserHandleCompat user) {
         final int N = apps.size();
         for (int i = 0; i < N; i++) {
             final AppInfo info = apps.get(i);
@@ -220,9 +205,8 @@ class AllAppsList {
     /**
      * Find an ApplicationInfo object for the given packageName and className.
      */
-    private AppInfo findApplicationInfoLocked(String packageName, UserHandleCompat user,
-            String className) {
-        for (AppInfo info: data) {
+    private AppInfo findApplicationInfoLocked(String packageName, UserHandleCompat user, String className) {
+        for (AppInfo info : data) {
             final ComponentName component = info.intent.getComponent();
             if (user.equals(info.user) && packageName.equals(component.getPackageName())
                     && className.equals(component.getClassName())) {

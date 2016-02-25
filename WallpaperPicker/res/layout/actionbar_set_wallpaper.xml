@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
 **
 ** Copyright 2013, The Android Open Source Project
@@ -18,8 +17,7 @@
 */
 -->
 
-<com.android.launcher3.AlphaDisableableButton
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.android.launcher3.AlphaDisableableButton xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/ActionBarSetWallpaperStyle"
     android:id="@+id/set_wallpaper_button"
     android:layout_width="match_parent"
@@ -28,5 +26,4 @@
     android:drawableLeft="@drawable/ic_actionbar_accept"
     android:drawablePadding="8dp"
     android:gravity="start|center_vertical"
-    android:text="@string/wallpaper_instructions">
-</com.android.launcher3.AlphaDisableableButton>
+    android:text="@string/wallpaper_instructions"></com.android.launcher3.AlphaDisableableButton>

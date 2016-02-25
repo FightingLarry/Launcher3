@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -61,15 +59,14 @@ public class PendingAppWidgetHostView extends LauncherAppWidgetHostView implemen
 
         mPaint = new TextPaint();
         mPaint.setColor(0xFFFFFFFF);
-        mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX,
-                getDeviceProfile().iconTextSizePx, getResources().getDisplayMetrics()));
+        mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, getDeviceProfile().iconTextSizePx,
+                getResources().getDisplayMetrics()));
         setBackgroundResource(R.drawable.quantum_panel_dark);
         setWillNotDraw(false);
     }
 
     @Override
-    public void updateAppWidgetSize(Bundle newOptions, int minWidth, int minHeight, int maxWidth,
-            int maxHeight) {
+    public void updateAppWidgetSize(Bundle newOptions, int minWidth, int minHeight, int maxWidth, int maxHeight) {
         // No-op
     }
 
@@ -160,11 +157,14 @@ public class PendingAppWidgetHostView extends LauncherAppWidgetHostView implemen
     protected void onDraw(Canvas canvas) {
         if (mDrawable != null) {
             if (mDrawableSizeChanged) {
-                int maxSize = LauncherAppState.getInstance().getDynamicGrid()
-                        .getDeviceProfile().iconSizePx + 2 * mDrawable.getOutset();
-                int size = Math.min(maxSize, Math.min(
-                        getWidth() - getPaddingLeft() - getPaddingRight(),
-                        getHeight() - getPaddingTop() - getPaddingBottom()));
+                int maxSize =
+                        LauncherAppState.getInstance().getDynamicGrid().getDeviceProfile().iconSizePx + 2
+                                * mDrawable.getOutset();
+                int size =
+                        Math.min(
+                                maxSize,
+                                Math.min(getWidth() - getPaddingLeft() - getPaddingRight(), getHeight()
+                                        - getPaddingTop() - getPaddingBottom()));
 
                 mRect.set(0, 0, size, size);
                 mRect.inset(mDrawable.getOutset(), mDrawable.getOutset());
@@ -187,17 +187,17 @@ public class PendingAppWidgetHostView extends LauncherAppWidgetHostView implemen
                 int availableHeight = getHeight() - paddingTop - paddingBottom;
 
                 // Recreate the setup text.
-                mSetupTextLayout = new StaticLayout(
-                        getResources().getText(R.string.gadget_setup_text), mPaint, availableWidth,
-                        Layout.Alignment.ALIGN_CENTER, 1, 0, true);
+                mSetupTextLayout =
+                        new StaticLayout(getResources().getText(R.string.gadget_setup_text), mPaint, availableWidth,
+                                Layout.Alignment.ALIGN_CENTER, 1, 0, true);
                 if (mSetupTextLayout.getLineCount() == 1) {
                     // The text fits in a single line. No need to draw the setup icon.
-                    int size = Math.min(iconSize, Math.min(availableWidth,
-                            availableHeight - mSetupTextLayout.getHeight()));
+                    int size =
+                            Math.min(iconSize, Math.min(availableWidth, availableHeight - mSetupTextLayout.getHeight()));
                     mRect.set(0, 0, size, size);
-                    mRect.offsetTo((getWidth() - mRect.width()) / 2,
-                            (getHeight() - mRect.height() - mSetupTextLayout.getHeight()
-                                    - grid.iconDrawablePaddingPx) / 2);
+                    mRect.offsetTo(
+                            (getWidth() - mRect.width()) / 2,
+                            (getHeight() - mRect.height() - mSetupTextLayout.getHeight() - grid.iconDrawablePaddingPx) / 2);
 
                     mTopCornerDrawable.setBounds(mRect);
 
@@ -207,17 +207,17 @@ public class PendingAppWidgetHostView extends LauncherAppWidgetHostView implemen
                 } else {
                     // The text can't be drawn in a single line. Draw a setup icon instead.
                     mSetupTextLayout = null;
-                    int size = Math.min(iconSize, Math.min(
-                            getWidth() - paddingLeft - paddingRight,
-                            getHeight() - paddingTop - paddingBottom));
+                    int size =
+                            Math.min(
+                                    iconSize,
+                                    Math.min(getWidth() - paddingLeft - paddingRight, getHeight() - paddingTop
+                                            - paddingBottom));
                     mRect.set(0, 0, size, size);
                     mRect.offsetTo((getWidth() - mRect.width()) / 2, (getHeight() - mRect.height()) / 2);
                     mCenterDrawable.setBounds(mRect);
 
-                    size = Math.min(size / 2,
-                            Math.max(mRect.top - paddingTop, mRect.left - paddingLeft));
-                    mTopCornerDrawable.setBounds(paddingLeft, paddingTop,
-                            paddingLeft + size, paddingTop + size);
+                    size = Math.min(size / 2, Math.max(mRect.top - paddingTop, mRect.left - paddingLeft));
+                    mTopCornerDrawable.setBounds(paddingLeft, paddingTop, paddingLeft + size, paddingTop + size);
                 }
                 mDrawableSizeChanged = false;
             }

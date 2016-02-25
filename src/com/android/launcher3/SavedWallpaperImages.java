@@ -1,20 +1,23 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -34,11 +37,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-
 
 public class SavedWallpaperImages extends BaseAdapter implements ListAdapter {
     private static String TAG = "Launcher3.SavedWallpaperImages";
@@ -49,6 +47,7 @@ public class SavedWallpaperImages extends BaseAdapter implements ListAdapter {
 
     public static class SavedWallpaperTile extends WallpaperPickerActivity.FileWallpaperInfo {
         private int mDbId;
+
         public SavedWallpaperTile(int dbId, File target, Drawable thumb) {
             super(target, thumb);
             mDbId = dbId;
@@ -72,16 +71,12 @@ public class SavedWallpaperImages extends BaseAdapter implements ListAdapter {
     public void loadThumbnailsAndImageIdList() {
         mImages = new ArrayList<SavedWallpaperTile>();
         SQLiteDatabase db = mDb.getReadableDatabase();
-        Cursor result = db.query(ImageDb.TABLE_NAME,
-                new String[] { ImageDb.COLUMN_ID,
-                    ImageDb.COLUMN_IMAGE_THUMBNAIL_FILENAME,
-                    ImageDb.COLUMN_IMAGE_FILENAME}, // cols to return
-                null, // select query
-                null, // args to select query
-                null,
-                null,
-                ImageDb.COLUMN_ID + " DESC",
-                null);
+        Cursor result =
+                db.query(ImageDb.TABLE_NAME, new String[] {ImageDb.COLUMN_ID, ImageDb.COLUMN_IMAGE_THUMBNAIL_FILENAME,
+                        ImageDb.COLUMN_IMAGE_FILENAME}, // cols to return
+                        null, // select query
+                        null, // args to select query
+                        null, null, ImageDb.COLUMN_ID + " DESC", null);
 
         while (result.moveToNext()) {
             String filename = result.getString(1);
@@ -89,9 +84,8 @@ public class SavedWallpaperImages extends BaseAdapter implements ListAdapter {
 
             Bitmap thumb = BitmapFactory.decodeFile(file.getAbsolutePath());
             if (thumb != null) {
-                mImages.add(new SavedWallpaperTile(result.getInt(0),
-                        new File(mContext.getFilesDir(), result.getString(2)),
-                        new BitmapDrawable(thumb)));
+                mImages.add(new SavedWallpaperTile(result.getInt(0), new File(mContext.getFilesDir(), result
+                        .getString(2)), new BitmapDrawable(thumb)));
             }
         }
         result.close();
@@ -114,21 +108,17 @@ public class SavedWallpaperImages extends BaseAdapter implements ListAdapter {
         if (thumbDrawable == null) {
             Log.e(TAG, "Error decoding thumbnail for wallpaper #" + position);
         }
-        return WallpaperPickerActivity.createImageTileView(
-                mLayoutInflater, convertView, parent, thumbDrawable);
+        return WallpaperPickerActivity.createImageTileView(mLayoutInflater, convertView, parent, thumbDrawable);
     }
 
     private Pair<String, String> getImageFilenames(int id) {
         SQLiteDatabase db = mDb.getReadableDatabase();
-        Cursor result = db.query(ImageDb.TABLE_NAME,
-                new String[] { ImageDb.COLUMN_IMAGE_THUMBNAIL_FILENAME,
-                    ImageDb.COLUMN_IMAGE_FILENAME }, // cols to return
-                ImageDb.COLUMN_ID + " = ?", // select query
-                new String[] { Integer.toString(id) }, // args to select query
-                null,
-                null,
-                null,
-                null);
+        Cursor result =
+                db.query(ImageDb.TABLE_NAME, new String[] {ImageDb.COLUMN_IMAGE_THUMBNAIL_FILENAME,
+                        ImageDb.COLUMN_IMAGE_FILENAME}, // cols to return
+                        ImageDb.COLUMN_ID + " = ?", // select query
+                        new String[] {Integer.toString(id)}, // args to select query
+                        null, null, null, null);
         if (result.getCount() > 0) {
             result.moveToFirst();
             String thumbFilename = result.getString(0);
@@ -147,24 +137,20 @@ public class SavedWallpaperImages extends BaseAdapter implements ListAdapter {
         File thumbFile = new File(mContext.getFilesDir(), filenames.second);
         thumbFile.delete();
         SQLiteDatabase db = mDb.getWritableDatabase();
-        db.delete(ImageDb.TABLE_NAME,
-                ImageDb.COLUMN_ID + " = ?", // SELECT query
-                new String[] {
-                    Integer.toString(id) // args to SELECT query
+        db.delete(ImageDb.TABLE_NAME, ImageDb.COLUMN_ID + " = ?", // SELECT query
+                new String[] {Integer.toString(id) // args to SELECT query
                 });
     }
 
     public void writeImage(Bitmap thumbnail, byte[] imageBytes) {
         try {
             File imageFile = File.createTempFile("wallpaper", "", mContext.getFilesDir());
-            FileOutputStream imageFileStream =
-                    mContext.openFileOutput(imageFile.getName(), Context.MODE_PRIVATE);
+            FileOutputStream imageFileStream = mContext.openFileOutput(imageFile.getName(), Context.MODE_PRIVATE);
             imageFileStream.write(imageBytes);
             imageFileStream.close();
 
             File thumbFile = File.createTempFile("wallpaperthumb", "", mContext.getFilesDir());
-            FileOutputStream thumbFileStream =
-                    mContext.openFileOutput(thumbFile.getName(), Context.MODE_PRIVATE);
+            FileOutputStream thumbFileStream = mContext.openFileOutput(thumbFile.getName(), Context.MODE_PRIVATE);
             thumbnail.compress(Bitmap.CompressFormat.JPEG, 95, thumbFileStream);
             thumbFileStream.close();
 
@@ -203,14 +189,12 @@ public class SavedWallpaperImages extends BaseAdapter implements ListAdapter {
                 oldSavedImagesFile.renameTo(savedImagesFile);
             }
         }
+
         @Override
         public void onCreate(SQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
-                    COLUMN_ID + " INTEGER NOT NULL, " +
-                    COLUMN_IMAGE_THUMBNAIL_FILENAME + " TEXT NOT NULL, " +
-                    COLUMN_IMAGE_FILENAME + " TEXT NOT NULL, " +
-                    "PRIMARY KEY (" + COLUMN_ID + " ASC) " +
-                    ");");
+            database.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + COLUMN_ID + " INTEGER NOT NULL, "
+                    + COLUMN_IMAGE_THUMBNAIL_FILENAME + " TEXT NOT NULL, " + COLUMN_IMAGE_FILENAME + " TEXT NOT NULL, "
+                    + "PRIMARY KEY (" + COLUMN_ID + " ASC) " + ");");
         }
 
         @Override

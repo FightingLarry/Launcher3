@@ -1,29 +1,30 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
-
-import java.io.*;
-import java.util.ArrayList;
 
 public class Stats {
     private static final boolean DEBUG_BROADCASTS = false;
@@ -62,8 +63,7 @@ public class Stats {
     public Stats(Launcher launcher) {
         mLauncher = launcher;
 
-        mLaunchBroadcastPermission =
-                launcher.getResources().getString(R.string.receive_launch_broadcasts_permission);
+        mLaunchBroadcastPermission = launcher.getResources().getString(R.string.receive_launch_broadcasts_permission);
 
         loadStats();
 
@@ -82,18 +82,13 @@ public class Stats {
         }
 
         if (DEBUG_BROADCASTS) {
-            launcher.registerReceiver(
-                    new BroadcastReceiver() {
-                        @Override
-                        public void onReceive(Context context, Intent intent) {
-                            android.util.Log.v("Stats", "got broadcast: " + intent + " for launched intent: "
-                                    + intent.getStringExtra(EXTRA_INTENT));
-                        }
-                    },
-                    new IntentFilter(ACTION_LAUNCH),
-                    mLaunchBroadcastPermission,
-                    null
-            );
+            launcher.registerReceiver(new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    android.util.Log.v("Stats",
+                            "got broadcast: " + intent + " for launched intent: " + intent.getStringExtra(EXTRA_INTENT));
+                }
+            }, new IntentFilter(ACTION_LAUNCH), mLaunchBroadcastPermission, null);
         }
     }
 
@@ -119,10 +114,8 @@ public class Stats {
 
         Intent broadcastIntent = new Intent(ACTION_LAUNCH).putExtra(EXTRA_INTENT, flat);
         if (shortcut != null) {
-            broadcastIntent.putExtra(EXTRA_CONTAINER, shortcut.container)
-                    .putExtra(EXTRA_SCREEN, shortcut.screenId)
-                    .putExtra(EXTRA_CELLX, shortcut.cellX)
-                    .putExtra(EXTRA_CELLY, shortcut.cellY);
+            broadcastIntent.putExtra(EXTRA_CONTAINER, shortcut.container).putExtra(EXTRA_SCREEN, shortcut.screenId)
+                    .putExtra(EXTRA_CELLX, shortcut.cellX).putExtra(EXTRA_CELLY, shortcut.cellY);
         }
         mLauncher.sendBroadcast(broadcastIntent, mLaunchBroadcastPermission);
 
@@ -164,14 +157,14 @@ public class Stats {
             stats.writeInt(STATS_VERSION);
             final int N = mHistogram.size();
             stats.writeInt(N);
-            for (int i=0; i<N; i++) {
+            for (int i = 0; i < N; i++) {
                 stats.writeUTF(mIntents.get(i));
                 stats.writeInt(mHistogram.get(i));
             }
             stats.close();
             stats = null;
             mLauncher.getFileStreamPath(STATS_FILE_NAME + ".tmp")
-                     .renameTo(mLauncher.getFileStreamPath(STATS_FILE_NAME));
+                    .renameTo(mLauncher.getFileStreamPath(STATS_FILE_NAME));
         } catch (FileNotFoundException e) {
             Log.e(TAG, "unable to create stats data: " + e);
         } catch (IOException e) {
@@ -180,7 +173,7 @@ public class Stats {
             if (stats != null) {
                 try {
                     stats.close();
-                } catch (IOException e) { }
+                } catch (IOException e) {}
             }
         }
     }
@@ -194,7 +187,7 @@ public class Stats {
             final int version = stats.readInt();
             if (version == STATS_VERSION) {
                 final int N = stats.readInt();
-                for (int i=0; i<N; i++) {
+                for (int i = 0; i < N; i++) {
                     final String pkg = stats.readUTF();
                     final int count = stats.readInt();
                     mIntents.add(pkg);
@@ -210,7 +203,7 @@ public class Stats {
             if (stats != null) {
                 try {
                     stats.close();
-                } catch (IOException e) { }
+                } catch (IOException e) {}
             }
         }
     }

@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -108,8 +106,8 @@ public class PagedViewWidget extends LinearLayout {
             final ImageView image = (ImageView) findViewById(R.id.widget_preview);
             if (image != null) {
                 FastBitmapDrawable preview = (FastBitmapDrawable) image.getDrawable();
-                if (sRecyclePreviewsWhenDetachedFromWindow &&
-                        mInfo != null && preview != null && preview.getBitmap() != null) {
+                if (sRecyclePreviewsWhenDetachedFromWindow && mInfo != null && preview != null
+                        && preview.getBitmap() != null) {
                     mWidgetPreviewLoader.recycleBitmap(mInfo, preview.getBitmap());
                 }
                 image.setImageDrawable(null);
@@ -117,8 +115,8 @@ public class PagedViewWidget extends LinearLayout {
         }
     }
 
-    public void applyFromAppWidgetProviderInfo(AppWidgetProviderInfo info,
-            int maxWidth, int[] cellSpan, WidgetPreviewLoader loader) {
+    public void applyFromAppWidgetProviderInfo(AppWidgetProviderInfo info, int maxWidth, int[] cellSpan,
+            WidgetPreviewLoader loader) {
         LauncherAppState app = LauncherAppState.getInstance();
         DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
 
@@ -139,8 +137,7 @@ public class PagedViewWidget extends LinearLayout {
         mWidgetPreviewLoader = loader;
     }
 
-    public void applyFromResolveInfo(
-            PackageManager pm, ResolveInfo info, WidgetPreviewLoader loader) {
+    public void applyFromResolveInfo(PackageManager pm, ResolveInfo info, WidgetPreviewLoader loader) {
         mIsAppWidget = false;
         mInfo = info;
         CharSequence label = info.loadLabel(pm);
@@ -162,8 +159,7 @@ public class PagedViewWidget extends LinearLayout {
     }
 
     void applyPreview(FastBitmapDrawable preview, int index) {
-        final PagedViewWidgetImageView image =
-            (PagedViewWidgetImageView) findViewById(R.id.widget_preview);
+        final PagedViewWidgetImageView image = (PagedViewWidgetImageView) findViewById(R.id.widget_preview);
         if (preview != null) {
             image.mAllowRequestLayout = false;
             image.setImageDrawable(preview);
@@ -171,10 +167,8 @@ public class PagedViewWidget extends LinearLayout {
                 // center horizontally
                 int[] imageSize = getPreviewSize();
                 int centerAmount = (imageSize[0] - preview.getIntrinsicWidth()) / 2;
-                image.setPadding(mOriginalImagePadding.left + centerAmount,
-                        mOriginalImagePadding.top,
-                        mOriginalImagePadding.right,
-                        mOriginalImagePadding.bottom);
+                image.setPadding(mOriginalImagePadding.left + centerAmount, mOriginalImagePadding.top,
+                        mOriginalImagePadding.right, mOriginalImagePadding.bottom);
             }
             image.setAlpha(1f);
             image.mAllowRequestLayout = true;
@@ -187,6 +181,7 @@ public class PagedViewWidget extends LinearLayout {
 
     interface ShortPressListener {
         void onShortPress(View v);
+
         void cleanUpShortPress(View v);
     }
 
@@ -214,7 +209,7 @@ public class PagedViewWidget extends LinearLayout {
      */
     private void removeShortPressCallback() {
         if (mPendingCheckForShortPress != null) {
-          removeCallbacks(mPendingCheckForShortPress);
+            removeCallbacks(mPendingCheckForShortPress);
         }
     }
 
@@ -252,10 +247,10 @@ public class PagedViewWidget extends LinearLayout {
 
         // We eat up the touch events here, since the PagedView (which uses the same swiping
         // touch code as Workspace previously) uses onInterceptTouchEvent() to determine when
-        // the user is scrolling between pages.  This means that if the pages themselves don't
+        // the user is scrolling between pages. This means that if the pages themselves don't
         // handle touch events, it gets forwarded up to PagedView itself, and it's own
         // onTouchEvent() handling will prevent further intercept touch events from being called
-        // (it's the same view in that case).  This is not ideal, but to prevent more changes,
+        // (it's the same view in that case). This is not ideal, but to prevent more changes,
         // we just always mark the touch event as handled.
         return true;
     }

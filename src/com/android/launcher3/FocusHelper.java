@@ -1,33 +1,30 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 import android.content.res.Configuration;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ScrollView;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * A keyboard listener we set on all the workspace icons.
@@ -38,6 +35,7 @@ class IconKeyEventListener implements View.OnKeyListener {
     }
 }
 
+
 /**
  * A keyboard listener we set on all the workspace icons.
  */
@@ -46,6 +44,7 @@ class FolderKeyEventListener implements View.OnKeyListener {
         return FocusHelper.handleFolderKeyEvent(v, keyCode, event);
     }
 }
+
 
 /**
  * A keyboard listener we set on all the hotseat buttons.
@@ -56,6 +55,7 @@ class HotseatIconKeyEventListener implements View.OnKeyListener {
         return FocusHelper.handleHotseatButtonKeyEvent(v, keyCode, event, configuration.orientation);
     }
 }
+
 
 public class FocusHelper {
     /**
@@ -84,8 +84,7 @@ public class FocusHelper {
     /**
      * Handles key events in a PageViewExtendedLayout containing PagedViewWidgets.
      */
-    static boolean handlePagedViewGridLayoutWidgetKeyEvent(PagedViewWidget w, int keyCode,
-            KeyEvent e) {
+    static boolean handlePagedViewGridLayoutWidgetKeyEvent(PagedViewWidget w, int keyCode, KeyEvent e) {
 
         final PagedViewGridLayout parent = (PagedViewGridLayout) w.getParent();
         final PagedView container = (PagedView) parent.getParent();
@@ -218,7 +217,8 @@ public class FocusHelper {
                 }
                 wasHandled = true;
                 break;
-            default: break;
+            default:
+                break;
         }
         return wasHandled;
     }
@@ -388,7 +388,8 @@ public class FocusHelper {
                 }
                 wasHandled = true;
                 break;
-            default: break;
+            default:
+                break;
         }
         return wasHandled;
     }
@@ -442,7 +443,8 @@ public class FocusHelper {
                 }
                 wasHandled = true;
                 break;
-            default: break;
+            default:
+                break;
         }
         return wasHandled;
     }
@@ -487,8 +489,7 @@ public class FocusHelper {
                 break;
             case KeyEvent.KEYCODE_DPAD_UP:
                 if (handleKeyEvent) {
-                    final Workspace workspace = (Workspace)
-                            v.getRootView().findViewById(R.id.workspace);
+                    final Workspace workspace = (Workspace) v.getRootView().findViewById(R.id.workspace);
                     if (workspace != null) {
                         int pageIndex = workspace.getCurrentPage();
                         CellLayout topLayout = (CellLayout) workspace.getChildAt(pageIndex);
@@ -509,7 +510,8 @@ public class FocusHelper {
                 // Do nothing
                 wasHandled = true;
                 break;
-            default: break;
+            default:
+                break;
         }
         return wasHandled;
     }
@@ -517,8 +519,7 @@ public class FocusHelper {
     /**
      * Private helper method to get the CellLayoutChildren given a CellLayout index.
      */
-    private static ShortcutAndWidgetContainer getCellLayoutChildrenForIndex(
-            ViewGroup container, int i) {
+    private static ShortcutAndWidgetContainer getCellLayoutChildrenForIndex(ViewGroup container, int i) {
         CellLayout parent = (CellLayout) container.getChildAt(i);
         return parent.getShortcutsAndWidgets();
     }
@@ -527,8 +528,7 @@ public class FocusHelper {
      * Private helper method to sort all the CellLayout children in order of their (x,y) spatially
      * from top left to bottom right.
      */
-    private static ArrayList<View> getCellLayoutChildrenSortedSpatially(CellLayout layout,
-            ViewGroup parent) {
+    private static ArrayList<View> getCellLayoutChildrenSortedSpatially(CellLayout layout, ViewGroup parent) {
         // First we order each the CellLayout children by their x,y coordinates
         final int cellCountX = layout.getCountX();
         final int count = parent.getChildCount();
@@ -548,8 +548,9 @@ public class FocusHelper {
         });
         return views;
     }
+
     /**
-     * Private helper method to find the index of the next BubbleTextView or FolderIcon in the 
+     * Private helper method to find the index of the next BubbleTextView or FolderIcon in the
      * direction delta.
      * 
      * @param delta either -1 or 1 depending on the direction we want to search
@@ -567,24 +568,24 @@ public class FocusHelper {
         }
         return null;
     }
-    private static View getIconInDirection(CellLayout layout, ViewGroup parent, int i,
-            int delta) {
+
+    private static View getIconInDirection(CellLayout layout, ViewGroup parent, int i, int delta) {
         final ArrayList<View> views = getCellLayoutChildrenSortedSpatially(layout, parent);
         return findIndexOfIcon(views, i, delta);
     }
-    private static View getIconInDirection(CellLayout layout, ViewGroup parent, View v,
-            int delta) {
+
+    private static View getIconInDirection(CellLayout layout, ViewGroup parent, View v, int delta) {
         final ArrayList<View> views = getCellLayoutChildrenSortedSpatially(layout, parent);
         return findIndexOfIcon(views, views.indexOf(v), delta);
     }
+
     /**
-     * Private helper method to find the next closest BubbleTextView or FolderIcon in the direction 
+     * Private helper method to find the next closest BubbleTextView or FolderIcon in the direction
      * delta on the next line.
      * 
      * @param delta either -1 or 1 depending on the line and direction we want to search
      */
-    private static View getClosestIconOnLine(CellLayout layout, ViewGroup parent, View v,
-            int lineDelta) {
+    private static View getClosestIconOnLine(CellLayout layout, ViewGroup parent, View v, int lineDelta) {
         final ArrayList<View> views = getCellLayoutChildrenSortedSpatially(layout, parent);
         final CellLayout.LayoutParams lp = (CellLayout.LayoutParams) v.getLayoutParams();
         final int cellCountY = layout.getCountY();
@@ -599,10 +600,10 @@ public class FocusHelper {
                 View newV = views.get(index);
                 CellLayout.LayoutParams tmpLp = (CellLayout.LayoutParams) newV.getLayoutParams();
                 boolean satisfiesRow = (lineDelta < 0) ? (tmpLp.cellY < row) : (tmpLp.cellY > row);
-                if (satisfiesRow &&
-                        (newV instanceof BubbleTextView || newV instanceof FolderIcon)) {
-                    float tmpDistance = (float) Math.sqrt(Math.pow(tmpLp.cellX - lp.cellX, 2) +
-                            Math.pow(tmpLp.cellY - lp.cellY, 2));
+                if (satisfiesRow && (newV instanceof BubbleTextView || newV instanceof FolderIcon)) {
+                    float tmpDistance =
+                            (float) Math
+                                    .sqrt(Math.pow(tmpLp.cellX - lp.cellX, 2) + Math.pow(tmpLp.cellY - lp.cellY, 2));
                     if (tmpDistance < closestDistance) {
                         closestIndex = index;
                         closestDistance = tmpDistance;
@@ -648,8 +649,7 @@ public class FocusHelper {
                     } else {
                         if (pageIndex > 0) {
                             parent = getCellLayoutChildrenForIndex(workspace, pageIndex - 1);
-                            newIcon = getIconInDirection(layout, parent,
-                                    parent.getChildCount(), -1);
+                            newIcon = getIconInDirection(layout, parent, parent.getChildCount(), -1);
                             if (newIcon != null) {
                                 newIcon.requestFocus();
                             } else {
@@ -751,8 +751,7 @@ public class FocusHelper {
                         }
                         v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
                     } else {
-                        View newIcon = getIconInDirection(layout, parent,
-                                parent.getChildCount(), -1);
+                        View newIcon = getIconInDirection(layout, parent, parent.getChildCount(), -1);
                         if (newIcon != null) {
                             newIcon.requestFocus();
                             v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
@@ -775,8 +774,7 @@ public class FocusHelper {
             case KeyEvent.KEYCODE_MOVE_END:
                 if (handleKeyEvent) {
                     // Select the last icon on this page
-                    View newIcon = getIconInDirection(layout, parent,
-                            parent.getChildCount(), -1);
+                    View newIcon = getIconInDirection(layout, parent, parent.getChildCount(), -1);
                     if (newIcon != null) {
                         newIcon.requestFocus();
                         v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
@@ -784,7 +782,8 @@ public class FocusHelper {
                 }
                 wasHandled = true;
                 break;
-            default: break;
+            default:
+                break;
         }
         return wasHandled;
     }
@@ -865,8 +864,7 @@ public class FocusHelper {
             case KeyEvent.KEYCODE_MOVE_END:
                 if (handleKeyEvent) {
                     // Select the last icon on this page
-                    View newIcon = getIconInDirection(layout, parent,
-                            parent.getChildCount(), -1);
+                    View newIcon = getIconInDirection(layout, parent, parent.getChildCount(), -1);
                     if (newIcon != null) {
                         newIcon.requestFocus();
                         v.playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN);
@@ -874,7 +872,8 @@ public class FocusHelper {
                 }
                 wasHandled = true;
                 break;
-            default: break;
+            default:
+                break;
         }
         return wasHandled;
     }

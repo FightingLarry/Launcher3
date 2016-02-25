@@ -1,20 +1,21 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3.compat;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import android.content.Context;
 import android.content.pm.PackageInstaller;
@@ -25,9 +26,6 @@ import android.util.SparseArray;
 
 import com.android.launcher3.IconCache;
 import com.android.launcher3.LauncherAppState;
-
-import java.util.ArrayList;
-import java.util.HashSet;
 
 public class PackageInstallerCompatVL extends PackageInstallerCompat {
 
@@ -74,14 +72,12 @@ public class PackageInstallerCompatVL extends PackageInstallerCompat {
     private void addSessionInfoToCahce(SessionInfo info, UserHandleCompat user) {
         String packageName = info.getAppPackageName();
         if (packageName != null) {
-            mCache.cachePackageInstallInfo(packageName, user, info.getAppIcon(),
-                    info.getAppLabel());
+            mCache.cachePackageInstallInfo(packageName, user, info.getAppIcon(), info.getAppLabel());
         }
     }
 
     @Override
-    public void onStop() {
-    }
+    public void onStop() {}
 
     @Override
     public void onFinishBind() {
@@ -130,9 +126,8 @@ public class PackageInstallerCompatVL extends PackageInstallerCompat {
         for (int i = mPendingReplays.size() - 1; i >= 0; i--) {
             SessionInfo session = mPendingReplays.valueAt(i);
             if (session.getAppPackageName() != null) {
-                updates.add(new PackageInstallInfo(session.getAppPackageName(),
-                        STATUS_INSTALLING,
-                        (int) (session.getProgress() * 100)));
+                updates.add(new PackageInstallInfo(session.getAppPackageName(), STATUS_INSTALLING, (int) (session
+                        .getProgress() * 100)));
             }
         }
         mPendingReplays.clear();
@@ -164,8 +159,9 @@ public class PackageInstallerCompatVL extends PackageInstallerCompat {
                 // Replay all updates with a one time update for this installed package. No
                 // need to store this record for future updates, as the app list will get
                 // refreshed on resume.
-                replayUpdates(new PackageInstallInfo(session.getAppPackageName(),
-                        success ? STATUS_INSTALLED : STATUS_FAILED, 0));
+                replayUpdates(new PackageInstallInfo(session.getAppPackageName(), success
+                        ? STATUS_INSTALLED
+                        : STATUS_FAILED, 0));
             }
         }
 
@@ -179,7 +175,7 @@ public class PackageInstallerCompatVL extends PackageInstallerCompat {
         }
 
         @Override
-        public void onActiveChanged(int sessionId, boolean active) { }
+        public void onActiveChanged(int sessionId, boolean active) {}
 
         @Override
         public void onBadgingChanged(int sessionId) {

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2008 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2008 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -14,20 +13,21 @@
      limitations under the License.
 -->
 
-<com.android.launcher3.CheckableFrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.android.launcher3.CheckableFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/wallpaperThumbnailWidth"
     android:layout_height="@dimen/wallpaperThumbnailHeight"
     android:focusable="true"
     android:clickable="true"
     android:background="@drawable/wallpaper_tile_fg"
     android:foreground="@drawable/wallpaper_tile_fg">
+
     <ImageView
         android:id="@+id/wallpaper_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/wallpaper_picker_translucent_gray"
         android:scaleType="centerCrop" />
+
     <TextView
         android:id="@+id/wallpaper_item_label"
         android:layout_width="wrap_content"
@@ -38,5 +38,5 @@
         android:text="@string/pick_image"
         android:drawableTop="@drawable/ic_images"
         android:drawablePadding="4dp"
-        android:textColor="@android:color/white"/>
+        android:textColor="@android:color/white" />
 </com.android.launcher3.CheckableFrameLayout>

@@ -1,5 +1,18 @@
 package com.android.launcher3;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -30,23 +43,11 @@ import android.util.Log;
 
 import com.android.launcher3.compat.AppWidgetManagerCompat;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-
 public class WidgetPreviewLoader {
 
     private static abstract class SoftReferenceThreadLocal<T> {
         private ThreadLocal<SoftReference<T>> mThreadLocal;
+
         public SoftReferenceThreadLocal() {
             mThreadLocal = new ThreadLocal<SoftReference<T>>();
         }
@@ -103,8 +104,7 @@ public class WidgetPreviewLoader {
         }
     }
 
-    private static class BitmapFactoryOptionsCache extends
-            SoftReferenceThreadLocal<BitmapFactory.Options> {
+    private static class BitmapFactoryOptionsCache extends SoftReferenceThreadLocal<BitmapFactory.Options> {
         @Override
         protected BitmapFactory.Options initialValue() {
             return new BitmapFactory.Options();
@@ -161,8 +161,8 @@ public class WidgetPreviewLoader {
 
         mDb = app.getWidgetPreviewCacheDb();
 
-        SharedPreferences sp = context.getSharedPreferences(
-                LauncherAppState.getSharedPreferencesKey(), Context.MODE_PRIVATE);
+        SharedPreferences sp =
+                context.getSharedPreferences(LauncherAppState.getSharedPreferencesKey(), Context.MODE_PRIVATE);
         final String lastVersionName = sp.getString(ANDROID_INCREMENTAL_VERSION_NAME_KEY, null);
         final String versionName = android.os.Build.VERSION.INCREMENTAL;
         if (!versionName.equals(lastVersionName)) {
@@ -182,8 +182,7 @@ public class WidgetPreviewLoader {
         mDb = app.getWidgetPreviewCacheDb();
     }
 
-    public void setPreviewSize(int previewWidth, int previewHeight,
-            PagedViewCellLayout widgetSpacingLayout) {
+    public void setPreviewSize(int previewWidth, int previewHeight, PagedViewCellLayout widgetSpacingLayout) {
         mPreviewBitmapWidth = previewWidth;
         mPreviewBitmapHeight = previewHeight;
         mSize = previewWidth + "x" + previewHeight;
@@ -194,13 +193,13 @@ public class WidgetPreviewLoader {
         final String name = getObjectName(o);
         final String packageName = getObjectPackage(o);
         // check if the package is valid
-        synchronized(sInvalidPackages) {
+        synchronized (sInvalidPackages) {
             boolean packageValid = !sInvalidPackages.contains(packageName);
             if (!packageValid) {
                 return null;
             }
         }
-        synchronized(mLoadedPreviews) {
+        synchronized (mLoadedPreviews) {
             // check if it exists in our existing cache
             if (mLoadedPreviews.containsKey(name)) {
                 WeakReference<Bitmap> bitmapReference = mLoadedPreviews.get(name);
@@ -212,13 +211,12 @@ public class WidgetPreviewLoader {
         }
 
         Bitmap unusedBitmap = null;
-        synchronized(mUnusedBitmaps) {
+        synchronized (mUnusedBitmaps) {
             // not in cache; we need to load it from the db
             while (unusedBitmap == null && mUnusedBitmaps.size() > 0) {
                 Bitmap candidate = mUnusedBitmaps.remove(0).get();
-                if (candidate != null && candidate.isMutable() &&
-                        candidate.getWidth() == mPreviewBitmapWidth &&
-                        candidate.getHeight() == mPreviewBitmapHeight) {
+                if (candidate != null && candidate.isMutable() && candidate.getWidth() == mPreviewBitmapWidth
+                        && candidate.getHeight() == mPreviewBitmapHeight) {
                     unusedBitmap = candidate;
                 }
             }
@@ -231,13 +229,12 @@ public class WidgetPreviewLoader {
         }
 
         if (unusedBitmap == null) {
-            unusedBitmap = Bitmap.createBitmap(mPreviewBitmapWidth, mPreviewBitmapHeight,
-                    Bitmap.Config.ARGB_8888);
+            unusedBitmap = Bitmap.createBitmap(mPreviewBitmapWidth, mPreviewBitmapHeight, Bitmap.Config.ARGB_8888);
         }
         Bitmap preview = readFromDb(name, unusedBitmap);
 
         if (preview != null) {
-            synchronized(mLoadedPreviews) {
+            synchronized (mLoadedPreviews) {
                 mLoadedPreviews.put(name, new WeakReference<Bitmap>(preview));
             }
             return preview;
@@ -249,14 +246,14 @@ public class WidgetPreviewLoader {
                 throw new RuntimeException("generatePreview is not recycling the bitmap " + o);
             }
 
-            synchronized(mLoadedPreviews) {
+            synchronized (mLoadedPreviews) {
                 mLoadedPreviews.put(name, new WeakReference<Bitmap>(preview));
             }
 
             // write to db on a thread pool... this can be done lazily and improves the performance
             // of the first time widget previews are loaded
             new AsyncTask<Void, Void, Void>() {
-                public Void doInBackground(Void ... args) {
+                public Void doInBackground(Void... args) {
                     writeToDb(o, generatedPreview);
                     return null;
                 }
@@ -302,12 +299,9 @@ public class WidgetPreviewLoader {
 
         @Override
         public void onCreate(SQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
-                    COLUMN_NAME + " TEXT NOT NULL, " +
-                    COLUMN_SIZE + " TEXT NOT NULL, " +
-                    COLUMN_PREVIEW_BITMAP + " BLOB NOT NULL, " +
-                    "PRIMARY KEY (" + COLUMN_NAME + ", " + COLUMN_SIZE + ") " +
-                    ");");
+            database.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + COLUMN_NAME + " TEXT NOT NULL, "
+                    + COLUMN_SIZE + " TEXT NOT NULL, " + COLUMN_PREVIEW_BITMAP + " BLOB NOT NULL, " + "PRIMARY KEY ("
+                    + COLUMN_NAME + ", " + COLUMN_SIZE + ") " + ");");
         }
 
         @Override
@@ -335,8 +329,7 @@ public class WidgetPreviewLoader {
             sb.append(SHORTCUT_PREFIX);
 
             ResolveInfo info = (ResolveInfo) o;
-            sb.append(new ComponentName(info.activityInfo.packageName,
-                    info.activityInfo.name).flattenToString());
+            sb.append(new ComponentName(info.activityInfo.packageName, info.activityInfo.name).flattenToString());
             output = sb.toString();
             sb.setLength(0);
         }
@@ -377,35 +370,33 @@ public class WidgetPreviewLoader {
         // Delete everything
         try {
             db.delete(CacheDb.TABLE_NAME, null, null);
-        } catch (SQLiteDiskIOException e) {
-        } catch (SQLiteCantOpenDatabaseException e) {
+        } catch (SQLiteDiskIOException e) {} catch (SQLiteCantOpenDatabaseException e) {
             dumpOpenFiles();
             throw e;
         }
     }
 
     public static void removePackageFromDb(final CacheDb cacheDb, final String packageName) {
-        synchronized(sInvalidPackages) {
+        synchronized (sInvalidPackages) {
             sInvalidPackages.add(packageName);
         }
         new AsyncTask<Void, Void, Void>() {
-            public Void doInBackground(Void ... args) {
+            public Void doInBackground(Void... args) {
                 SQLiteDatabase db = cacheDb.getWritableDatabase();
                 try {
                     db.delete(CacheDb.TABLE_NAME,
-                            CacheDb.COLUMN_NAME + " LIKE ? OR " +
-                            CacheDb.COLUMN_NAME + " LIKE ?", // SELECT query
-                            new String[] {
-                                    WIDGET_PREFIX + packageName + "/%",
-                                    SHORTCUT_PREFIX + packageName + "/%"
-                            } // args to SELECT query
+                            CacheDb.COLUMN_NAME + " LIKE ? OR " + CacheDb.COLUMN_NAME + " LIKE ?", // SELECT
+                                                                                                   // query
+                            new String[] {WIDGET_PREFIX + packageName + "/%", SHORTCUT_PREFIX + packageName + "/%"} // args
+                                                                                                                    // to
+                                                                                                                    // SELECT
+                                                                                                                    // query
                     );
-                } catch (SQLiteDiskIOException e) {
-                } catch (SQLiteCantOpenDatabaseException e) {
+                } catch (SQLiteDiskIOException e) {} catch (SQLiteCantOpenDatabaseException e) {
                     dumpOpenFiles();
                     throw e;
                 }
-                synchronized(sInvalidPackages) {
+                synchronized (sInvalidPackages) {
                     sInvalidPackages.remove(packageName);
                 }
                 return null;
@@ -415,14 +406,12 @@ public class WidgetPreviewLoader {
 
     private static void removeItemFromDb(final CacheDb cacheDb, final String objectName) {
         new AsyncTask<Void, Void, Void>() {
-            public Void doInBackground(Void ... args) {
+            public Void doInBackground(Void... args) {
                 SQLiteDatabase db = cacheDb.getWritableDatabase();
                 try {
-                    db.delete(CacheDb.TABLE_NAME,
-                            CacheDb.COLUMN_NAME + " = ? ", // SELECT query
-                            new String[] { objectName }); // args to SELECT query
-                } catch (SQLiteDiskIOException e) {
-                } catch (SQLiteCantOpenDatabaseException e) {
+                    db.delete(CacheDb.TABLE_NAME, CacheDb.COLUMN_NAME + " = ? ", // SELECT query
+                            new String[] {objectName}); // args to SELECT query
+                } catch (SQLiteDiskIOException e) {} catch (SQLiteCantOpenDatabaseException e) {
                     dumpOpenFiles();
                     throw e;
                 }
@@ -433,20 +422,17 @@ public class WidgetPreviewLoader {
 
     private Bitmap readFromDb(String name, Bitmap b) {
         if (mCachedSelectQuery == null) {
-            mCachedSelectQuery = CacheDb.COLUMN_NAME + " = ? AND " +
-                    CacheDb.COLUMN_SIZE + " = ?";
+            mCachedSelectQuery = CacheDb.COLUMN_NAME + " = ? AND " + CacheDb.COLUMN_SIZE + " = ?";
         }
         SQLiteDatabase db = mDb.getReadableDatabase();
         Cursor result;
         try {
-            result = db.query(CacheDb.TABLE_NAME,
-                    new String[] { CacheDb.COLUMN_PREVIEW_BITMAP }, // cols to return
+            result = db.query(CacheDb.TABLE_NAME, new String[] {CacheDb.COLUMN_PREVIEW_BITMAP}, // cols
+                                                                                                // to
+                                                                                                // return
                     mCachedSelectQuery, // select query
-                    new String[] { name, mSize }, // args to select query
-                    null,
-                    null,
-                    null,
-                    null);
+                    new String[] {name, mSize}, // args to select query
+                    null, null, null, null);
         } catch (SQLiteDiskIOException e) {
             recreateDb();
             return null;
@@ -474,16 +460,14 @@ public class WidgetPreviewLoader {
     }
 
     private Bitmap generatePreview(Object info, Bitmap preview) {
-        if (preview != null &&
-                (preview.getWidth() != mPreviewBitmapWidth ||
-                preview.getHeight() != mPreviewBitmapHeight)) {
+        if (preview != null
+                && (preview.getWidth() != mPreviewBitmapWidth || preview.getHeight() != mPreviewBitmapHeight)) {
             throw new RuntimeException("Improperly sized bitmap passed as argument");
         }
         if (info instanceof AppWidgetProviderInfo) {
             return generateWidgetPreview((AppWidgetProviderInfo) info, preview);
         } else {
-            return generateShortcutPreview(
-                    (ResolveInfo) info, mPreviewBitmapWidth, mPreviewBitmapHeight, preview);
+            return generateShortcutPreview((ResolveInfo) info, mPreviewBitmapWidth, mPreviewBitmapHeight, preview);
         }
     }
 
@@ -491,22 +475,19 @@ public class WidgetPreviewLoader {
         int[] cellSpans = Launcher.getSpanForWidget(mContext, info);
         int maxWidth = maxWidthForWidgetPreview(cellSpans[0]);
         int maxHeight = maxHeightForWidgetPreview(cellSpans[1]);
-        return generateWidgetPreview(info, cellSpans[0], cellSpans[1],
-                maxWidth, maxHeight, preview, null);
+        return generateWidgetPreview(info, cellSpans[0], cellSpans[1], maxWidth, maxHeight, preview, null);
     }
 
     public int maxWidthForWidgetPreview(int spanX) {
-        return Math.min(mPreviewBitmapWidth,
-                mWidgetSpacingLayout.estimateCellWidth(spanX));
+        return Math.min(mPreviewBitmapWidth, mWidgetSpacingLayout.estimateCellWidth(spanX));
     }
 
     public int maxHeightForWidgetPreview(int spanY) {
-        return Math.min(mPreviewBitmapHeight,
-                mWidgetSpacingLayout.estimateCellHeight(spanY));
+        return Math.min(mPreviewBitmapHeight, mWidgetSpacingLayout.estimateCellHeight(spanY));
     }
 
-    public Bitmap generateWidgetPreview(AppWidgetProviderInfo info, int cellHSpan, int cellVSpan,
-            int maxPreviewWidth, int maxPreviewHeight, Bitmap preview, int[] preScaledWidthOut) {
+    public Bitmap generateWidgetPreview(AppWidgetProviderInfo info, int cellHSpan, int cellVSpan, int maxPreviewWidth,
+            int maxPreviewHeight, Bitmap preview, int[] preScaledWidthOut) {
         // Load the preview image if possible
         if (maxPreviewWidth < 0) maxPreviewWidth = Integer.MAX_VALUE;
         if (maxPreviewHeight < 0) maxPreviewHeight = Integer.MAX_VALUE;
@@ -517,8 +498,8 @@ public class WidgetPreviewLoader {
             if (drawable != null) {
                 drawable = mutateOnMainThread(drawable);
             } else {
-                Log.w(TAG, "Can't load widget preview drawable 0x" +
-                        Integer.toHexString(info.previewImage) + " for provider: " + info.provider);
+                Log.w(TAG, "Can't load widget preview drawable 0x" + Integer.toHexString(info.previewImage)
+                        + " for provider: " + info.provider);
             }
         }
 
@@ -535,12 +516,10 @@ public class WidgetPreviewLoader {
             if (cellVSpan < 1) cellVSpan = 1;
 
             // This Drawable is not directly drawn, so there's no need to mutate it.
-            BitmapDrawable previewDrawable = (BitmapDrawable) mContext.getResources()
-                    .getDrawable(R.drawable.widget_tile);
-            final int previewDrawableWidth = previewDrawable
-                    .getIntrinsicWidth();
-            final int previewDrawableHeight = previewDrawable
-                    .getIntrinsicHeight();
+            BitmapDrawable previewDrawable =
+                    (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.widget_tile);
+            final int previewDrawableWidth = previewDrawable.getIntrinsicWidth();
+            final int previewDrawableHeight = previewDrawable.getIntrinsicHeight();
             previewWidth = previewDrawableWidth * cellHSpan;
             previewHeight = previewDrawableHeight * cellVSpan;
 
@@ -550,8 +529,8 @@ public class WidgetPreviewLoader {
             Paint p = mDefaultAppWidgetPreviewPaint.get();
             if (p == null) {
                 p = new Paint();
-                p.setShader(new BitmapShader(previewDrawable.getBitmap(),
-                        Shader.TileMode.REPEAT, Shader.TileMode.REPEAT));
+                p.setShader(new BitmapShader(previewDrawable.getBitmap(), Shader.TileMode.REPEAT,
+                        Shader.TileMode.REPEAT));
                 mDefaultAppWidgetPreviewPaint.set(p);
             }
             final Rect dest = mCachedAppWidgetPreviewDestRect.get();
@@ -562,8 +541,7 @@ public class WidgetPreviewLoader {
             // Draw the icon in the top left corner
             int minOffset = (int) (mAppIconSize * WIDGET_PREVIEW_ICON_PADDING_PERCENTAGE);
             int smallestSide = Math.min(previewWidth, previewHeight);
-            float iconScale = Math.min((float) smallestSide
-                    / (mAppIconSize + 2 * minOffset), 1f);
+            float iconScale = Math.min((float) smallestSide / (mAppIconSize + 2 * minOffset), 1f);
 
             try {
                 Drawable icon = mManager.loadIcon(info, mIconCache);
@@ -571,12 +549,10 @@ public class WidgetPreviewLoader {
                     int hoffset = (int) ((previewDrawableWidth - mAppIconSize * iconScale) / 2);
                     int yoffset = (int) ((previewDrawableHeight - mAppIconSize * iconScale) / 2);
                     icon = mutateOnMainThread(icon);
-                    renderDrawableToBitmap(icon, defaultPreview, hoffset,
-                            yoffset, (int) (mAppIconSize * iconScale),
+                    renderDrawableToBitmap(icon, defaultPreview, hoffset, yoffset, (int) (mAppIconSize * iconScale),
                             (int) (mAppIconSize * iconScale));
                 }
-            } catch (Resources.NotFoundException e) {
-            }
+            } catch (Resources.NotFoundException e) {}
         }
 
         // Scale to fit width only - let the widget preview be clipped in the
@@ -601,8 +577,7 @@ public class WidgetPreviewLoader {
         // Draw the scaled preview into the final bitmap
         int x = (preview.getWidth() - previewWidth) / 2;
         if (widgetPreviewExists) {
-            renderDrawableToBitmap(drawable, preview, x, 0, previewWidth,
-                    previewHeight);
+            renderDrawableToBitmap(drawable, preview, x, 0, previewWidth, previewHeight);
         } else {
             final Canvas c = mCachedAppWidgetPreviewCanvas.get();
             final Rect src = mCachedAppWidgetPreviewSrcRect.get();
@@ -623,13 +598,10 @@ public class WidgetPreviewLoader {
         return mManager.getBadgeBitmap(info, preview);
     }
 
-    private Bitmap generateShortcutPreview(
-            ResolveInfo info, int maxWidth, int maxHeight, Bitmap preview) {
+    private Bitmap generateShortcutPreview(ResolveInfo info, int maxWidth, int maxHeight, Bitmap preview) {
         Bitmap tempBitmap = mCachedShortcutPreviewBitmap.get();
         final Canvas c = mCachedShortcutPreviewCanvas.get();
-        if (tempBitmap == null ||
-                tempBitmap.getWidth() != maxWidth ||
-                tempBitmap.getHeight() != maxHeight) {
+        if (tempBitmap == null || tempBitmap.getWidth() != maxWidth || tempBitmap.getHeight() != maxHeight) {
             tempBitmap = Bitmap.createBitmap(maxWidth, maxHeight, Config.ARGB_8888);
             mCachedShortcutPreviewBitmap.set(tempBitmap);
         } else {
@@ -640,20 +612,15 @@ public class WidgetPreviewLoader {
         // Render the icon
         Drawable icon = mutateOnMainThread(mIconCache.getFullResIcon(info));
 
-        int paddingTop = mContext.
-                getResources().getDimensionPixelOffset(R.dimen.shortcut_preview_padding_top);
-        int paddingLeft = mContext.
-                getResources().getDimensionPixelOffset(R.dimen.shortcut_preview_padding_left);
-        int paddingRight = mContext.
-                getResources().getDimensionPixelOffset(R.dimen.shortcut_preview_padding_right);
+        int paddingTop = mContext.getResources().getDimensionPixelOffset(R.dimen.shortcut_preview_padding_top);
+        int paddingLeft = mContext.getResources().getDimensionPixelOffset(R.dimen.shortcut_preview_padding_left);
+        int paddingRight = mContext.getResources().getDimensionPixelOffset(R.dimen.shortcut_preview_padding_right);
 
         int scaledIconWidth = (maxWidth - paddingLeft - paddingRight);
 
-        renderDrawableToBitmap(
-                icon, tempBitmap, paddingLeft, paddingTop, scaledIconWidth, scaledIconWidth);
+        renderDrawableToBitmap(icon, tempBitmap, paddingLeft, paddingTop, scaledIconWidth, scaledIconWidth);
 
-        if (preview != null &&
-                (preview.getWidth() != maxWidth || preview.getHeight() != maxHeight)) {
+        if (preview != null && (preview.getWidth() != maxWidth || preview.getHeight() != maxHeight)) {
             throw new RuntimeException("Improperly sized bitmap passed as argument");
         } else if (preview == null) {
             preview = Bitmap.createBitmap(maxWidth, maxHeight, Config.ARGB_8888);
@@ -678,8 +645,7 @@ public class WidgetPreviewLoader {
         return preview;
     }
 
-    private static void renderDrawableToBitmap(
-            Drawable d, Bitmap bitmap, int x, int y, int w, int h) {
+    private static void renderDrawableToBitmap(Drawable d, Bitmap bitmap, int x, int y, int w, int h) {
         if (bitmap != null) {
             Canvas c = new Canvas(bitmap);
             Rect oldBounds = d.copyBounds();
@@ -708,6 +674,7 @@ public class WidgetPreviewLoader {
 
     private static final int MAX_OPEN_FILES = 1024;
     private static final int SAMPLE_RATE = 23;
+
     /**
      * Dumps all files that are open in this process without allocating a file descriptor.
      */
@@ -723,8 +690,9 @@ public class WidgetPreviewLoader {
             final String TYPE_DEV = "dev";
             final String TYPE_NON_FS = "non-fs";
             final String TYPE_OTHER = "other";
-            List<String> types = Arrays.asList(TYPE_APK, TYPE_JAR, TYPE_PIPE, TYPE_SOCKET, TYPE_DB,
-                    TYPE_ANON_INODE, TYPE_DEV, TYPE_NON_FS, TYPE_OTHER);
+            List<String> types =
+                    Arrays.asList(TYPE_APK, TYPE_JAR, TYPE_PIPE, TYPE_SOCKET, TYPE_DB, TYPE_ANON_INODE, TYPE_DEV,
+                            TYPE_NON_FS, TYPE_OTHER);
             int[] count = new int[types.size()];
             int[] duplicates = new int[types.size()];
             HashSet<String> files = new HashSet<String>();
@@ -768,16 +736,15 @@ public class WidgetPreviewLoader {
                     }
                     files.add(resolved);
                     if (total % SAMPLE_RATE == 0) {
-                        Log.i(TAG, " fd " + i + ": " + resolved
-                                + " (" + types.get(type) + ")");
+                        Log.i(TAG, " fd " + i + ": " + resolved + " (" + types.get(type) + ")");
                     }
                 } catch (IOException e) {
                     // Ignoring exceptions for non-existing file descriptors.
                 }
             }
             for (int i = 0; i < types.size(); i++) {
-                Log.i(TAG, String.format("Open %10s files: %4d total, %4d duplicates",
-                        types.get(i), count[i], duplicates[i]));
+                Log.i(TAG, String.format("Open %10s files: %4d total, %4d duplicates", types.get(i), count[i],
+                        duplicates[i]));
             }
         } catch (Throwable t) {
             // Catch everything. This is called from an exception handler that we shouldn't upset.

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2011 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2011 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -17,7 +16,7 @@
 <resources>
     <dimen name="app_icon_size">72dp</dimen>
 
-<!-- QSB -->
+    <!-- QSB -->
     <dimen name="toolbar_button_vertical_padding">8dip</dimen>
     <dimen name="toolbar_button_horizontal_padding">8dip</dimen>
 
@@ -26,7 +25,7 @@
     <dimen name="dragViewOffsetX">0dp</dimen>
     <dimen name="dragViewOffsetY">0dp</dimen>
 
-<!-- Cling -->
+    <!-- Cling -->
     <dimen name="cling_migration_content_margin">96dp</dimen>
     <dimen name="cling_migration_content_width">320dp</dimen>
 

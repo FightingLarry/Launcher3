@@ -1,20 +1,21 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.photos.views;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -39,20 +40,15 @@ import com.android.gallery3d.glrenderer.BasicTexture;
 import com.android.gallery3d.glrenderer.GLES20Canvas;
 import com.android.photos.views.TiledImageRenderer.TileSource;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
-
 /**
- * Shows an image using {@link TiledImageRenderer} using either {@link GLSurfaceView}
- * or {@link BlockingGLTextureView}.
+ * Shows an image using {@link TiledImageRenderer} using either {@link GLSurfaceView} or
+ * {@link BlockingGLTextureView}.
  */
 public class TiledImageView extends FrameLayout {
 
     private static final boolean USE_TEXTURE_VIEW = false;
-    private static final boolean IS_SUPPORTED =
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
-    private static final boolean USE_CHOREOGRAPHER =
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+    private static final boolean IS_SUPPORTED = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+    private static final boolean USE_CHOREOGRAPHER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
 
     private BlockingGLTextureView mTextureView;
     private GLSurfaceView mGLSurfaceView;
@@ -107,9 +103,8 @@ public class TiledImageView extends FrameLayout {
             mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
             view = mGLSurfaceView;
         }
-        addView(view, new LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        //setTileSource(new ColoredTiles());
+        addView(view, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        // setTileSource(new ColoredTiles());
     }
 
     @Override
@@ -178,8 +173,7 @@ public class TiledImageView extends FrameLayout {
     }
 
     @Override
-    protected void onLayout(boolean changed, int left, int top, int right,
-            int bottom) {
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         if (!IS_SUPPORTED) {
             return;
@@ -190,13 +184,12 @@ public class TiledImageView extends FrameLayout {
     }
 
     private void updateScaleIfNecessaryLocked(ImageRendererWrapper renderer) {
-        if (renderer == null || renderer.source == null
-                || renderer.scale > 0 || getWidth() == 0) {
+        if (renderer == null || renderer.source == null || renderer.scale > 0 || getWidth() == 0) {
             return;
         }
-        renderer.scale = Math.min(
-                (float) getWidth() / (float) renderer.source.getImageWidth(),
-                (float) getHeight() / (float) renderer.source.getImageHeight());
+        renderer.scale =
+                Math.min((float) getWidth() / (float) renderer.source.getImageWidth(), (float) getHeight()
+                        / (float) renderer.source.getImageHeight());
     }
 
     @Override
@@ -254,6 +247,7 @@ public class TiledImageView extends FrameLayout {
     }
 
     private RectF mTempRectF = new RectF();
+
     public void positionFromMatrix(Matrix matrix) {
         if (!IS_SUPPORTED) {
             return;
@@ -261,10 +255,8 @@ public class TiledImageView extends FrameLayout {
         if (mRenderer.source != null) {
             final int rotation = mRenderer.source.getRotation();
             final boolean swap = !(rotation % 180 == 0);
-            final int width = swap ? mRenderer.source.getImageHeight()
-                    : mRenderer.source.getImageWidth();
-            final int height = swap ? mRenderer.source.getImageWidth()
-                    : mRenderer.source.getImageHeight();
+            final int width = swap ? mRenderer.source.getImageHeight() : mRenderer.source.getImageWidth();
+            final int height = swap ? mRenderer.source.getImageWidth() : mRenderer.source.getImageHeight();
             mTempRectF.set(0, 0, width, height);
             matrix.mapRect(mTempRectF);
             matrix.getValues(mValues);
@@ -314,8 +306,7 @@ public class TiledImageView extends FrameLayout {
             synchronized (mLock) {
                 readyCallback = mRenderer.isReadyCallback;
                 mRenderer.image.setModel(mRenderer.source, mRenderer.rotation);
-                mRenderer.image.setPosition(mRenderer.centerX, mRenderer.centerY,
-                        mRenderer.scale);
+                mRenderer.image.setPosition(mRenderer.centerX, mRenderer.centerY, mRenderer.scale);
             }
             boolean complete = mRenderer.image.draw(mCanvas);
             if (complete && readyCallback != null) {
@@ -336,15 +327,8 @@ public class TiledImageView extends FrameLayout {
 
     @SuppressWarnings("unused")
     private static class ColoredTiles implements TileSource {
-        private static final int[] COLORS = new int[] {
-            Color.RED,
-            Color.BLUE,
-            Color.YELLOW,
-            Color.GREEN,
-            Color.CYAN,
-            Color.MAGENTA,
-            Color.WHITE,
-        };
+        private static final int[] COLORS = new int[] {Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.CYAN,
+                Color.MAGENTA, Color.WHITE,};
 
         private Paint mPaint = new Paint();
         private Canvas mCanvas = new Canvas();
@@ -373,8 +357,7 @@ public class TiledImageView extends FrameLayout {
         public Bitmap getTile(int level, int x, int y, Bitmap bitmap) {
             int tileSize = getTileSize();
             if (bitmap == null) {
-                bitmap = Bitmap.createBitmap(tileSize, tileSize,
-                        Bitmap.Config.ARGB_8888);
+                bitmap = Bitmap.createBitmap(tileSize, tileSize, Bitmap.Config.ARGB_8888);
             }
             mCanvas.setBitmap(bitmap);
             mCanvas.drawColor(COLORS[level]);

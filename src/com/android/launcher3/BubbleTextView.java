@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -34,9 +32,8 @@ import android.view.ViewConfiguration;
 import android.widget.TextView;
 
 /**
- * TextView that draws a bubble behind the text. We cannot use a LineBackgroundSpan
- * because we want to make the bubble taller than the text and TextView's clip is
- * too aggressive.
+ * TextView that draws a bubble behind the text. We cannot use a LineBackgroundSpan because we want
+ * to make the bubble taller than the text and TextView's clip is too aggressive.
  */
 public class BubbleTextView extends TextView {
 
@@ -78,8 +75,7 @@ public class BubbleTextView extends TextView {
     public BubbleTextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
-        TypedArray a = context.obtainStyledAttributes(attrs,
-                R.styleable.BubbleTextView, defStyle, 0);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BubbleTextView, defStyle, 0);
         mCustomShadowsEnabled = a.getBoolean(R.styleable.BubbleTextView_customShadows, true);
         a.recycle();
 
@@ -111,13 +107,12 @@ public class BubbleTextView extends TextView {
         }
     }
 
-    public void applyFromShortcutInfo(ShortcutInfo info, IconCache iconCache,
-            boolean setDefaultPadding) {
+    public void applyFromShortcutInfo(ShortcutInfo info, IconCache iconCache, boolean setDefaultPadding) {
         applyFromShortcutInfo(info, iconCache, setDefaultPadding, false);
     }
 
-    public void applyFromShortcutInfo(ShortcutInfo info, IconCache iconCache,
-            boolean setDefaultPadding, boolean promiseStateChanged) {
+    public void applyFromShortcutInfo(ShortcutInfo info, IconCache iconCache, boolean setDefaultPadding,
+            boolean promiseStateChanged) {
         Bitmap b = info.getIcon(iconCache);
         LauncherAppState app = LauncherAppState.getInstance();
 
@@ -288,7 +283,7 @@ public class BubbleTextView extends TextView {
             final int scrollY = getScrollY();
 
             if (mBackgroundSizeChanged) {
-                background.setBounds(0, 0,  getRight() - getLeft(), getBottom() - getTop());
+                background.setBounds(0, 0, getRight() - getLeft(), getBottom() - getTop());
                 mBackgroundSizeChanged = false;
             }
 
@@ -312,9 +307,8 @@ public class BubbleTextView extends TextView {
         getPaint().setShadowLayer(SHADOW_LARGE_RADIUS, 0.0f, SHADOW_Y_OFFSET, SHADOW_LARGE_COLOUR);
         super.draw(canvas);
         canvas.save(Canvas.CLIP_SAVE_FLAG);
-        canvas.clipRect(getScrollX(), getScrollY() + getExtendedPaddingTop(),
-                getScrollX() + getWidth(),
-                getScrollY() + getHeight(), Region.Op.INTERSECT);
+        canvas.clipRect(getScrollX(), getScrollY() + getExtendedPaddingTop(), getScrollX() + getWidth(), getScrollY()
+                + getHeight(), Region.Op.INTERSECT);
         getPaint().setShadowLayer(SHADOW_SMALL_RADIUS, 0.0f, 0.0f, SHADOW_SMALL_COLOUR);
         super.draw(canvas);
         canvas.restore();
@@ -381,9 +375,9 @@ public class BubbleTextView extends TextView {
         if (getTag() instanceof ShortcutInfo) {
             ShortcutInfo info = (ShortcutInfo) getTag();
             final boolean isPromise = info.isPromise();
-            final int progressLevel = isPromise ?
-                    ((info.hasStatusFlag(ShortcutInfo.FLAG_INSTALL_SESSION_ACTIVE) ?
-                            info.getInstallProgress() : 0)) : 100;
+            final int progressLevel =
+                    isPromise ? ((info.hasStatusFlag(ShortcutInfo.FLAG_INSTALL_SESSION_ACTIVE) ? info
+                            .getInstallProgress() : 0)) : 100;
 
             Drawable[] drawables = getCompoundDrawables();
             Drawable top = drawables[1];
@@ -406,8 +400,9 @@ public class BubbleTextView extends TextView {
 
     private Theme getPreloaderTheme() {
         Object tag = getTag();
-        int style = ((tag != null) && (tag instanceof ShortcutInfo) &&
-                (((ShortcutInfo) tag).container >= 0)) ? R.style.PreloadIcon_Folder
+        int style =
+                ((tag != null) && (tag instanceof ShortcutInfo) && (((ShortcutInfo) tag).container >= 0))
+                        ? R.style.PreloadIcon_Folder
                         : R.style.PreloadIcon;
         Theme theme = sPreloaderThemes.get(style);
         if (theme == null) {

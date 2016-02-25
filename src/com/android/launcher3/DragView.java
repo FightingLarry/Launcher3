@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -49,22 +47,22 @@ public class DragView extends View {
     private float mOffsetY = 0.0f;
     private float mInitialScale = 1f;
     // The intrinsic icon scale factor is the scale factor for a drag icon over the workspace
-    // size.  This is ignored for non-icons.
+    // size. This is ignored for non-icons.
     private float mIntrinsicIconScale = 1f;
 
     /**
      * Construct the drag view.
      * <p>
-     * The registration point is the point inside our view that the touch events should
-     * be centered upon.
+     * The registration point is the point inside our view that the touch events should be centered
+     * upon.
      *
      * @param launcher The Launcher instance
-     * @param bitmap The view that we're dragging around.  We scale it up when we draw it.
+     * @param bitmap The view that we're dragging around. We scale it up when we draw it.
      * @param registrationX The x coordinate of the registration point.
      * @param registrationY The y coordinate of the registration point.
      */
-    public DragView(Launcher launcher, Bitmap bitmap, int registrationX, int registrationY,
-            int left, int top, int width, int height, final float initialScale) {
+    public DragView(Launcher launcher, Bitmap bitmap, int registrationX, int registrationY, int left, int top,
+            int width, int height, final float initialScale) {
         super(launcher);
         mDragLayer = launcher.getDragLayer();
         mInitialScale = initialScale;
@@ -180,7 +178,8 @@ public class DragView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        @SuppressWarnings("all") // suppress dead code warning
+        @SuppressWarnings("all")
+        // suppress dead code warning
         final boolean debug = false;
         if (debug) {
             Paint p = new Paint();
@@ -267,10 +266,10 @@ public class DragView extends View {
         setTranslationY(touchY - mRegistrationY);
         // Post the animation to skip other expensive work happening on the first frame
         post(new Runnable() {
-                public void run() {
-                    mAnim.start();
-                }
-            });
+            public void run() {
+                mAnim.start();
+            }
+        });
     }
 
     public void cancelAnimation() {
@@ -301,4 +300,3 @@ public class DragView extends View {
         }
     }
 }
-

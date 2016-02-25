@@ -38,8 +38,8 @@ class PreloadIconDrawable extends Drawable {
     private int mIndicatorColor = 0;
 
     /**
-     * Indicates the progress of the preloader [0-100]. If it goes above 100, only the icon
-     * is shown with no progress bar.
+     * Indicates the progress of the preloader [0-100]. If it goes above 100, only the icon is shown
+     * with no progress bar.
      */
     private int mProgress = 0;
 
@@ -97,11 +97,8 @@ class PreloadIconDrawable extends Drawable {
         // Amount by which padding has to be scaled
         float paddingScaleX = ((float) bounds.width()) / d.getIntrinsicWidth();
         float paddingScaleY = ((float) bounds.height()) / d.getIntrinsicHeight();
-        mIndicatorRect.set(
-                bounds.left + sTempRect.left * paddingScaleX,
-                bounds.top + sTempRect.top * paddingScaleY,
-                bounds.right - sTempRect.right * paddingScaleX,
-                bounds.bottom - sTempRect.bottom * paddingScaleY);
+        mIndicatorRect.set(bounds.left + sTempRect.left * paddingScaleX, bounds.top + sTempRect.top * paddingScaleY,
+                bounds.right - sTempRect.right * paddingScaleX, bounds.bottom - sTempRect.bottom * paddingScaleY);
 
         float inset = mPaint.getStrokeWidth() / 2;
         mIndicatorRect.inset(inset, inset);
@@ -120,8 +117,7 @@ class PreloadIconDrawable extends Drawable {
         }
         final float iconScale;
 
-        if ((mAnimationProgress >= ANIMATION_PROGRESS_STARTED)
-                && (mAnimationProgress < ANIMATION_PROGRESS_COMPLETED)) {
+        if ((mAnimationProgress >= ANIMATION_PROGRESS_STARTED) && (mAnimationProgress < ANIMATION_PROGRESS_COMPLETED)) {
             mPaint.setAlpha((int) ((1 - mAnimationProgress) * 255));
             mBgDrawable.setAlpha(mPaint.getAlpha());
             mBgDrawable.draw(canvas);
@@ -198,8 +194,9 @@ class PreloadIconDrawable extends Drawable {
             mAnimator.cancel();
         }
         setAnimationProgress(ANIMATION_PROGRESS_STARTED);
-        mAnimator = ObjectAnimator.ofFloat(this, "animationProgress",
-                ANIMATION_PROGRESS_STARTED, ANIMATION_PROGRESS_COMPLETED);
+        mAnimator =
+                ObjectAnimator.ofFloat(this, "animationProgress", ANIMATION_PROGRESS_STARTED,
+                        ANIMATION_PROGRESS_COMPLETED);
         mAnimator.start();
     }
 
@@ -232,8 +229,7 @@ class PreloadIconDrawable extends Drawable {
             mIndicatorColor = DEFAULT_COLOR;
             return mIndicatorColor;
         }
-        mIndicatorColor = Utilities.findDominantColorByHue(
-                ((FastBitmapDrawable) mIcon).getBitmap(), 20);
+        mIndicatorColor = Utilities.findDominantColorByHue(((FastBitmapDrawable) mIcon).getBitmap(), 20);
 
         // Make sure that the dominant color has enough saturation to be visible properly.
         float[] hsv = new float[3];

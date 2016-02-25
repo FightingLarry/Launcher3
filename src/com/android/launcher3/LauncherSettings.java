@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -27,7 +25,9 @@ class LauncherSettings {
     static interface ChangeLogColumns extends BaseColumns {
         /**
          * The time of the last update to this row.
-         * <P>Type: INTEGER</P>
+         * <P>
+         * Type: INTEGER
+         * </P>
          */
         static final String MODIFIED = "modified";
     }
@@ -35,22 +35,28 @@ class LauncherSettings {
     static interface BaseLauncherColumns extends ChangeLogColumns {
         /**
          * Descriptive name of the gesture that can be displayed to the user.
-         * <P>Type: TEXT</P>
+         * <P>
+         * Type: TEXT
+         * </P>
          */
         static final String TITLE = "title";
 
         /**
-         * The Intent URL of the gesture, describing what it points to. This
-         * value is given to {@link android.content.Intent#parseUri(String, int)} to create
-         * an Intent that can be launched.
-         * <P>Type: TEXT</P>
+         * The Intent URL of the gesture, describing what it points to. This value is given to
+         * {@link android.content.Intent#parseUri(String, int)} to create an Intent that can be
+         * launched.
+         * <P>
+         * Type: TEXT
+         * </P>
          */
         static final String INTENT = "intent";
 
         /**
          * The type of the gesture
          *
-         * <P>Type: INTEGER</P>
+         * <P>
+         * Type: INTEGER
+         * </P>
          */
         static final String ITEM_TYPE = "itemType";
 
@@ -66,7 +72,9 @@ class LauncherSettings {
 
         /**
          * The icon type.
-         * <P>Type: INTEGER</P>
+         * <P>
+         * Type: INTEGER
+         * </P>
          */
         static final String ICON_TYPE = "iconType";
 
@@ -82,19 +90,25 @@ class LauncherSettings {
 
         /**
          * The icon package name, if icon type is ICON_TYPE_RESOURCE.
-         * <P>Type: TEXT</P>
+         * <P>
+         * Type: TEXT
+         * </P>
          */
         static final String ICON_PACKAGE = "iconPackage";
 
         /**
          * The icon resource id, if icon type is ICON_TYPE_RESOURCE.
-         * <P>Type: TEXT</P>
+         * <P>
+         * Type: TEXT
+         * </P>
          */
         static final String ICON_RESOURCE = "iconResource";
 
         /**
          * The custom icon bitmap, if icon type is ICON_TYPE_BITMAP.
-         * <P>Type: BLOB</P>
+         * <P>
+         * Type: BLOB
+         * </P>
          */
         static final String ICON = "icon";
     }
@@ -108,13 +122,14 @@ class LauncherSettings {
         /**
          * The content:// style URL for this table
          */
-        static final Uri CONTENT_URI = Uri.parse("content://" +
-                LauncherProvider.AUTHORITY + "/" + LauncherProvider.TABLE_WORKSPACE_SCREENS +
-                "?" + LauncherProvider.PARAMETER_NOTIFY + "=true");
+        static final Uri CONTENT_URI = Uri.parse("content://" + LauncherProvider.AUTHORITY + "/"
+                + LauncherProvider.TABLE_WORKSPACE_SCREENS + "?" + LauncherProvider.PARAMETER_NOTIFY + "=true");
 
         /**
          * The rank of this screen -- ie. how it is ordered relative to the other screens.
-         * <P>Type: INTEGER</P>
+         * <P>
+         * Type: INTEGER
+         * </P>
          */
         static final String SCREEN_RANK = "screenRank";
     }
@@ -126,24 +141,21 @@ class LauncherSettings {
         /**
          * The content:// style URL for this table
          */
-        static final Uri CONTENT_URI = Uri.parse("content://" +
-                LauncherProvider.AUTHORITY + "/" + LauncherProvider.TABLE_FAVORITES +
-                "?" + LauncherProvider.PARAMETER_NOTIFY + "=true");
+        static final Uri CONTENT_URI = Uri.parse("content://" + LauncherProvider.AUTHORITY + "/"
+                + LauncherProvider.TABLE_FAVORITES + "?" + LauncherProvider.PARAMETER_NOTIFY + "=true");
 
         /**
          * The content:// style URL for this table
          */
-        static final Uri OLD_CONTENT_URI = Uri.parse("content://" +
-                LauncherProvider.OLD_AUTHORITY + "/" + LauncherProvider.TABLE_FAVORITES +
-                "?" + LauncherProvider.PARAMETER_NOTIFY + "=true");
+        static final Uri OLD_CONTENT_URI = Uri.parse("content://" + LauncherProvider.OLD_AUTHORITY + "/"
+                + LauncherProvider.TABLE_FAVORITES + "?" + LauncherProvider.PARAMETER_NOTIFY + "=true");
 
         /**
-         * The content:// style URL for this table. When this Uri is used, no notification is
-         * sent if the content changes.
+         * The content:// style URL for this table. When this Uri is used, no notification is sent
+         * if the content changes.
          */
-        static final Uri CONTENT_URI_NO_NOTIFICATION = Uri.parse("content://" +
-                LauncherProvider.AUTHORITY + "/" + LauncherProvider.TABLE_FAVORITES +
-                "?" + LauncherProvider.PARAMETER_NOTIFY + "=false");
+        static final Uri CONTENT_URI_NO_NOTIFICATION = Uri.parse("content://" + LauncherProvider.AUTHORITY + "/"
+                + LauncherProvider.TABLE_FAVORITES + "?" + LauncherProvider.PARAMETER_NOTIFY + "=false");
 
         /**
          * The content:// style URL for a given row, identified by its id.
@@ -154,14 +166,15 @@ class LauncherSettings {
          * @return The unique content URL for the specified row.
          */
         static Uri getContentUri(long id, boolean notify) {
-            return Uri.parse("content://" + LauncherProvider.AUTHORITY +
-                    "/" + LauncherProvider.TABLE_FAVORITES + "/" + id + "?" +
-                    LauncherProvider.PARAMETER_NOTIFY + "=" + notify);
+            return Uri.parse("content://" + LauncherProvider.AUTHORITY + "/" + LauncherProvider.TABLE_FAVORITES + "/"
+                    + id + "?" + LauncherProvider.PARAMETER_NOTIFY + "=" + notify);
         }
 
         /**
          * The container holding the favorite
-         * <P>Type: INTEGER</P>
+         * <P>
+         * Type: INTEGER
+         * </P>
          */
         static final String CONTAINER = "container";
 
@@ -173,41 +186,53 @@ class LauncherSettings {
 
         static final String containerToString(int container) {
             switch (container) {
-                case CONTAINER_DESKTOP: return "desktop";
-                case CONTAINER_HOTSEAT: return "hotseat";
-                default: return String.valueOf(container);
+                case CONTAINER_DESKTOP:
+                    return "desktop";
+                case CONTAINER_HOTSEAT:
+                    return "hotseat";
+                default:
+                    return String.valueOf(container);
             }
         }
 
         /**
          * The screen holding the favorite (if container is CONTAINER_DESKTOP)
-         * <P>Type: INTEGER</P>
+         * <P>
+         * Type: INTEGER
+         * </P>
          */
         static final String SCREEN = "screen";
 
         /**
-         * The X coordinate of the cell holding the favorite
-         * (if container is CONTAINER_HOTSEAT or CONTAINER_HOTSEAT)
-         * <P>Type: INTEGER</P>
+         * The X coordinate of the cell holding the favorite (if container is CONTAINER_HOTSEAT or
+         * CONTAINER_HOTSEAT)
+         * <P>
+         * Type: INTEGER
+         * </P>
          */
         static final String CELLX = "cellX";
 
         /**
-         * The Y coordinate of the cell holding the favorite
-         * (if container is CONTAINER_DESKTOP)
-         * <P>Type: INTEGER</P>
+         * The Y coordinate of the cell holding the favorite (if container is CONTAINER_DESKTOP)
+         * <P>
+         * Type: INTEGER
+         * </P>
          */
         static final String CELLY = "cellY";
 
         /**
          * The X span of the cell holding the favorite
-         * <P>Type: INTEGER</P>
+         * <P>
+         * Type: INTEGER
+         * </P>
          */
         static final String SPANX = "spanX";
 
         /**
          * The Y span of the cell holding the favorite
-         * <P>Type: INTEGER</P>
+         * <P>
+         * Type: INTEGER
+         * </P>
          */
         static final String SPANY = "spanY";
 
@@ -225,12 +250,12 @@ class LauncherSettings {
         static final int ITEM_TYPE_FOLDER = 2;
 
         /**
-        * The favorite is a live folder
-        *
-        * Note: live folders can no longer be added to Launcher, and any live folders which
-        * exist within the launcher database will be ignored when loading.  That said, these
-        * entries in the database may still exist, and are not automatically stripped.
-        */
+         * The favorite is a live folder
+         *
+         * Note: live folders can no longer be added to Launcher, and any live folders which exist
+         * within the launcher database will be ignored when loading. That said, these entries in
+         * the database may still exist, and are not automatically stripped.
+         */
         static final int ITEM_TYPE_LIVE_FOLDER = 3;
 
         /**
@@ -256,36 +281,46 @@ class LauncherSettings {
         /**
          * The appWidgetId of the widget
          *
-         * <P>Type: INTEGER</P>
+         * <P>
+         * Type: INTEGER
+         * </P>
          */
         static final String APPWIDGET_ID = "appWidgetId";
 
         /**
          * The ComponentName of the widget provider
          *
-         * <P>Type: STRING</P>
+         * <P>
+         * Type: STRING
+         * </P>
          */
         public static final String APPWIDGET_PROVIDER = "appWidgetProvider";
-        
+
         /**
-         * Indicates whether this favorite is an application-created shortcut or not.
-         * If the value is 0, the favorite is not an application-created shortcut, if the
-         * value is 1, it is an application-created shortcut.
-         * <P>Type: INTEGER</P>
+         * Indicates whether this favorite is an application-created shortcut or not. If the value
+         * is 0, the favorite is not an application-created shortcut, if the value is 1, it is an
+         * application-created shortcut.
+         * <P>
+         * Type: INTEGER
+         * </P>
          */
         @Deprecated
         static final String IS_SHORTCUT = "isShortcut";
 
         /**
-         * The URI associated with the favorite. It is used, for instance, by
-         * live folders to find the content provider.
-         * <P>Type: TEXT</P>
+         * The URI associated with the favorite. It is used, for instance, by live folders to find
+         * the content provider.
+         * <P>
+         * Type: TEXT
+         * </P>
          */
         static final String URI = "uri";
 
         /**
          * The display mode if the item is a live folder.
-         * <P>Type: INTEGER</P>
+         * <P>
+         * Type: INTEGER
+         * </P>
          *
          * @see android.provider.LiveFolders#DISPLAY_MODE_GRID
          * @see android.provider.LiveFolders#DISPLAY_MODE_LIST
@@ -294,7 +329,9 @@ class LauncherSettings {
 
         /**
          * Boolean indicating that his item was restored and not yet successfully bound.
-         * <P>Type: INTEGER</P>
+         * <P>
+         * Type: INTEGER
+         * </P>
          */
         static final String RESTORED = "restored";
     }

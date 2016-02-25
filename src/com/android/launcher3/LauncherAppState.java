@@ -1,20 +1,21 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 import android.app.SearchManager;
 import android.content.ComponentName;
@@ -30,9 +31,6 @@ import android.util.Log;
 
 import com.android.launcher3.compat.LauncherAppsCompat;
 import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
-
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
     private static final String TAG = "LauncherAppState";
@@ -117,8 +115,7 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
 
         // Register for changes to the favorites
         ContentResolver resolver = sContext.getContentResolver();
-        resolver.registerContentObserver(LauncherSettings.Favorites.CONTENT_URI, true,
-                mFavoritesObserver);
+        resolver.registerContentObserver(LauncherSettings.Favorites.CONTENT_URI, true, mFavoritesObserver);
     }
 
     public void recreateWidgetPreviewDb() {
@@ -189,23 +186,21 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
         return SHARED_PREFERENCES_KEY;
     }
 
-    DeviceProfile initDynamicGrid(Context context, int minWidth, int minHeight,
-                                  int width, int height,
-                                  int availableWidth, int availableHeight) {
+    DeviceProfile initDynamicGrid(Context context, int minWidth, int minHeight, int width, int height,
+            int availableWidth, int availableHeight) {
         if (mDynamicGrid == null) {
-            mDynamicGrid = new DynamicGrid(context,
-                    context.getResources(),
-                    minWidth, minHeight, width, height,
-                    availableWidth, availableHeight);
+            mDynamicGrid =
+                    new DynamicGrid(context, context.getResources(), minWidth, minHeight, width, height,
+                            availableWidth, availableHeight);
             mDynamicGrid.getDeviceProfile().addCallback(this);
         }
 
         // Update the icon size
         DeviceProfile grid = mDynamicGrid.getDeviceProfile();
-        grid.updateFromConfiguration(context, context.getResources(), width, height,
-                availableWidth, availableHeight);
+        grid.updateFromConfiguration(context, context.getResources(), width, height, availableWidth, availableHeight);
         return grid;
     }
+
     public DynamicGrid getDynamicGrid() {
         return mDynamicGrid;
     }
@@ -220,8 +215,7 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
     }
 
     public static boolean isScreenLandscape(Context context) {
-        return context.getResources().getConfiguration().orientation ==
-            Configuration.ORIENTATION_LANDSCAPE;
+        return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     public float getScreenDensity() {

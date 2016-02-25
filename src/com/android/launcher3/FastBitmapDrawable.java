@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -40,7 +38,7 @@ class FastBitmapDrawable extends Drawable {
         public float getInterpolation(float input) {
             if (input < 0.05f) {
                 return input / 0.05f;
-            } else if (input < 0.3f){
+            } else if (input < 0.3f) {
                 return 1;
             } else {
                 return (1 - input) / 0.7f;
@@ -54,11 +52,10 @@ class FastBitmapDrawable extends Drawable {
     private static final ColorMatrix sTempMatrix = new ColorMatrix();
 
     /**
-     * Store the brightness colors filters to optimize animations during icon press. This
-     * only works for non-ghost-mode icons.
+     * Store the brightness colors filters to optimize animations during icon press. This only works
+     * for non-ghost-mode icons.
      */
-    private static final SparseArray<ColorFilter> sCachedBrightnessFilter =
-            new SparseArray<ColorFilter>();
+    private static final SparseArray<ColorFilter> sCachedBrightnessFilter = new SparseArray<ColorFilter>();
 
     private static final int GHOST_MODE_MIN_COLOR_RANGE = 130;
 
@@ -150,9 +147,9 @@ class FastBitmapDrawable extends Drawable {
         if (mPressed != pressed) {
             mPressed = pressed;
             if (mPressed) {
-                mPressedAnimator = ObjectAnimator
-                        .ofInt(this, "brightness", PRESSED_BRIGHTNESS)
-                        .setDuration(CLICK_FEEDBACK_DURATION);
+                mPressedAnimator =
+                        ObjectAnimator.ofInt(this, "brightness", PRESSED_BRIGHTNESS).setDuration(
+                                CLICK_FEEDBACK_DURATION);
                 mPressedAnimator.setInterpolator(CLICK_FEEDBACK_INTERPOLATOR);
                 mPressedAnimator.start();
             } else if (mPressedAnimator != null) {
@@ -187,11 +184,8 @@ class FastBitmapDrawable extends Drawable {
 
                 // For ghost mode, set the color range to [GHOST_MODE_MIN_COLOR_RANGE, 255]
                 float range = (255 - GHOST_MODE_MIN_COLOR_RANGE) / 255.0f;
-                sTempMatrix.set(new float[] {
-                        range, 0, 0, 0, GHOST_MODE_MIN_COLOR_RANGE,
-                        0, range, 0, 0, GHOST_MODE_MIN_COLOR_RANGE,
-                        0, 0, range, 0, GHOST_MODE_MIN_COLOR_RANGE,
-                        0, 0, 0, 1, 0 });
+                sTempMatrix.set(new float[] {range, 0, 0, 0, GHOST_MODE_MIN_COLOR_RANGE, 0, range, 0, 0,
+                        GHOST_MODE_MIN_COLOR_RANGE, 0, 0, range, 0, GHOST_MODE_MIN_COLOR_RANGE, 0, 0, 0, 1, 0});
                 sGhostModeMatrix.preConcat(sTempMatrix);
             }
 
@@ -205,8 +199,7 @@ class FastBitmapDrawable extends Drawable {
         } else if (mBrightness != 0) {
             ColorFilter filter = sCachedBrightnessFilter.get(mBrightness);
             if (filter == null) {
-                filter = new PorterDuffColorFilter(Color.argb(mBrightness, 255, 255, 255),
-                        PorterDuff.Mode.SRC_ATOP);
+                filter = new PorterDuffColorFilter(Color.argb(mBrightness, 255, 255, 255), PorterDuff.Mode.SRC_ATOP);
                 sCachedBrightnessFilter.put(mBrightness, filter);
             }
             mPaint.setColorFilter(filter);

@@ -1,20 +1,26 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3.compat;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONStringer;
+import org.json.JSONTokener;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,14 +28,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.launcher3.LauncherAppState;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONStringer;
-import org.json.JSONTokener;
-
-import java.util.ArrayList;
-import java.util.HashSet;
 
 public class PackageInstallerCompatV16 extends PackageInstallerCompat {
 
@@ -39,8 +37,7 @@ public class PackageInstallerCompatV16 extends PackageInstallerCompat {
     private static final String KEY_PROGRESS = "progress";
     private static final String KEY_STATE = "state";
 
-    private static final String PREFS =
-            "com.android.launcher3.compat.PackageInstallerCompatV16.queue";
+    private static final String PREFS = "com.android.launcher3.compat.PackageInstallerCompatV16.queue";
 
     protected final SharedPreferences mPrefs;
 
@@ -75,7 +72,7 @@ public class PackageInstallerCompatV16 extends PackageInstallerCompat {
     }
 
     @Override
-    public void onStop() { }
+    public void onStop() {}
 
     private void replayUpdates() {
         if (DEBUG) Log.d(TAG, "updates resumed");
@@ -87,7 +84,7 @@ public class PackageInstallerCompatV16 extends PackageInstallerCompat {
         }
         mReplayPending = false;
         ArrayList<PackageInstallInfo> updates = new ArrayList<PackageInstallInfo>();
-        for (String packageName: mPrefs.getAll().keySet()) {
+        for (String packageName : mPrefs.getAll().keySet()) {
             final String json = mPrefs.getString(packageName, null);
             if (!TextUtils.isEmpty(json)) {
                 updates.add(infoFromJson(packageName, json));
@@ -113,9 +110,7 @@ public class PackageInstallerCompatV16 extends PackageInstallerCompat {
             if (DEBUG) Log.d(TAG, "no longer tracking " + packageName);
         } else {
             editor.putString(packageName, infoToJson(installInfo));
-            if (DEBUG)
-                Log.d(TAG, "saved state: " + infoToJson(installInfo)
-                        + " for package: " + packageName);
+            if (DEBUG) Log.d(TAG, "saved state: " + infoToJson(installInfo) + " for package: " + packageName);
 
         }
         editor.commit();
@@ -156,11 +151,9 @@ public class PackageInstallerCompatV16 extends PackageInstallerCompat {
     private static String infoToJson(PackageInstallInfo info) {
         String value = null;
         try {
-            JSONStringer json = new JSONStringer()
-                    .object()
-                    .key(KEY_STATE).value(info.state)
-                    .key(KEY_PROGRESS).value(info.progress)
-                    .endObject();
+            JSONStringer json =
+                    new JSONStringer().object().key(KEY_STATE).value(info.state).key(KEY_PROGRESS).value(info.progress)
+                            .endObject();
             value = json.toString();
         } catch (JSONException e) {
             Log.e(TAG, "failed to serialize app state update", e);

@@ -1,31 +1,34 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.*;
+import android.os.Binder;
+import android.os.Debug;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.util.LongSparseArray;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MemoryTracker extends Service {
     public static final String TAG = MemoryTracker.class.getSimpleName();
@@ -44,18 +47,21 @@ public class MemoryTracker extends Service {
         public long currentPss, currentUss;
         public long[] pss = new long[256];
         public long[] uss = new long[256];
-            //= new Meminfo[(int) (30 * 60 / (UPDATE_RATE / 1000))]; // 30 minutes
+        // = new Meminfo[(int) (30 * 60 / (UPDATE_RATE / 1000))]; // 30 minutes
         public long max = 1;
         public int head = 0;
+
         public ProcessMemInfo(int pid, String name, long start) {
             this.pid = pid;
             this.name = name;
             this.startTime = start;
         }
+
         public long getUptime() {
             return System.currentTimeMillis() - startTime;
         }
     };
+
     public final LongSparseArray<ProcessMemInfo> mData = new LongSparseArray<ProcessMemInfo>();
     public final ArrayList<Long> mPids = new ArrayList<Long>();
     private int[] mPidsArray = new int[0];
@@ -84,11 +90,8 @@ public class MemoryTracker extends Service {
     ActivityManager mAm;
 
     public static void startTrackingMe(Context context, String name) {
-        context.startService(new Intent(context, MemoryTracker.class)
-                .setAction(MemoryTracker.ACTION_START_TRACKING)
-                .putExtra("pid", android.os.Process.myPid())
-                .putExtra("name", name)
-        );
+        context.startService(new Intent(context, MemoryTracker.class).setAction(MemoryTracker.ACTION_START_TRACKING)
+                .putExtra("pid", android.os.Process.myPid()).putExtra("name", name));
     }
 
     public ProcessMemInfo getMemInfo(int pid) {
@@ -116,10 +119,11 @@ public class MemoryTracker extends Service {
         final int N = mPids.size();
         mPidsArray = new int[N];
         StringBuffer sb = new StringBuffer("Now tracking processes: ");
-        for (int i=0; i<N; i++) {
+        for (int i = 0; i < N; i++) {
             final int p = mPids.get(i).intValue();
             mPidsArray[i] = p;
-            sb.append(p); sb.append(" ");
+            sb.append(p);
+            sb.append(" ");
         }
         Log.v(TAG, sb.toString());
     }
@@ -127,7 +131,7 @@ public class MemoryTracker extends Service {
     void update() {
         synchronized (mLock) {
             Debug.MemoryInfo[] dinfos = mAm.getProcessMemoryInfo(mPidsArray);
-            for (int i=0; i<dinfos.length; i++) {
+            for (int i = 0; i < dinfos.length; i++) {
                 Debug.MemoryInfo dinfo = dinfos[i];
                 if (i > mPids.size()) {
                     Log.e(TAG, "update: unknown process info received: " + dinfo);
@@ -135,18 +139,19 @@ public class MemoryTracker extends Service {
                 }
                 final long pid = mPids.get(i).intValue();
                 final ProcessMemInfo info = mData.get(pid);
-                info.head = (info.head+1) % info.pss.length;
+                info.head = (info.head + 1) % info.pss.length;
                 info.pss[info.head] = info.currentPss = dinfo.getTotalPss();
                 info.uss[info.head] = info.currentUss = dinfo.getTotalPrivateDirty();
                 if (info.currentPss > info.max) info.max = info.currentPss;
                 if (info.currentUss > info.max) info.max = info.currentUss;
-                // Log.v(TAG, "update: pid " + pid + " pss=" + info.currentPss + " uss=" + info.currentUss);
+                // Log.v(TAG, "update: pid " + pid + " pss=" + info.currentPss + " uss=" +
+                // info.currentUss);
                 if (info.currentPss == 0) {
                     Log.v(TAG, "update: pid " + pid + " has pss=0, it probably died");
                     mData.remove(pid);
                 }
             }
-            for (int i=mPids.size()-1; i>=0; i--) {
+            for (int i = mPids.size() - 1; i >= 0; i--) {
                 final long pid = mPids.get(i).intValue();
                 if (mData.get(pid) == null) {
                     mPids.remove(i);
@@ -165,8 +170,8 @@ public class MemoryTracker extends Service {
         for (ActivityManager.RunningServiceInfo svc : svcs) {
             if (svc.service.getPackageName().equals(getPackageName())) {
                 Log.v(TAG, "discovered running service: " + svc.process + " (" + svc.pid + ")");
-                startTrackingProcess(svc.pid, svc.process,
-                        System.currentTimeMillis() - (SystemClock.elapsedRealtime() - svc.activeSince));
+                startTrackingProcess(svc.pid, svc.process, System.currentTimeMillis()
+                        - (SystemClock.elapsedRealtime() - svc.activeSince));
             }
         }
 

@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -76,8 +74,7 @@ public class HolographicViewHelper {
      */
     private Bitmap createOriginalImage(ImageView v, Canvas canvas) {
         final Drawable d = v.getDrawable();
-        final Bitmap b = Bitmap.createBitmap(
-                d.getIntrinsicWidth(), d.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        final Bitmap b = Bitmap.createBitmap(d.getIntrinsicWidth(), d.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
 
         canvas.setBitmap(b);
         canvas.save();
@@ -89,13 +86,12 @@ public class HolographicViewHelper {
     }
 
     /**
-     * Creates a new press state image which is the old image with a blue overlay.
-     * Responsibility for the bitmap is transferred to the caller.
+     * Creates a new press state image which is the old image with a blue overlay. Responsibility
+     * for the bitmap is transferred to the caller.
      */
     private Bitmap createImageWithOverlay(ImageView v, Canvas canvas, int color) {
         final Drawable d = v.getDrawable();
-        final Bitmap b = Bitmap.createBitmap(
-                d.getIntrinsicWidth(), d.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        final Bitmap b = Bitmap.createBitmap(d.getIntrinsicWidth(), d.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
 
         canvas.setBitmap(b);
         canvas.save();

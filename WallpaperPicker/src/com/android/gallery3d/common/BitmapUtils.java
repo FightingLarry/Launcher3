@@ -1,20 +1,22 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.gallery3d.common;
+
+import java.io.ByteArrayOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -26,53 +28,39 @@ import android.os.Build;
 import android.util.FloatMath;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 public class BitmapUtils {
     private static final String TAG = "BitmapUtils";
     private static final int DEFAULT_JPEG_QUALITY = 90;
     public static final int UNCONSTRAINED = -1;
 
-    private BitmapUtils(){}
+    private BitmapUtils() {}
 
     /*
-     * Compute the sample size as a function of minSideLength
-     * and maxNumOfPixels.
-     * minSideLength is used to specify that minimal width or height of a
-     * bitmap.
-     * maxNumOfPixels is used to specify the maximal size in pixels that is
-     * tolerable in terms of memory usage.
-     *
-     * The function returns a sample size based on the constraints.
-     * Both size and minSideLength can be passed in as UNCONSTRAINED,
-     * which indicates no care of the corresponding constraint.
-     * The functions prefers returning a sample size that
-     * generates a smaller bitmap, unless minSideLength = UNCONSTRAINED.
-     *
-     * Also, the function rounds up the sample size to a power of 2 or multiple
-     * of 8 because BitmapFactory only honors sample size this way.
-     * For example, BitmapFactory downsamples an image by 2 even though the
-     * request is 3. So we round up the sample size to avoid OOM.
+     * Compute the sample size as a function of minSideLength and maxNumOfPixels. minSideLength is
+     * used to specify that minimal width or height of a bitmap. maxNumOfPixels is used to specify
+     * the maximal size in pixels that is tolerable in terms of memory usage.
+     * 
+     * The function returns a sample size based on the constraints. Both size and minSideLength can
+     * be passed in as UNCONSTRAINED, which indicates no care of the corresponding constraint. The
+     * functions prefers returning a sample size that generates a smaller bitmap, unless
+     * minSideLength = UNCONSTRAINED.
+     * 
+     * Also, the function rounds up the sample size to a power of 2 or multiple of 8 because
+     * BitmapFactory only honors sample size this way. For example, BitmapFactory downsamples an
+     * image by 2 even though the request is 3. So we round up the sample size to avoid OOM.
      */
-    public static int computeSampleSize(int width, int height,
-            int minSideLength, int maxNumOfPixels) {
-        int initialSize = computeInitialSampleSize(
-                width, height, minSideLength, maxNumOfPixels);
+    public static int computeSampleSize(int width, int height, int minSideLength, int maxNumOfPixels) {
+        int initialSize = computeInitialSampleSize(width, height, minSideLength, maxNumOfPixels);
 
-        return initialSize <= 8
-                ? Utils.nextPowerOf2(initialSize)
-                : (initialSize + 7) / 8 * 8;
+        return initialSize <= 8 ? Utils.nextPowerOf2(initialSize) : (initialSize + 7) / 8 * 8;
     }
 
-    private static int computeInitialSampleSize(int w, int h,
-            int minSideLength, int maxNumOfPixels) {
-        if (maxNumOfPixels == UNCONSTRAINED
-                && minSideLength == UNCONSTRAINED) return 1;
+    private static int computeInitialSampleSize(int w, int h, int minSideLength, int maxNumOfPixels) {
+        if (maxNumOfPixels == UNCONSTRAINED && minSideLength == UNCONSTRAINED) return 1;
 
-        int lowerBound = (maxNumOfPixels == UNCONSTRAINED) ? 1 :
-                (int) FloatMath.ceil(FloatMath.sqrt((float) (w * h) / maxNumOfPixels));
+        int lowerBound =
+                (maxNumOfPixels == UNCONSTRAINED) ? 1 : (int) FloatMath.ceil(FloatMath.sqrt((float) (w * h)
+                        / maxNumOfPixels));
 
         if (minSideLength == UNCONSTRAINED) {
             return lowerBound;
@@ -84,14 +72,11 @@ public class BitmapUtils {
 
     // This computes a sample size which makes the longer side at least
     // minSideLength long. If that's not possible, return 1.
-    public static int computeSampleSizeLarger(int w, int h,
-            int minSideLength) {
+    public static int computeSampleSizeLarger(int w, int h, int minSideLength) {
         int initialSize = Math.max(w / minSideLength, h / minSideLength);
         if (initialSize <= 1) return 1;
 
-        return initialSize <= 8
-                ? Utils.prevPowerOf2(initialSize)
-                : initialSize / 8 * 8;
+        return initialSize <= 8 ? Utils.prevPowerOf2(initialSize) : initialSize / 8 * 8;
     }
 
     // Find the min x that 1 / x >= scale
@@ -99,26 +84,20 @@ public class BitmapUtils {
         int initialSize = (int) FloatMath.floor(1f / scale);
         if (initialSize <= 1) return 1;
 
-        return initialSize <= 8
-                ? Utils.prevPowerOf2(initialSize)
-                : initialSize / 8 * 8;
+        return initialSize <= 8 ? Utils.prevPowerOf2(initialSize) : initialSize / 8 * 8;
     }
 
     // Find the max x that 1 / x <= scale.
     public static int computeSampleSize(float scale) {
         Utils.assertTrue(scale > 0);
         int initialSize = Math.max(1, (int) FloatMath.ceil(1 / scale));
-        return initialSize <= 8
-                ? Utils.nextPowerOf2(initialSize)
-                : (initialSize + 7) / 8 * 8;
+        return initialSize <= 8 ? Utils.nextPowerOf2(initialSize) : (initialSize + 7) / 8 * 8;
     }
 
-    public static Bitmap resizeBitmapByScale(
-            Bitmap bitmap, float scale, boolean recycle) {
+    public static Bitmap resizeBitmapByScale(Bitmap bitmap, float scale, boolean recycle) {
         int width = Math.round(bitmap.getWidth() * scale);
         int height = Math.round(bitmap.getHeight() * scale);
-        if (width == bitmap.getWidth()
-                && height == bitmap.getHeight()) return bitmap;
+        if (width == bitmap.getWidth() && height == bitmap.getHeight()) return bitmap;
         Bitmap target = Bitmap.createBitmap(width, height, getConfig(bitmap));
         Canvas canvas = new Canvas(target);
         canvas.scale(scale, scale);
@@ -136,12 +115,10 @@ public class BitmapUtils {
         return config;
     }
 
-    public static Bitmap resizeDownBySideLength(
-            Bitmap bitmap, int maxLength, boolean recycle) {
+    public static Bitmap resizeDownBySideLength(Bitmap bitmap, int maxLength, boolean recycle) {
         int srcWidth = bitmap.getWidth();
         int srcHeight = bitmap.getHeight();
-        float scale = Math.min(
-                (float) maxLength / srcWidth, (float) maxLength / srcHeight);
+        float scale = Math.min((float) maxLength / srcWidth, (float) maxLength / srcHeight);
         if (scale >= 1.0f) return bitmap;
         return resizeBitmapByScale(bitmap, scale, recycle);
     }
@@ -153,7 +130,7 @@ public class BitmapUtils {
 
         // scale the image so that the shorter side equals to the target;
         // the longer side will be center-cropped.
-        float scale = (float) size / Math.min(w,  h);
+        float scale = (float) size / Math.min(w, h);
 
         Bitmap target = Bitmap.createBitmap(size, size, getConfig(bitmap));
         int width = Math.round(scale * bitmap.getWidth());
@@ -229,8 +206,7 @@ public class BitmapUtils {
                 if (instance != null) {
                     clazz.getMethod("release").invoke(instance);
                 }
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         }
         return null;
     }
@@ -248,8 +224,7 @@ public class BitmapUtils {
     public static boolean isSupportedByRegionDecoder(String mimeType) {
         if (mimeType == null) return false;
         mimeType = mimeType.toLowerCase();
-        return mimeType.startsWith("image/") &&
-                (!mimeType.equals("image/gif") && !mimeType.endsWith("bmp"));
+        return mimeType.startsWith("image/") && (!mimeType.equals("image/gif") && !mimeType.endsWith("bmp"));
     }
 
     public static boolean isRotationSupported(String mimeType) {

@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
@@ -56,8 +54,7 @@ class LauncherClings implements OnClickListener {
     /** Ctor */
     public LauncherClings(Launcher launcher) {
         mLauncher = launcher;
-        mInflater = LayoutInflater.from(new
-                ContextThemeWrapper(mLauncher, android.R.style.Theme_DeviceDefault));
+        mInflater = LayoutInflater.from(new ContextThemeWrapper(mLauncher, android.R.style.Theme_DeviceDefault));
     }
 
     @Override
@@ -70,9 +67,8 @@ class LauncherClings implements OnClickListener {
             // Copy the shortcuts from the old database
             LauncherModel model = mLauncher.getModel();
             model.resetLoadedState(false, true);
-            model.startLoader(false, PagedView.INVALID_RESTORE_PAGE,
-                    LauncherModel.LOADER_FLAG_CLEAR_WORKSPACE
-                            | LauncherModel.LOADER_FLAG_MIGRATE_SHORTCUTS);
+            model.startLoader(false, PagedView.INVALID_RESTORE_PAGE, LauncherModel.LOADER_FLAG_CLEAR_WORKSPACE
+                    | LauncherModel.LOADER_FLAG_MIGRATE_SHORTCUTS);
             // Set the flag to skip the folder cling
             String spKey = LauncherAppState.getSharedPreferencesKey();
             SharedPreferences sp = mLauncher.getSharedPreferences(spKey, Context.MODE_PRIVATE);
@@ -111,8 +107,8 @@ class LauncherClings implements OnClickListener {
                         showLongPressCling(false);
                     }
                 };
-                dismissCling(mLauncher.findViewById(R.id.migration_cling), cb,
-                        MIGRATION_CLING_DISMISSED_KEY, DISMISS_CLING_DURATION);
+                dismissCling(mLauncher.findViewById(R.id.migration_cling), cb, MIGRATION_CLING_DISMISSED_KEY,
+                        DISMISS_CLING_DURATION);
             }
         };
         mLauncher.getWorkspace().post(dismissCb);
@@ -133,13 +129,14 @@ class LauncherClings implements OnClickListener {
         });
 
         final ViewGroup content = (ViewGroup) cling.findViewById(R.id.cling_content);
-        mInflater.inflate(showWelcome ? R.layout.longpress_cling_welcome_content
-                : R.layout.longpress_cling_content, content);
+        mInflater.inflate(showWelcome ? R.layout.longpress_cling_welcome_content : R.layout.longpress_cling_content,
+                content);
         content.findViewById(R.id.cling_dismiss_longpress_info).setOnClickListener(this);
 
         if (TAG_CROP_TOP_AND_SIDES.equals(content.getTag())) {
-            Drawable bg = new BorderCropDrawable(mLauncher.getResources().getDrawable(R.drawable.cling_bg),
-                    true, true, true, false);
+            Drawable bg =
+                    new BorderCropDrawable(mLauncher.getResources().getDrawable(R.drawable.cling_bg), true, true, true,
+                            false);
             content.setBackground(bg);
         }
 
@@ -179,25 +176,22 @@ class LauncherClings implements OnClickListener {
     private void dismissLongPressCling() {
         Runnable dismissCb = new Runnable() {
             public void run() {
-                dismissCling(mLauncher.findViewById(R.id.longpress_cling), null,
-                        WORKSPACE_CLING_DISMISSED_KEY, DISMISS_CLING_DURATION);
+                dismissCling(mLauncher.findViewById(R.id.longpress_cling), null, WORKSPACE_CLING_DISMISSED_KEY,
+                        DISMISS_CLING_DURATION);
             }
         };
         mLauncher.getWorkspace().post(dismissCb);
     }
 
     /** Hides the specified Cling */
-    private void dismissCling(final View cling, final Runnable postAnimationCb,
-                              final String flag, int duration) {
+    private void dismissCling(final View cling, final Runnable postAnimationCb, final String flag, int duration) {
         // To catch cases where siblings of top-level views are made invisible, just check whether
         // the cling is directly set to GONE before dismissing it.
         if (cling != null && cling.getVisibility() != View.GONE) {
             final Runnable cleanUpClingCb = new Runnable() {
                 public void run() {
                     cling.setVisibility(View.GONE);
-                    mLauncher.getSharedPrefs().edit()
-                        .putBoolean(flag, true)
-                        .apply();
+                    mLauncher.getSharedPrefs().edit().putBoolean(flag, true).apply();
                     if (postAnimationCb != null) {
                         postAnimationCb.run();
                     }
@@ -218,11 +212,11 @@ class LauncherClings implements OnClickListener {
         }
 
         // disable clings when running in a test harness
-        if(ActivityManager.isRunningInTestHarness()) return false;
+        if (ActivityManager.isRunningInTestHarness()) return false;
 
         // Disable clings for accessibility when explore by touch is enabled
-        final AccessibilityManager a11yManager = (AccessibilityManager) mLauncher.getSystemService(
-                Launcher.ACCESSIBILITY_SERVICE);
+        final AccessibilityManager a11yManager =
+                (AccessibilityManager) mLauncher.getSystemService(Launcher.ACCESSIBILITY_SERVICE);
         if (a11yManager.isTouchExplorationEnabled()) {
             return false;
         }
@@ -239,8 +233,7 @@ class LauncherClings implements OnClickListener {
                 return false;
             }
         }
-        if (Settings.Secure.getInt(mLauncher.getContentResolver(), SKIP_FIRST_USE_HINTS, 0)
-                == 1) {
+        if (Settings.Secure.getInt(mLauncher.getContentResolver(), SKIP_FIRST_USE_HINTS, 0) == 1) {
             return false;
         }
         return true;
@@ -248,14 +241,13 @@ class LauncherClings implements OnClickListener {
 
     public boolean shouldShowFirstRunOrMigrationClings() {
         SharedPreferences sharedPrefs = mLauncher.getSharedPrefs();
-        return areClingsEnabled() &&
-            !sharedPrefs.getBoolean(WORKSPACE_CLING_DISMISSED_KEY, false) &&
-            !sharedPrefs.getBoolean(MIGRATION_CLING_DISMISSED_KEY, false);
+        return areClingsEnabled() && !sharedPrefs.getBoolean(WORKSPACE_CLING_DISMISSED_KEY, false)
+                && !sharedPrefs.getBoolean(MIGRATION_CLING_DISMISSED_KEY, false);
     }
 
     public static void synchonouslyMarkFirstRunClingDismissed(Context ctx) {
-        SharedPreferences prefs = ctx.getSharedPreferences(
-                LauncherAppState.getSharedPreferencesKey(), Context.MODE_PRIVATE);
+        SharedPreferences prefs =
+                ctx.getSharedPreferences(LauncherAppState.getSharedPreferencesKey(), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(WORKSPACE_CLING_DISMISSED_KEY, true);
         editor.commit();

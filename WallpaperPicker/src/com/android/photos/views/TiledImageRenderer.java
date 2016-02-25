@@ -1,17 +1,15 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.photos.views;
@@ -43,21 +41,13 @@ public class TiledImageRenderer {
     private static final int UPLOAD_LIMIT = 1;
 
     /*
-     *  This is the tile state in the CPU side.
-     *  Life of a Tile:
-     *      ACTIVATED (initial state)
-     *              --> IN_QUEUE - by queueForDecode()
-     *              --> RECYCLED - by recycleTile()
-     *      IN_QUEUE --> DECODING - by decodeTile()
-     *               --> RECYCLED - by recycleTile)
-     *      DECODING --> RECYCLING - by recycleTile()
-     *               --> DECODED  - by decodeTile()
-     *               --> DECODE_FAIL - by decodeTile()
-     *      RECYCLING --> RECYCLED - by decodeTile()
-     *      DECODED --> ACTIVATED - (after the decoded bitmap is uploaded)
-     *      DECODED --> RECYCLED - by recycleTile()
-     *      DECODE_FAIL -> RECYCLED - by recycleTile()
-     *      RECYCLED --> ACTIVATED - by obtainTile()
+     * This is the tile state in the CPU side. Life of a Tile: ACTIVATED (initial state) -->
+     * IN_QUEUE - by queueForDecode() --> RECYCLED - by recycleTile() IN_QUEUE --> DECODING - by
+     * decodeTile() --> RECYCLED - by recycleTile) DECODING --> RECYCLING - by recycleTile() -->
+     * DECODED - by decodeTile() --> DECODE_FAIL - by decodeTile() RECYCLING --> RECYCLED - by
+     * decodeTile() DECODED --> ACTIVATED - (after the decoded bitmap is uploaded) DECODED -->
+     * RECYCLED - by recycleTile() DECODE_FAIL -> RECYCLED - by recycleTile() RECYCLED --> ACTIVATED
+     * - by obtainTile()
      */
     private static final int STATE_ACTIVATED = 0x01;
     private static final int STATE_IN_QUEUE = 0x02;
@@ -74,7 +64,7 @@ public class TiledImageRenderer {
 
     private TileSource mModel;
     private BasicTexture mPreview;
-    protected int mLevelCount;  // cache the value of mScaledBitmaps.length
+    protected int mLevelCount; // cache the value of mScaledBitmaps.length
 
     // The mLevel variable indicates which level of bitmap we should use.
     // Level 0 means the original full-sized bitmap, and a larger value means
@@ -132,26 +122,28 @@ public class TiledImageRenderer {
          * {@link TiledImageRenderer#suggestedTileSize(Context)}
          */
         public int getTileSize();
+
         public int getImageWidth();
+
         public int getImageHeight();
+
         public int getRotation();
 
         /**
-         * Return a Preview image if available. This will be used as the base layer
-         * if higher res tiles are not yet available
+         * Return a Preview image if available. This will be used as the base layer if higher res
+         * tiles are not yet available
          */
         public BasicTexture getPreview();
 
         /**
-         * The tile returned by this method can be specified this way: Assuming
-         * the image size is (width, height), first take the intersection of (0,
-         * 0) - (width, height) and (x, y) - (x + tileSize, y + tileSize). If
-         * in extending the region, we found some part of the region is outside
-         * the image, those pixels are filled with black.
+         * The tile returned by this method can be specified this way: Assuming the image size is
+         * (width, height), first take the intersection of (0, 0) - (width, height) and (x, y) - (x
+         * + tileSize, y + tileSize). If in extending the region, we found some part of the region
+         * is outside the image, those pixels are filled with black.
          *
-         * If level > 0, it does the same operation on a down-scaled version of
-         * the original image (down-scaled by a factor of 2^level), but (x, y)
-         * still refers to the coordinate on the original image.
+         * If level > 0, it does the same operation on a down-scaled version of the original image
+         * (down-scaled by a factor of 2^level), but (x, y) still refers to the coordinate on the
+         * original image.
          *
          * The method would be called by the decoder thread.
          */
@@ -164,10 +156,9 @@ public class TiledImageRenderer {
 
     private static boolean isHighResolution(Context context) {
         DisplayMetrics metrics = new DisplayMetrics();
-        WindowManager wm = (WindowManager)
-                context.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         wm.getDefaultDisplay().getMetrics(metrics);
-        return metrics.heightPixels > 2048 ||  metrics.widthPixels > 2048;
+        return metrics.heightPixels > 2048 || metrics.widthPixels > 2048;
     }
 
     public TiledImageRenderer(View parent) {
@@ -201,8 +192,7 @@ public class TiledImageRenderer {
 
     private void calculateLevelCount() {
         if (mPreview != null) {
-            mLevelCount = Math.max(0, Utils.ceilLog2(
-                mImageWidth / (float) mPreview.getWidth()));
+            mLevelCount = Math.max(0, Utils.ceilLog2(mImageWidth / (float) mPreview.getWidth()));
         } else {
             int levels = 1;
             int maxDim = Math.max(mImageWidth, mImageHeight);
@@ -238,8 +228,7 @@ public class TiledImageRenderer {
     }
 
     public void setPosition(int centerX, int centerY, float scale) {
-        if (mCenterX == centerX && mCenterY == centerY
-                && mScale == scale) {
+        if (mCenterX == centerX && mCenterY == centerY && mScale == scale) {
             return;
         }
         mCenterX = centerX;
@@ -252,7 +241,7 @@ public class TiledImageRenderer {
     //
     // 1. Decide the tile level we want to use for display.
     // 2. Decide the tile levels we want to keep as texture (in addition to
-    //    the one we use for display).
+    // the one we use for display).
     // 3. Recycle unused tiles.
     // 4. Activate the tiles we want.
     private void layoutTiles() {
@@ -309,8 +298,7 @@ public class TiledImageRenderer {
             for (int i = 0; i < n; i++) {
                 Tile tile = mActiveTiles.valueAt(i);
                 int level = tile.mTileLevel;
-                if (level < fromLevel || level >= endLevel
-                        || !range[level - fromLevel].contains(tile.mX, tile.mY)) {
+                if (level < fromLevel || level >= endLevel || !range[level - fromLevel].contains(tile.mX, tile.mY)) {
                     mActiveTiles.removeAt(i);
                     i--;
                     n--;
@@ -356,8 +344,7 @@ public class TiledImageRenderer {
     //
     // (cX, cY) is the point on the original bitmap which will be put in the
     // center of the ImageViewer.
-    private void getRange(Rect out,
-            int cX, int cY, int level, float scale, int rotation) {
+    private void getRange(Rect out, int cX, int cY, int level, float scale, int rotation) {
 
         double radians = Math.toRadians(-rotation);
         double w = mViewWidth;
@@ -365,10 +352,8 @@ public class TiledImageRenderer {
 
         double cos = Math.cos(radians);
         double sin = Math.sin(radians);
-        int width = (int) Math.ceil(Math.max(
-                Math.abs(cos * w - sin * h), Math.abs(cos * w + sin * h)));
-        int height = (int) Math.ceil(Math.max(
-                Math.abs(sin * w + cos * h), Math.abs(sin * w - cos * h)));
+        int width = (int) Math.ceil(Math.max(Math.abs(cos * w - sin * h), Math.abs(cos * w + sin * h)));
+        int height = (int) Math.ceil(Math.max(Math.abs(sin * w + cos * h), Math.abs(sin * w - cos * h)));
 
         int left = (int) Math.floor(cX - width / (2f * scale));
         int top = (int) Math.floor(cY - height / (2f * scale));
@@ -447,8 +432,7 @@ public class TiledImageRenderer {
                     }
                 }
             } else if (mPreview != null) {
-                mPreview.draw(canvas, mOffsetX, mOffsetY,
-                        Math.round(mImageWidth * mScale),
+                mPreview.draw(canvas, mOffsetX, mOffsetY, Math.round(mImageWidth * mScale),
                         Math.round(mImageHeight * mScale));
             }
         } finally {
@@ -478,15 +462,15 @@ public class TiledImageRenderer {
         }
     }
 
-   private void queueForDecode(Tile tile) {
-       synchronized (mQueueLock) {
-           if (tile.mTileState == STATE_ACTIVATED) {
-               tile.mTileState = STATE_IN_QUEUE;
-               if (mDecodeQueue.push(tile)) {
-                   mQueueLock.notifyAll();
-               }
-           }
-       }
+    private void queueForDecode(Tile tile) {
+        synchronized (mQueueLock) {
+            if (tile.mTileState == STATE_ACTIVATED) {
+                tile.mTileState = STATE_IN_QUEUE;
+                if (mDecodeQueue.push(tile)) {
+                    mQueueLock.notifyAll();
+                }
+            }
+        }
     }
 
     private void decodeTile(Tile tile) {
@@ -593,8 +577,7 @@ public class TiledImageRenderer {
 
     // Draw the tile to a square at canvas that locates at (x, y) and
     // has a side length of length.
-    private void drawTile(GLCanvas canvas,
-            int tx, int ty, int level, float x, float y, float length) {
+    private void drawTile(GLCanvas canvas, int tx, int ty, int level, float x, float y, float length) {
         RectF source = mSourceRect;
         RectF target = mTargetRect;
         target.set(x, y, x + length, y + length);
@@ -610,7 +593,7 @@ public class TiledImageRenderer {
                     } else {
                         mRenderComplete = false;
                     }
-                } else if (tile.mTileState != STATE_DECODE_FAIL){
+                } else if (tile.mTileState != STATE_DECODE_FAIL) {
                     mRenderComplete = false;
                     queueForDecode(tile);
                 }
@@ -623,14 +606,12 @@ public class TiledImageRenderer {
             int size = mTileSize << level;
             float scaleX = (float) mPreview.getWidth() / mImageWidth;
             float scaleY = (float) mPreview.getHeight() / mImageHeight;
-            source.set(tx * scaleX, ty * scaleY, (tx + size) * scaleX,
-                    (ty + size) * scaleY);
+            source.set(tx * scaleX, ty * scaleY, (tx + size) * scaleX, (ty + size) * scaleY);
             canvas.drawTexture(mPreview, source, target);
         }
     }
 
-    private boolean drawTile(
-            Tile tile, GLCanvas canvas, RectF source, RectF target) {
+    private boolean drawTile(Tile tile, GLCanvas canvas, RectF source, RectF target) {
         while (true) {
             if (tile.isContentValid()) {
                 canvas.drawTexture(tile, source, target);
@@ -743,8 +724,7 @@ public class TiledImageRenderer {
 
         @Override
         public String toString() {
-            return String.format("tile(%s, %s, %s / %s)",
-                    mX / mTileSize, mY / mTileSize, mLevel, mLevelCount);
+            return String.format("tile(%s, %s, %s / %s)", mX / mTileSize, mY / mTileSize, mLevel, mLevelCount);
         }
     }
 

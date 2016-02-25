@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2011 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2011 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,9 +12,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<com.android.launcher3.PagedViewWidget
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:launcher="http://schemas.android.com/apk/res-auto/com.android.launcher3"
+<com.android.launcher3.PagedViewWidget xmlns:android="http://schemas.android.com/apk/res/android"
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -30,6 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1">
+
         <FrameLayout
             android:id="@+id/left_border"
             android:layout_width="1dp"
@@ -48,6 +46,7 @@
             android:paddingEnd="@dimen/app_widget_preview_padding_right"
             android:paddingRight="@dimen/app_widget_preview_padding_right"
             android:scaleType="matrix" />
+
         <FrameLayout
             android:id="@+id/right_border"
             android:layout_width="1dp"

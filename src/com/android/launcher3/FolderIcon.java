@@ -1,20 +1,20 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.android.launcher3;
+
+import java.util.ArrayList;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -43,8 +43,6 @@ import android.widget.TextView;
 
 import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.FolderInfo.FolderListener;
-
-import java.util.ArrayList;
 
 /**
  * An icon that can appear on in the workspace representing an {@link UserFolder}.
@@ -136,14 +134,14 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         return !workspace.workspaceInModalState();
     }
 
-    static FolderIcon fromXml(int resId, Launcher launcher, ViewGroup group,
-            FolderInfo folderInfo, IconCache iconCache) {
-        @SuppressWarnings("all") // suppress dead code warning
+    static FolderIcon fromXml(int resId, Launcher launcher, ViewGroup group, FolderInfo folderInfo, IconCache iconCache) {
+        @SuppressWarnings("all")
+        // suppress dead code warning
         final boolean error = INITIAL_ITEM_ANIMATION_DURATION >= DROP_IN_ANIMATION_DURATION;
         if (error) {
-            throw new IllegalStateException("DROP_IN_ANIMATION_DURATION must be greater than " +
-                    "INITIAL_ITEM_ANIMATION_DURATION, as sequencing of adding first two items " +
-                    "is dependent on this");
+            throw new IllegalStateException("DROP_IN_ANIMATION_DURATION must be greater than "
+                    + "INITIAL_ITEM_ANIMATION_DURATION, as sequencing of adding first two items "
+                    + "is dependent on this");
         }
         LauncherAppState app = LauncherAppState.getInstance();
         DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
@@ -167,8 +165,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         icon.setOnClickListener(launcher);
         icon.mInfo = folderInfo;
         icon.mLauncher = launcher;
-        icon.setContentDescription(String.format(launcher.getString(R.string.folder_name_format),
-                folderInfo.title));
+        icon.setContentDescription(String.format(launcher.getString(R.string.folder_name_format), folderInfo.title));
         Folder folder = Folder.fromXml(launcher);
         folder.setDragController(launcher.getDragController());
         folder.setFolderIcon(icon);
@@ -322,9 +319,8 @@ public class FolderIcon extends FrameLayout implements FolderListener {
 
     private boolean willAcceptItem(ItemInfo item) {
         final int itemType = item.itemType;
-        return ((itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION ||
-                itemType == LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT) &&
-                !mFolder.isFull() && item != mInfo && !mInfo.opened);
+        return ((itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION || itemType == LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT)
+                && !mFolder.isFull() && item != mInfo && !mInfo.opened);
     }
 
     public boolean acceptDrop(Object dragInfo) {
@@ -345,8 +341,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         mFolderRingAnimator.animateToAcceptState();
         layout.showFolderAccept(mFolderRingAnimator);
         mOpenAlarm.setOnAlarmListener(mOnOpenListener);
-        if (SPRING_LOADING_ENABLED &&
-                ((dragInfo instanceof AppInfo) || (dragInfo instanceof ShortcutInfo))) {
+        if (SPRING_LOADING_ENABLED && ((dragInfo instanceof AppInfo) || (dragInfo instanceof ShortcutInfo))) {
             // TODO: we currently don't support spring-loading for PendingAddShortcutInfos even
             // though widget-style shortcuts can be added to folders. The issue is that we need
             // to deal with configuration activities which are currently handled in
@@ -356,8 +351,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         mDragInfo = (ItemInfo) dragInfo;
     }
 
-    public void onDragOver(Object dragInfo) {
-    }
+    public void onDragOver(Object dragInfo) {}
 
     OnAlarmListener mOnOpenListener = new OnAlarmListener() {
         public void onAlarm(Alarm alarm) {
@@ -376,14 +370,12 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         }
     };
 
-    public void performCreateAnimation(final ShortcutInfo destInfo, final View destView,
-            final ShortcutInfo srcInfo, final DragView srcView, Rect dstRect,
-            float scaleRelativeToDragLayer, Runnable postAnimationRunnable) {
+    public void performCreateAnimation(final ShortcutInfo destInfo, final View destView, final ShortcutInfo srcInfo,
+            final DragView srcView, Rect dstRect, float scaleRelativeToDragLayer, Runnable postAnimationRunnable) {
 
         // These correspond two the drawable and view that the icon was dropped _onto_
         Drawable animateDrawable = getTopDrawable((TextView) destView);
-        computePreviewDrawingParams(animateDrawable.getIntrinsicWidth(),
-                destView.getMeasuredWidth());
+        computePreviewDrawingParams(animateDrawable.getIntrinsicWidth(), destView.getMeasuredWidth());
 
         // This will animate the first item from it's position as an icon into its
         // position as the first item in the preview
@@ -396,13 +388,11 @@ public class FolderIcon extends FrameLayout implements FolderListener {
 
     public void performDestroyAnimation(final View finalView, Runnable onCompleteRunnable) {
         Drawable animateDrawable = getTopDrawable((TextView) finalView);
-        computePreviewDrawingParams(animateDrawable.getIntrinsicWidth(),
-                finalView.getMeasuredWidth());
+        computePreviewDrawingParams(animateDrawable.getIntrinsicWidth(), finalView.getMeasuredWidth());
 
         // This will animate the first item from it's position as an icon into its
         // position as the first item in the preview
-        animateFirstItem(animateDrawable, FINAL_ITEM_ANIMATION_DURATION, true,
-                onCompleteRunnable);
+        animateFirstItem(animateDrawable, FINAL_ITEM_ANIMATION_DURATION, true, onCompleteRunnable);
     }
 
     public void onDragExit(Object dragInfo) {
@@ -414,9 +404,8 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         mOpenAlarm.cancelAlarm();
     }
 
-    private void onDrop(final ShortcutInfo item, DragView animateView, Rect finalRect,
-            float scaleRelativeToDragLayer, int index, Runnable postAnimationRunnable,
-            DragObject d) {
+    private void onDrop(final ShortcutInfo item, DragView animateView, Rect finalRect, float scaleRelativeToDragLayer,
+            int index, Runnable postAnimationRunnable, DragObject d) {
         item.cellX = -1;
         item.cellY = -1;
 
@@ -449,15 +438,13 @@ public class FolderIcon extends FrameLayout implements FolderListener {
             center[0] = (int) Math.round(scaleRelativeToDragLayer * center[0]);
             center[1] = (int) Math.round(scaleRelativeToDragLayer * center[1]);
 
-            to.offset(center[0] - animateView.getMeasuredWidth() / 2,
-                      center[1] - animateView.getMeasuredHeight() / 2);
+            to.offset(center[0] - animateView.getMeasuredWidth() / 2, center[1] - animateView.getMeasuredHeight() / 2);
 
             float finalAlpha = index < NUM_ITEMS_IN_PREVIEW ? 0.5f : 0f;
 
             float finalScale = scale * scaleRelativeToDragLayer;
-            dragLayer.animateView(animateView, from, to, finalAlpha,
-                    1, 1, finalScale, finalScale, DROP_IN_ANIMATION_DURATION,
-                    new DecelerateInterpolator(2), new AccelerateInterpolator(2),
+            dragLayer.animateView(animateView, from, to, finalAlpha, 1, 1, finalScale, finalScale,
+                    DROP_IN_ANIMATION_DURATION, new DecelerateInterpolator(2), new AccelerateInterpolator(2),
                     postAnimationRunnable, DragLayer.ANIMATION_END_DISAPPEAR, null);
             addItem(item);
             mHiddenItems.add(item);
@@ -498,7 +485,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
             final int previewPadding = FolderRingAnimator.sPreviewPadding;
 
             mAvailableSpaceInPreview = (previewSize - 2 * previewPadding);
-            // cos(45) = 0.707  + ~= 0.1) = 0.8f
+            // cos(45) = 0.707 + ~= 0.1) = 0.8f
             int adjustedAvailableSpace = (int) ((mAvailableSpaceInPreview / 2) * (1 + 0.8f));
 
             int unscaledHeight = (int) (mIntrinsicIconSize * (1 + PERSPECTIVE_SHIFT_FACTOR));
@@ -524,6 +511,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
             this.scale = scale;
             this.overlayAlpha = overlayAlpha;
         }
+
         float transX;
         float transY;
         float scale;
@@ -544,8 +532,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         return mParams.scale;
     }
 
-    private PreviewItemDrawingParams computePreviewItemDrawingParams(int index,
-            PreviewItemDrawingParams params) {
+    private PreviewItemDrawingParams computePreviewItemDrawingParams(int index, PreviewItemDrawingParams params) {
         index = NUM_ITEMS_IN_PREVIEW - index - 1;
         float r = (index * 1.0f) / (NUM_ITEMS_IN_PREVIEW - 1);
         float scale = (1 - PERSPECTIVE_SCALE_FACTOR * (1 - r));
@@ -588,8 +575,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
                 d.draw(canvas);
                 fd.setBrightness(oldBrightness);
             } else {
-                d.setColorFilter(Color.argb(params.overlayAlpha, 255, 255, 255),
-                        PorterDuff.Mode.SRC_ATOP);
+                d.setColorFilter(Color.argb(params.overlayAlpha, 255, 255, 255), PorterDuff.Mode.SRC_ATOP);
                 d.draw(canvas);
                 d.clearColorFilter();
             }
@@ -649,7 +635,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         mAnimParams.drawable = d;
 
         ValueAnimator va = LauncherAnimUtils.ofFloat(this, 0f, 1.0f);
-        va.addUpdateListener(new AnimatorUpdateListener(){
+        va.addUpdateListener(new AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
                 float progress = (Float) animation.getAnimatedValue();
                 if (reverse) {
@@ -668,6 +654,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
             public void onAnimationStart(Animator animation) {
                 mAnimating = true;
             }
+
             @Override
             public void onAnimationEnd(Animator animation) {
                 mAnimating = false;
@@ -709,8 +696,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
 
     public void onTitleChanged(CharSequence title) {
         mFolderName.setText(title.toString());
-        setContentDescription(String.format(getContext().getString(R.string.folder_name_format),
-                title));
+        setContentDescription(String.format(getContext().getString(R.string.folder_name_format), title));
     }
 
     @Override
