@@ -74,7 +74,7 @@ public class LauncherProvider extends ContentProvider {
     private static final boolean LOGD = true;
 
     private static final String DATABASE_NAME = "launcher.db";
-
+    // v2.1
     private static final int DATABASE_VERSION = 21;
 
     static final String OLD_AUTHORITY = "com.android.launcher2.settings";
@@ -151,7 +151,9 @@ public class LauncherProvider extends ContentProvider {
         if (values == null) {
             throw new RuntimeException("Error: attempting to insert null values");
         }
+        // {@v2.1
         if (!table.equals(AppTypeTable.TABLE_APPTYPE)) {
+            // @}
             if (!values.containsKey(LauncherSettings.ChangeLogColumns._ID)) {
                 throw new RuntimeException("Error: attempting to add item without specifying an id");
             }
@@ -411,7 +413,7 @@ public class LauncherProvider extends ContentProvider {
         private static final String ATTR_ICON = "icon";
         private static final String ATTR_TITLE = "title";
         private static final String ATTR_URI = "uri";
-
+        // v2.1
         private static final String ATTR_APPTYPE = "appType";
 
         // Style attrs -- "Include"
@@ -478,7 +480,7 @@ public class LauncherProvider extends ContentProvider {
                     + "modified INTEGER NOT NULL DEFAULT 0," + "restored INTEGER NOT NULL DEFAULT 0,"
                     + "profileId INTEGER DEFAULT " + userSerialNumber + ");");
             addWorkspacesTable(db);
-
+            // v2.1
             addAppTypeTable(db);
 
             // Database was just created, so wipe any previous widgets
@@ -526,6 +528,7 @@ public class LauncherProvider extends ContentProvider {
                     + LauncherSettings.ChangeLogColumns.MODIFIED + " INTEGER NOT NULL DEFAULT 0" + ");");
         }
 
+        // v2.1
         private void addAppTypeTable(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + AppTypeTable.TABLE_APPTYPE + " (" + AppTypeTable.ID
                     + " INTEGER PRIMARY KEY AUTOINCREMENT," + AppTypeTable.APPTYPE + " TEXT,"
@@ -881,7 +884,7 @@ public class LauncherProvider extends ContentProvider {
                 Log.w(TAG, "Destroying all old data.");
                 db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAVORITES);
                 db.execSQL("DROP TABLE IF EXISTS " + TABLE_WORKSPACE_SCREENS);
-                // version = 21
+                // v2.1 version = 21
                 db.execSQL("DROP TABLE IF EXISTS " + AppTypeTable.TABLE_APPTYPE);
 
                 onCreate(db);
@@ -1673,6 +1676,7 @@ public class LauncherProvider extends ContentProvider {
             return true;
         }
 
+        // v2.1
         private long addInfoToDb(SQLiteDatabase db, final ContentValues childValues, AppTypeModel model) {
             ComponentName cn = new ComponentName(model.packageName, model.className);
             final Intent intent = buildMainIntent();
@@ -1682,7 +1686,7 @@ public class LauncherProvider extends ContentProvider {
         }
 
         private long addAppShortcut(SQLiteDatabase db, ContentValues values, XmlResourceParser parser) {
-
+            // {@ v2.1
             String appType = getAttributeValue(parser, ATTR_APPTYPE);
             if (!TextUtils.isEmpty(appType)) {
                 AppTypeModel model = AppTypeTable.queryByAppType(mContext, appType);
@@ -1691,6 +1695,7 @@ public class LauncherProvider extends ContentProvider {
                 }
                 return -1;
             }
+            // @}
 
             final String packageName = getAttributeValue(parser, ATTR_PACKAGE_NAME);
             final String className = getAttributeValue(parser, ATTR_CLASS_NAME);

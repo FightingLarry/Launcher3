@@ -1,8 +1,9 @@
 package com.dh.home;
 
 /**
- * Created by DemonHunter on 2016/2/2.
+ * // v2.1 Created by DemonHunter on 2016/2/2.
  */
+
 public class AppTypeModel {
 
     public String appType;

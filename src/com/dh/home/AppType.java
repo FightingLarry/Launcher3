@@ -1,5 +1,6 @@
 package com.dh.home;
 
+// v2.1
 public enum AppType {
     /** Hotseat */
     PHONE("PHONE"), CONTACTS("CONTACTS"), BROWSER("BROWSER"), MMS("MMS"), //

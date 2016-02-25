@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <favorites xmlns:launcher="http://schemas.android.com/apk/res-auto/com.android.launcher3">
-
+    <!--v2.1-->
     <appwidget
         launcher:className="com.android.alarmclock.AnalogAppWidgetProvider"
         launcher:packageName="com.android.deskclock"

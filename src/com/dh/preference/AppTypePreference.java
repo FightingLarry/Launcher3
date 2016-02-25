@@ -3,6 +3,7 @@ package com.dh.preference;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+// v2.1
 public class AppTypePreference {
 
     private static final String TAG = "AppTypePreference";

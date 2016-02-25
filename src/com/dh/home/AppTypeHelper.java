@@ -19,7 +19,7 @@ import android.text.TextUtils;
 
 import com.dh.preference.AppTypePreference;
 
-
+// v2.1
 public class AppTypeHelper {
 
     private static final String QUERYINTENT_PHONE =
