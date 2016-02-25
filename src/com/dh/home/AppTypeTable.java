@@ -32,9 +32,11 @@ public class AppTypeTable {
 
     public static final String MODIFIED = "modified";
 
-    public static AppTypeModel queryByPackage(Context context, String packageName) {
-        String[] selectionArgs = {packageName};
-        List<AppTypeModel> models = query(context, null, PACKAGENAME + "=? ", selectionArgs, null);
+    // v3.0
+    public static AppTypeModel queryByPackageClassName(Context context, String packageName, String className) {
+        String[] selectionArgs = {packageName, className};
+        List<AppTypeModel> models =
+                query(context, null, PACKAGENAME + "=? AND " + CLASSNAME + "=? ", selectionArgs, null);
         if (models != null && models.size() > 0) {
             return models.get(0);
         }

@@ -14,6 +14,26 @@
 
 package com.android.launcher3;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
@@ -85,13 +105,11 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Interpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Advanceable;
 import android.widget.FrameLayout;
@@ -109,36 +127,17 @@ import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
 import com.android.launcher3.compat.UserHandleCompat;
 import com.android.launcher3.compat.UserManagerCompat;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * Default launcher application.
  */
 public class Launcher extends Activity
         implements
-            View.OnClickListener,
-            OnLongClickListener,
-            LauncherModel.Callbacks,
-            View.OnTouchListener,
-            PageSwitchListener,
-            LauncherProviderChangeListener {
+        View.OnClickListener,
+        OnLongClickListener,
+        LauncherModel.Callbacks,
+        View.OnTouchListener,
+        PageSwitchListener,
+        LauncherProviderChangeListener {
     static final String TAG = "Launcher";
     static final boolean LOGD = true;
 
@@ -223,11 +222,16 @@ public class Launcher extends Activity
     public static final boolean SHOW_WEIGHT_WATCHER_DEFAULT = false;
 
     public static final String USER_HAS_MIGRATED = "launcher.user_migrated_from_old_data";
+    private int mCalenderdate;
 
-    /** The different states that Launcher can be in. */
+    /**
+     * The different states that Launcher can be in.
+     */
     private enum State {
         NONE, WORKSPACE, APPS_CUSTOMIZE, APPS_CUSTOMIZE_SPRING_LOADED
-    };
+    }
+
+    ;
 
     private State mState = State.WORKSPACE;
     private AnimatorSet mStateAnimation;
@@ -498,10 +502,51 @@ public class Launcher extends Activity
         }
     }
 
-    @Override
-    public void onLauncherProviderChange() {}
+    //v3.0
+    private void registerTimeTickReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_TIME_TICK);
+        filter.addAction(Intent.ACTION_TIME_CHANGED);
+        filter.addAction(Intent.ACTION_DATE_CHANGED);
+        filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+        registerReceiver(mTimeTickReceiver, filter);
 
-    /** To be overriden by subclasses to hint to Launcher that we have custom content */
+    }
+
+    //v3.0
+    private void unregisterTimeTickReceiver() {
+        unregisterReceiver(mTimeTickReceiver);
+    }
+
+    //v3.0
+    private final BroadcastReceiver mTimeTickReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (Intent.ACTION_TIME_TICK.equals(action) || Intent.ACTION_DATE_CHANGED.equals(action)
+                    || Intent.ACTION_TIME_CHANGED.equals(action) || Intent.ACTION_TIMEZONE_CHANGED.equals(action)) {
+                updateCalendarOrTimeView();
+            }
+        }
+    };
+
+    //v3.0
+    private void updateCalendarOrTimeView() {
+        Calendar calendar = Calendar.getInstance();
+        int date = calendar.get(Calendar.DAY_OF_MONTH);
+        if (date != mCalenderdate) {
+            mModel.updateCalendarPkg(this);
+            mCalenderdate = date;
+        }
+    }
+
+    @Override
+    public void onLauncherProviderChange() {
+    }
+
+    /**
+     * To be overriden by subclasses to hint to Launcher that we have custom content
+     */
     protected boolean hasCustomContentToLeft() {
         return false;
     }
@@ -511,7 +556,8 @@ public class Launcher extends Activity
      * {@link #addToCustomContentPage}. This will only be invoked if
      * {@link #hasCustomContentToLeft()} is {@code true}.
      */
-    protected void populateCustomContentContainer() {}
+    protected void populateCustomContentContainer() {
+    }
 
     /**
      * Invoked by subclasses to signal a change to the {@link #addCustomContentToLeft} value to
@@ -687,7 +733,7 @@ public class Launcher extends Activity
         } else {
             // View.generateViewId() is not available. The following fallback logic is a copy
             // of its implementation.
-            for (;;) {
+            for (; ; ) {
                 final int result = sNextGeneratedId.get();
                 // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
                 int newValue = result + 1;
@@ -1036,6 +1082,10 @@ public class Launcher extends Activity
         mWorkspace.onResume();
 
         PackageInstallerCompat.getInstance(this).onResume();
+        //{@v3.0
+        registerTimeTickReceiver();
+        updateCalendarOrTimeView();
+        //@}
     }
 
     @Override
@@ -1054,6 +1104,8 @@ public class Launcher extends Activity
         if (mWorkspace.getCustomContentCallbacks() != null) {
             mWorkspace.getCustomContentCallbacks().onHide();
         }
+        //v3.0
+        unregisterTimeTickReceiver();
     }
 
     QSBScroller mQsbScroller = new QSBScroller() {
@@ -1363,7 +1415,6 @@ public class Launcher extends Activity
      * Creates a view representing a shortcut.
      *
      * @param info The data structure describing the shortcut.
-     *
      * @return A View inflated from R.layout.application.
      */
     View createShortcut(ShortcutInfo info) {
@@ -1375,9 +1426,8 @@ public class Launcher extends Activity
      * Creates a view representing a shortcut inflated from the specified resource.
      *
      * @param layoutResId The id of the XML layout used to create the shortcut.
-     * @param parent The group the shortcut belongs to.
-     * @param info The data structure describing the shortcut.
-     *
+     * @param parent      The group the shortcut belongs to.
+     * @param info        The data structure describing the shortcut.
      * @return A View inflated from layoutResId.
      */
     View createShortcut(int layoutResId, ViewGroup parent, ShortcutInfo info) {
@@ -1391,7 +1441,7 @@ public class Launcher extends Activity
     /**
      * Add a shortcut to the workspace.
      *
-     * @param data The intent describing the shortcut.
+     * @param data     The intent describing the shortcut.
      * @param cellInfo The position on screen where to create the shortcut.
      */
     private void completeAddShortcut(Intent data, long container, long screenId, int cellX, int cellY) {
@@ -1471,10 +1521,10 @@ public class Launcher extends Activity
      * Add a widget to the workspace.
      *
      * @param appWidgetId The app widget id
-     * @param cellInfo The position on screen where to create the widget.
+     * @param cellInfo    The position on screen where to create the widget.
      */
     private void completeAddAppWidget(final int appWidgetId, long container, long screenId, AppWidgetHostView hostView,
-            AppWidgetProviderInfo appWidgetInfo) {
+                                      AppWidgetProviderInfo appWidgetInfo) {
         if (appWidgetInfo == null) {
             appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
         }
@@ -1644,7 +1694,8 @@ public class Launcher extends Activity
                 Log.w(TAG, "IllegalArgumentException while setting up transparent bars");
             } catch (InvocationTargetException e) {
                 Log.w(TAG, "InvocationTargetException while setting up transparent bars");
-            } finally {}
+            } finally {
+            }
         }
     }
 
@@ -2030,8 +2081,8 @@ public class Launcher extends Activity
      * Start a text search.
      *
      * @return {@code true} if the search will start immediately, so any further keypresses will be
-     *         handled directly by the search UI. {@code false} if {@link Launcher} should continue
-     *         to buffer keypresses.
+     * handled directly by the search UI. {@code false} if {@link Launcher} should continue
+     * to buffer keypresses.
      */
     public boolean startSearch(String initialQuery, boolean selectInitialQuery, Bundle appSearchData, Rect sourceBounds) {
         startGlobalSearch(initialQuery, selectInitialQuery, appSearchData, sourceBounds);
@@ -2042,7 +2093,7 @@ public class Launcher extends Activity
      * Starts the global search activity. This code is a copied from SearchManager
      */
     private void startGlobalSearch(String initialQuery, boolean selectInitialQuery, Bundle appSearchData,
-            Rect sourceBounds) {
+                                   Rect sourceBounds) {
         final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         ComponentName globalSearchActivity = searchManager.getGlobalSearchActivity();
         if (globalSearchActivity == null) {
@@ -2130,7 +2181,8 @@ public class Launcher extends Activity
         }
     }
 
-    protected void onWorkspaceLockedChanged() {}
+    protected void onWorkspaceLockedChanged() {
+    }
 
     private void resetAddInfo() {
         mPendingAddInfo.container = ItemInfo.NO_ID;
@@ -2142,12 +2194,12 @@ public class Launcher extends Activity
     }
 
     void addAppWidgetImpl(final int appWidgetId, final ItemInfo info, final AppWidgetHostView boundWidget,
-            final AppWidgetProviderInfo appWidgetInfo) {
+                          final AppWidgetProviderInfo appWidgetInfo) {
         addAppWidgetImpl(appWidgetId, info, boundWidget, appWidgetInfo, 0);
     }
 
     void addAppWidgetImpl(final int appWidgetId, final ItemInfo info, final AppWidgetHostView boundWidget,
-            final AppWidgetProviderInfo appWidgetInfo, int delay) {
+                          final AppWidgetProviderInfo appWidgetInfo, int delay) {
         if (appWidgetInfo.configure != null) {
             mPendingAddWidgetInfo = appWidgetInfo;
             mPendingAddWidgetId = appWidgetId;
@@ -2180,9 +2232,9 @@ public class Launcher extends Activity
      * Process a shortcut drop.
      *
      * @param componentName The name of the component
-     * @param screenId The ID of the screen where it should be added
-     * @param cell The cell it should be added to, optional
-     * @param position The location on the screen where it was dropped, optional
+     * @param screenId      The ID of the screen where it should be added
+     * @param cell          The cell it should be added to, optional
+     * @param position      The location on the screen where it was dropped, optional
      */
     void processShortcutFromDrop(ComponentName componentName, long container, long screenId, int[] cell, int[] loc) {
         resetAddInfo();
@@ -2203,13 +2255,13 @@ public class Launcher extends Activity
     /**
      * Process a widget drop.
      *
-     * @param info The PendingAppWidgetInfo of the widget being added.
+     * @param info     The PendingAppWidgetInfo of the widget being added.
      * @param screenId The ID of the screen where it should be added
-     * @param cell The cell it should be added to, optional
+     * @param cell     The cell it should be added to, optional
      * @param position The location on the screen where it was dropped, optional
      */
     void addAppWidgetFromDrop(PendingAddWidgetInfo info, long container, long screenId, int[] cell, int[] span,
-            int[] loc) {
+                              int[] loc) {
         resetAddInfo();
         mPendingAddInfo.container = info.container = container;
         mPendingAddInfo.screenId = info.screenId = screenId;
@@ -2494,7 +2546,7 @@ public class Launcher extends Activity
     }
 
     private void showBrokenAppInstallDialog(final String packageName,
-            DialogInterface.OnClickListener onSearchClickListener) {
+                                            DialogInterface.OnClickListener onSearchClickListener) {
         new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault))
                 .setTitle(R.string.abandoned_promises_title).setMessage(R.string.abandoned_promise_explanation)
                 .setPositiveButton(R.string.abandoned_search, onSearchClickListener)
@@ -2677,13 +2729,15 @@ public class Launcher extends Activity
         return mHapticFeedbackTouchListener;
     }
 
-    public void onDragStarted(View view) {}
+    public void onDragStarted(View view) {
+    }
 
     /**
      * Called when the user stops interacting with the launcher. This implies that the user is now
      * on the homescreen and is not doing housekeeping.
      */
-    protected void onInteractionEnd() {}
+    protected void onInteractionEnd() {
+    }
 
     /**
      * Called when the user starts interacting with the launcher. The possible interactions are: -
@@ -2691,7 +2745,8 @@ public class Launcher extends Activity
      * time to stop doing things that only make sense when the user is on the homescreen and not
      * doing housekeeping.
      */
-    protected void onInteractionBegin() {}
+    protected void onInteractionBegin() {
+    }
 
     void startApplicationDetailsActivity(ComponentName componentName, UserHandleCompat user) {
         String packageName = componentName.getPackageName();
@@ -2966,7 +3021,8 @@ public class Launcher extends Activity
         View itemUnderLongClick = null;
         if (v.getTag() instanceof ItemInfo) {
             ItemInfo info = (ItemInfo) v.getTag();
-            longClickCellInfo = new CellLayout.CellInfo(v, info);;
+            longClickCellInfo = new CellLayout.CellInfo(v, info);
+            ;
             itemUnderLongClick = longClickCellInfo.cell;
             resetAddInfo();
         }
@@ -2989,7 +3045,7 @@ public class Launcher extends Activity
                 final boolean isAllAppsButton =
                         inHotseat
                                 && isAllAppsButtonRank(mHotseat.getOrderInHotseat(longClickCellInfo.cellX,
-                                        longClickCellInfo.cellY));
+                                longClickCellInfo.cellY));
                 if (!(itemUnderLongClick instanceof Folder || isAllAppsButton)) {
                     // User long pressed on an item
                     mWorkspace.startDrag(longClickCellInfo);
@@ -3089,7 +3145,7 @@ public class Launcher extends Activity
     }
 
     private void showAppsCustomizeHelper(final boolean animated, final boolean springLoaded,
-            final AppsCustomizePagedView.ContentType contentType) {
+                                         final AppsCustomizePagedView.ContentType contentType) {
         if (mStateAnimation != null) {
             mStateAnimation.setDuration(0);
             mStateAnimation.cancel();
@@ -3318,11 +3374,11 @@ public class Launcher extends Activity
     /**
      * Zoom the camera back into the workspace, hiding 'fromView'. This is the opposite of
      * showAppsCustomizeHelper.
-     * 
+     *
      * @param animated If true, the transition will be animated.
      */
     private void hideAppsCustomizeHelper(Workspace.State toState, final boolean animated, final boolean springLoaded,
-            final Runnable onCompleteRunnable) {
+                                         final Runnable onCompleteRunnable) {
 
         if (mStateAnimation != null) {
             mStateAnimation.setDuration(0);
@@ -3618,7 +3674,8 @@ public class Launcher extends Activity
         onWorkspaceShown(animated);
     }
 
-    public void onWorkspaceShown(boolean animated) {}
+    public void onWorkspaceShown(boolean animated) {
+    }
 
     void showAllApps(boolean animated, AppsCustomizePagedView.ContentType contentType, boolean resetPageToZero) {
         if (mState != State.WORKSPACE) return;
@@ -3720,7 +3777,9 @@ public class Launcher extends Activity
         }
     }
 
-    /** Maps the current orientation to an index for referencing orientation correct global icons */
+    /**
+     * Maps the current orientation to an index for referencing orientation correct global icons
+     */
     private int getCurrentOrientationIndexForGlobalIcons() {
         // default - 0, landscape - 1
         switch (getResources().getConfiguration().orientation) {
@@ -3755,7 +3814,7 @@ public class Launcher extends Activity
 
     // if successful in getting icon, return it; otherwise, set button to use default drawable
     private Drawable.ConstantState updateTextButtonWithIconFromExternalActivity(int buttonId,
-            ComponentName activityName, int fallbackDrawableId, String toolbarResourceName) {
+                                                                                ComponentName activityName, int fallbackDrawableId, String toolbarResourceName) {
         Drawable toolbarIcon = getExternalPackageToolbarIcon(activityName, toolbarResourceName);
         Resources r = getResources();
         int w = r.getDimensionPixelSize(R.dimen.toolbar_external_icon_width);
@@ -3781,7 +3840,7 @@ public class Launcher extends Activity
 
     // if successful in getting icon, return it; otherwise, set button to use default drawable
     private Drawable.ConstantState updateButtonWithIconFromExternalActivity(int buttonId, ComponentName activityName,
-            int fallbackDrawableId, String toolbarResourceName) {
+                                                                            int fallbackDrawableId, String toolbarResourceName) {
         ImageView button = (ImageView) findViewById(buttonId);
         Drawable toolbarIcon = getExternalPackageToolbarIcon(activityName, toolbarResourceName);
 
@@ -3978,21 +4037,22 @@ public class Launcher extends Activity
     /**
      * If the activity is currently paused, signal that we need to run the passed Runnable in
      * onResume.
-     *
+     * <p/>
      * This needs to be called from incoming places where resources might have been loaded while we
      * are paused. That is becaues the Configuration might be wrong when we're not running, and if
      * it comes back to what it was when we were paused, we are not restarted.
-     *
+     * <p/>
      * Implementation of the method from LauncherModel.Callbacks.
      *
      * @return true if we are currently paused. The caller might be able to skip some work in that
-     *         case since we will come back again.
+     * case since we will come back again.
      */
     private boolean waitUntilResume(Runnable run, boolean deletePreviousRunnables) {
         if (mPaused) {
             Log.i(TAG, "Deferring update until onResume");
             if (deletePreviousRunnables) {
-                while (mBindOnResumeCallbacks.remove(run)) {}
+                while (mBindOnResumeCallbacks.remove(run)) {
+                }
             }
             mBindOnResumeCallbacks.add(run);
             return true;
@@ -4011,15 +4071,15 @@ public class Launcher extends Activity
 
     /**
      * If the activity is currently paused, signal that we need to re-run the loader in onResume.
-     *
+     * <p/>
      * This needs to be called from incoming places where resources might have been loaded while we
      * are paused. That is becaues the Configuration might be wrong when we're not running, and if
      * it comes back to what it was when we were paused, we are not restarted.
-     *
+     * <p/>
      * Implementation of the method from LauncherModel.Callbacks.
      *
      * @return true if we are currently paused. The caller might be able to skip some work in that
-     *         case since we will come back again.
+     * case since we will come back again.
      */
     public boolean setLoadOnResume() {
         if (mPaused) {
@@ -4044,7 +4104,7 @@ public class Launcher extends Activity
 
     /**
      * Refreshes the shortcuts shown on the workspace.
-     *
+     * <p/>
      * Implementation of the method from LauncherModel.Callbacks.
      */
     public void startBinding() {
@@ -4118,7 +4178,7 @@ public class Launcher extends Activity
     }
 
     public void bindAppsAdded(final ArrayList<Long> newScreens, final ArrayList<ItemInfo> addNotAnimated,
-            final ArrayList<ItemInfo> addAnimated, final ArrayList<AppInfo> addedApps) {
+                              final ArrayList<ItemInfo> addAnimated, final ArrayList<AppInfo> addedApps) {
         Runnable r = new Runnable() {
             public void run() {
                 bindAppsAdded(newScreens, addNotAnimated, addAnimated, addedApps);
@@ -4152,11 +4212,11 @@ public class Launcher extends Activity
 
     /**
      * Bind the items start-end from the list.
-     *
+     * <p/>
      * Implementation of the method from LauncherModel.Callbacks.
      */
     public void bindItems(final ArrayList<ItemInfo> shortcuts, final int start, final int end,
-            final boolean forceAnimateIcons) {
+                          final boolean forceAnimateIcons) {
         Runnable r = new Runnable() {
             public void run() {
                 bindItems(shortcuts, start, end, forceAnimateIcons);
@@ -4275,7 +4335,7 @@ public class Launcher extends Activity
 
     /**
      * Add the views for a widget to the workspace.
-     *
+     * <p/>
      * Implementation of the method from LauncherModel.Callbacks.
      */
     public void bindAppWidget(final LauncherAppWidgetInfo item) {
@@ -4378,7 +4438,7 @@ public class Launcher extends Activity
      * Restores a pending widget.
      *
      * @param appWidgetId The app widget id
-     * @param cellInfo The position on screen where to create the widget.
+     * @param cellInfo    The position on screen where to create the widget.
      */
     private void completeRestoreAppWidget(final int appWidgetId) {
         LauncherAppWidgetHostView view = mWorkspace.getWidgetForAppWidgetId(appWidgetId);
@@ -4400,7 +4460,7 @@ public class Launcher extends Activity
 
     /**
      * Callback saying that there aren't any more items to bind.
-     *
+     * <p/>
      * Implementation of the method from LauncherModel.Callbacks.
      */
     public void finishBindingItems(final boolean upgradePath) {
@@ -4501,7 +4561,7 @@ public class Launcher extends Activity
 
     /**
      * Add the icons for all apps.
-     *
+     * <p/>
      * Implementation of the method from LauncherModel.Callbacks.
      */
     public void bindAllApplications(final ArrayList<AppInfo> apps) {
@@ -4526,7 +4586,7 @@ public class Launcher extends Activity
 
     /**
      * A package was updated.
-     *
+     * <p/>
      * Implementation of the method from LauncherModel.Callbacks.
      */
     public void bindAppsUpdated(final ArrayList<AppInfo> apps) {
@@ -4568,7 +4628,7 @@ public class Launcher extends Activity
 
     /**
      * Update the state of a package, typically related to install state.
-     *
+     * <p/>
      * Implementation of the method from LauncherModel.Callbacks.
      */
     @Override
@@ -4580,7 +4640,7 @@ public class Launcher extends Activity
 
     /**
      * Update the label and icon of all the icons in a package
-     *
+     * <p/>
      * Implementation of the method from LauncherModel.Callbacks.
      */
     @Override
@@ -4595,11 +4655,11 @@ public class Launcher extends Activity
      * applications to remove, the reason being that this can be called when a package is updated as
      * well. In that scenario, we only remove specific components from the workspace, where as
      * package-removal should clear all items by package name.
-     *
+     * <p/>
      * Implementation of the method from LauncherModel.Callbacks.
      */
     public void bindComponentsRemoved(final ArrayList<String> packageNames, final ArrayList<AppInfo> appInfos,
-            final UserHandleCompat user) {
+                                      final UserHandleCompat user) {
         Runnable r = new Runnable() {
             public void run() {
                 bindComponentsRemoved(packageNames, appInfos, user);
@@ -4912,7 +4972,7 @@ public class Launcher extends Activity
     }
 
     public ItemInfo createShortcutDragInfo(Intent shortcutIntent, CharSequence caption, Bitmap icon,
-            UserHandleCompat user) {
+                                           UserHandleCompat user) {
         UserManagerCompat userManager = UserManagerCompat.getInstance(this);
         CharSequence contentDescription = userManager.getBadgedLabelForUser(caption, user);
         return new ShortcutInfo(shortcutIntent, caption, contentDescription, icon, user);
@@ -4929,7 +4989,8 @@ public class Launcher extends Activity
     }
 
     @Override
-    public void onPageSwitch(View newPage, int newPageIndex) {}
+    public void onPageSwitch(View newPage, int newPageIndex) {
+    }
 
     /**
      * Prints out out state for debugging.

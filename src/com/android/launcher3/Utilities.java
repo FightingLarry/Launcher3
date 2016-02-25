@@ -16,6 +16,9 @@
 
 package com.android.launcher3;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -44,8 +47,6 @@ import android.util.SparseArray;
 import android.view.View;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 /**
  * Various utilities shared amongst the Launcher's classes.
  */
@@ -64,7 +65,8 @@ public final class Utilities {
         sCanvas.setDrawFilter(new PaintFlagsDrawFilter(Paint.DITHER_FLAG,
                 Paint.FILTER_BITMAP_FLAG));
     }
-    static int sColors[] = { 0xffff0000, 0xff00ff00, 0xff0000ff };
+
+    static int sColors[] = {0xffff0000, 0xff00ff00, 0xff0000ff};
     static int sColorIndex = 0;
 
     static int[] sLoc0 = new int[2];
@@ -180,8 +182,8 @@ public final class Utilities {
             final Canvas canvas = sCanvas;
             canvas.setBitmap(bitmap);
 
-            final int left = (textureWidth-width) / 2;
-            final int top = (textureHeight-height) / 2;
+            final int left = (textureWidth - width) / 2;
+            final int top = (textureHeight - height) / 2;
 
             @SuppressWarnings("all") // suppress dead code warning
             final boolean debug = false;
@@ -191,11 +193,11 @@ public final class Utilities {
                 if (++sColorIndex >= sColors.length) sColorIndex = 0;
                 Paint debugPaint = new Paint();
                 debugPaint.setColor(0xffcccc00);
-                canvas.drawRect(left, top, left+width, top+height, debugPaint);
+                canvas.drawRect(left, top, left + width, top + height, debugPaint);
             }
 
             sOldBounds.set(icon.getBounds());
-            icon.setBounds(left, top, left+width, top+height);
+            icon.setBounds(left, top, left + width, top + height);
             icon.draw(canvas);
             icon.setBounds(sOldBounds);
             canvas.setBitmap(null);
@@ -204,14 +206,43 @@ public final class Utilities {
         }
     }
 
+    //v3.0
+    public static Bitmap createCalendarIconBitmap(Drawable icon, Context context) {
+        Bitmap calendarIcon = createIconBitmap(icon, context);
+        String dayString = String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+
+        synchronized (sCanvas) {
+            final Canvas canvas = sCanvas;
+            canvas.setBitmap(calendarIcon);
+
+            final float mDensity = context.getResources().getDisplayMetrics().density;
+            Paint mDatePaint = new Paint();
+            mDatePaint.setTextSize((int) 30F * mDensity);
+            mDatePaint.setColor(Color.WHITE);
+            mDatePaint.setAntiAlias(true);
+
+            Rect rect = new Rect();
+            mDatePaint.getTextBounds(dayString, 0, dayString.length(), rect);
+            int width1 = rect.right - rect.left;
+            int height1 = rect.bottom - rect.top;
+            int width2 = calendarIcon.getWidth();
+            int height2 = calendarIcon.getHeight();
+
+            canvas.drawText(dayString, (width2 - width1) / 2 - rect.left, (height2 - height1) / 2 - rect.top,
+                    mDatePaint);
+
+            canvas.setBitmap(null);
+            return calendarIcon;
+        }
+    }
+
     /**
      * Returns a Bitmap representing the thumbnail of the specified Bitmap.
      *
-     * @param bitmap The bitmap to get a thumbnail of.
+     * @param bitmap  The bitmap to get a thumbnail of.
      * @param context The application's context.
-     *
      * @return A thumbnail for the specified bitmap or the bitmap itself if the
-     *         thumbnail could not be created.
+     * thumbnail could not be created.
      */
     static Bitmap resampleIconBitmap(Bitmap bitmap, Context context) {
         synchronized (sCanvas) { // we share the statics :-(
@@ -232,14 +263,14 @@ public final class Utilities {
      * Given a coordinate relative to the descendant, find the coordinate in a parent view's
      * coordinates.
      *
-     * @param descendant The descendant to which the passed coordinate is relative.
-     * @param root The root view to make the coordinates relative to.
-     * @param coord The coordinate that we want mapped.
+     * @param descendant        The descendant to which the passed coordinate is relative.
+     * @param root              The root view to make the coordinates relative to.
+     * @param coord             The coordinate that we want mapped.
      * @param includeRootScroll Whether or not to account for the scroll of the descendant:
-     *          sometimes this is relevant as in a child's coordinates within the descendant.
+     *                          sometimes this is relevant as in a child's coordinates within the descendant.
      * @return The factor by which this descendant is scaled relative to this DragLayer. Caution
-     *         this scale factor is assumed to be equal in X and Y, and so if at any point this
-     *         assumption fails, we will need to return a pair of scale factors.
+     * this scale factor is assumed to be equal in X and Y, and so if at any point this
+     * assumption fails, we will need to return a pair of scale factors.
      */
     public static float getDescendantCoordRelativeToParent(View descendant, View root,
                                                            int[] coord, boolean includeRootScroll) {
@@ -248,7 +279,7 @@ public final class Utilities {
         float[] pt = {coord[0], coord[1]};
 
         View v = descendant;
-        while(v != root && v != null) {
+        while (v != root && v != null) {
             ancestorChain.add(v);
             v = (View) v.getParent();
         }
@@ -286,7 +317,7 @@ public final class Utilities {
         float[] pt = {coord[0], coord[1]};
 
         View v = descendant;
-        while(v != root) {
+        while (v != root) {
             ancestorChain.add(v);
             v = (View) v.getParent();
         }
@@ -297,7 +328,7 @@ public final class Utilities {
         int count = ancestorChain.size();
         for (int i = count - 1; i >= 0; i--) {
             View ancestor = ancestorChain.get(i);
-            View next = i > 0 ? ancestorChain.get(i-1) : null;
+            View next = i > 0 ? ancestorChain.get(i - 1) : null;
 
             pt[0] += ancestor.getScrollX();
             pt[1] += ancestor.getScrollY();
@@ -415,7 +446,8 @@ public final class Utilities {
 
     /**
      * This picks a dominant color, looking for high-saturation, high-value, repeated hues.
-     * @param bitmap The bitmap to scan
+     *
+     * @param bitmap  The bitmap to scan
      * @param samples The approximate max number of samples to use.
      */
     static int findDominantColorByHue(Bitmap bitmap, int samples) {
@@ -513,4 +545,6 @@ public final class Utilities {
         }
         return null;
     }
+
+
 }
