@@ -30,11 +30,13 @@ public class AppTypeHelper {
             "#Intent;action=android.intent.action.MAIN;type=vnd.android-dir/mms-sms;launchFlags=0x10000000;end";
     private static final String QUERYINTENT_BROWSER =
             "http://m.baidu.com/?from=1000228o#Intent;action=android.intent.action.VIEW;launchFlags=0x10000000;end";
-
+    // AppType对应的本机应用信息
     private static Map<String, List<ActivityInfo>> sPackageMap = new HashMap<>();
 
+    // 持久化Apptype和本机应用的对应关系，1对1
     public synchronized static void configSystemAppIcon(Context context) {
 
+        // configSystemAppIcon只执行一次。
         if (AppTypePreference.getInstance(context).getHasConfigSystemAppIcon()) {
             return;
         }
@@ -75,6 +77,7 @@ public class AppTypeHelper {
                     }
                 }
             } else {
+                // 得到AppType对应的包名的List
                 infos = matchLoaclAppsByAppType(context, appType.getValue());
             }
             if (infos != null && infos.size() > 0) {
@@ -82,6 +85,7 @@ public class AppTypeHelper {
                     ActivityInfo activityInfo = infos.get(0);
                     saveToDb(context, appType, activityInfo);
                 } else {
+                    // 筛选出唯一的应用，系统应用优先。
                     for (ActivityInfo info : infos) {
                         String packageName = info.packageName;
                         boolean isSystemApp = false;
@@ -94,10 +98,12 @@ public class AppTypeHelper {
                             } catch (NameNotFoundException e) {}
                         }
                         if (isSystemApp) {
+                            // 如果是系统应用，直接持久化
                             saveToDb(context, appType, info);
                             continue next;
                         }
                     }
+                    // 如果不是系统应用，找到list的第一个应用信息，持久化。
                     ActivityInfo activityInfo = infos.get(0);
                     saveToDb(context, appType, activityInfo);
                 }
@@ -117,10 +123,13 @@ public class AppTypeHelper {
     }
 
     synchronized static List<ActivityInfo> matchLoaclAppsByAppType(Context context, String appType) {
+
         if (sPackageMap.isEmpty()) {
             matchLoaclApps(context);
         }
+
         List<ActivityInfo> list = new ArrayList<>();
+        // 多个Apptype，用逗号隔开。
         String[] appTypeArr = appType.split(",");
         for (int i = 0; i < appTypeArr.length; i++) {
             if (!TextUtils.isEmpty(appTypeArr[i])) {
@@ -164,9 +173,11 @@ public class AppTypeHelper {
 
     // v2.1 start
     private static void matchLoaclApps(Context paramContext) {
+        // 查找出本地所有应用
         Intent localIntent = new Intent(Intent.ACTION_MAIN, null);
         localIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> localList = paramContext.getPackageManager().queryIntentActivities(localIntent, 0);
+        // 筛选市场上的应用。
         List<String> matchArrayList = new ArrayList<>();
         matchArrayList.add("com.tcl.mid.android.camera");
         matchArrayList.add("com.android.jrdcamera.CameraLauncher");
@@ -408,15 +419,27 @@ public class AppTypeHelper {
         matchArrayList.clear();
     }
 
+    /**
+     *
+     * @param paramContext
+     * @param localList 手机上所有应用
+     * @param matchArrayList 应用类型对应的市场上的应用
+     * @param appType 应用类型
+     */
     private static void matchLoaclApps(Context paramContext, List<ResolveInfo> localList, List<String> matchArrayList,
             String appType) {
+        // 用于保存匹配的应用信息。
         List<ActivityInfo> localArrayList = new ArrayList<>();
         Iterator<String> collectIterator = matchArrayList.iterator();
+        // 市场上的应用
         while (collectIterator.hasNext()) {
             String collect = collectIterator.next();
             Iterator<ResolveInfo> resolveInfos = localList.iterator();
+            // 本机应用
             while (resolveInfos.hasNext()) {
+                // 本机的一个应用信息
                 ResolveInfo localResolveInfo = resolveInfos.next();
+                // className，packageName
                 if ((collect.equals(localResolveInfo.activityInfo.name))
                         || (collect.equals(localResolveInfo.activityInfo.packageName)))
                     if (!localArrayList.contains(localResolveInfo.activityInfo)) {
