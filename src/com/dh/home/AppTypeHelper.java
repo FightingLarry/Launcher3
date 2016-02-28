@@ -63,6 +63,7 @@ public class AppTypeHelper {
             if (isQueryIntent) {
                 ActivityInfo info = matchLoaclAppsByQueryIntent(context, queryintent);
                 if (info == null) {
+                    // 没有找到匹配的应用，在我们筛选出来的包名里面选一个。
                     infos = matchLoaclAppsByAppType(context, appType.getValue());
                 } else {
                     // lyc 华为手机联系人、电话、短信写在一个程序里面，坑啊。。。
@@ -73,6 +74,7 @@ public class AppTypeHelper {
                             infos.add(info);
                         }
                     } else {
+                        // 通过QueryInten找到了应用
                         infos.add(info);
                     }
                 }
@@ -82,6 +84,7 @@ public class AppTypeHelper {
             }
             if (infos != null && infos.size() > 0) {
                 if (isQueryIntent) {
+                    // 直接取第一个就行。
                     ActivityInfo activityInfo = infos.get(0);
                     saveToDb(context, appType, activityInfo);
                 } else {
@@ -148,19 +151,25 @@ public class AppTypeHelper {
             Iterator<ResolveInfo> localIterator =
                     localPackageManager.queryIntentActivities(Intent.parseUri(queryIntent, 0),
                             PackageManager.MATCH_DEFAULT_ONLY).iterator();
+            // 非系统应用列表
             List<ActivityInfo> unSystemAppList = new ArrayList<ActivityInfo>();
+            // 优先系统应用
             while (localIterator.hasNext()) {
                 ResolveInfo localResolveInfo = localIterator.next();
+                // 不是应用
                 if ((localResolveInfo.activityInfo == null) || (localResolveInfo.activityInfo.applicationInfo == null)) {
                     continue;
                 }
+                // 判断是不是系统应用
                 if ((ApplicationInfo.FLAG_SYSTEM & localResolveInfo.activityInfo.applicationInfo.flags) == 0) {
                     // 不是系统应用
                     unSystemAppList.add(localResolveInfo.activityInfo);
                     continue;
                 }
+                // 想要找的系统应用
                 return localResolveInfo.activityInfo;
             }
+            // 非系统应用找第一个。
             if (unSystemAppList != null && unSystemAppList.size() > 0) {
                 return unSystemAppList.get(0);
             }
