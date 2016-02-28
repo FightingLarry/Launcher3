@@ -41,6 +41,13 @@ public class AppTypeTable {
         return null;
     }
 
+    /**
+     * 通过AppType查找应用信息
+     * 
+     * @param context
+     * @param appType
+     * @return
+     */
     public static AppTypeModel queryByAppType(Context context, String appType) {
         String[] selectionArgs = {appType};
         List<AppTypeModel> models = query(context, null, APPTYPE + "=? ", selectionArgs, null);
@@ -56,10 +63,12 @@ public class AppTypeTable {
         try {
             final ContentResolver contentResolver = context.getContentResolver();
             final Uri uri = CONTENT_URI;
+            // 查找AppTypeTable表
             cursor = contentResolver.query(uri, projection, selection.toString(), selectionArgs, sortOrder);
             List<AppTypeModel> list = new ArrayList<>();
             if (cursor != null && cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
+                    // 存储结果
                     AppTypeModel model = new AppTypeModel();
                     model.appType = cursor.getString(cursor.getColumnIndexOrThrow(APPTYPE));
                     model.packageName = cursor.getString(cursor.getColumnIndexOrThrow(PACKAGENAME));
