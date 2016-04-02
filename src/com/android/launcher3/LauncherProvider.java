@@ -938,7 +938,7 @@ public class LauncherProvider extends ContentProvider {
             try {
                 // Select and iterate through each matching widget
                 c =
-                        db.query(TABLE_FAVORITES, new String[] {Favorites._ID, Favorites.INTENT}, selectWhere, null,
+                        db.query(TABLE_FAVORITES, new String[]{Favorites._ID, Favorites.INTENT}, selectWhere, null,
                                 null, null, null);
                 if (c == null) return false;
 
@@ -1676,7 +1676,7 @@ public class LauncherProvider extends ContentProvider {
             return true;
         }
 
-        // v2.1
+        // v2.1 存入到favorites表中
         private long addInfoToDb(SQLiteDatabase db, final ContentValues childValues, AppTypeModel model) {
             ComponentName cn = new ComponentName(model.packageName, model.className);
             final Intent intent = buildMainIntent();
@@ -1689,6 +1689,7 @@ public class LauncherProvider extends ContentProvider {
             // {@ v2.1
             String appType = getAttributeValue(parser, ATTR_APPTYPE);
             if (!TextUtils.isEmpty(appType)) {
+                // 通过AppType查找应用信息
                 AppTypeModel model = AppTypeTable.queryByAppType(mContext, appType);
                 if (model != null) {
                     return addInfoToDb(db, values, model);
@@ -1730,6 +1731,7 @@ public class LauncherProvider extends ContentProvider {
             }
         }
 
+        //
         private long addAppShortcut(SQLiteDatabase db, ContentValues values, String title, Intent intent) {
             long id = generateNewItemId();
             values.put(Favorites.INTENT, intent.toUri(0));
@@ -1738,6 +1740,7 @@ public class LauncherProvider extends ContentProvider {
             values.put(Favorites.SPANX, 1);
             values.put(Favorites.SPANY, 1);
             values.put(Favorites._ID, id);
+            // 真正的插入到数据库
             if (dbInsertAndCheck(this, db, TABLE_FAVORITES, null, values) < 0) {
                 return -1;
             } else {
