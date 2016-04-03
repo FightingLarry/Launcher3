@@ -76,7 +76,11 @@
         launcher:screen="3"
         launcher:x="3"
         launcher:y="0" />
-
+    <folder
+        launcher:folderType="auto"
+        launcher:screen="2"
+        launcher:x="0"
+        launcher:y="0" />
 
 </favorites>
 

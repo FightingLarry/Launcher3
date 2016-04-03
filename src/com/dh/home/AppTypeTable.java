@@ -15,12 +15,18 @@ import com.android.launcher3.LauncherProvider;
  * // v2.1 Created by DemonHunter on 2016/2/2.
  */
 public class AppTypeTable {
+    /* v3.1 */
+    public static final String ITEM_TYPE = "item_type";
 
-    public static final String TABLE_APPTYPE = "appType";
+    public static final int ITEM_TYPE_APP = 0;
+
+    public static final int ITEM_TYPE_FOLDER = 1;
+
+    public static final String TABLE_NAME = "appType";
 
     public static final String ID = "_id";
 
-    public static final Uri CONTENT_URI = Uri.parse("content://" + LauncherProvider.AUTHORITY + "/" + TABLE_APPTYPE);
+    public static final Uri CONTENT_URI = Uri.parse("content://" + LauncherProvider.AUTHORITY + "/" + TABLE_NAME);
 
     public static final String APPTYPE = "appType";
 
@@ -41,6 +47,12 @@ public class AppTypeTable {
             return models.get(0);
         }
         return null;
+    }
+
+    // v3.1
+    public static List<AppTypeModel> queryByFolderType(Context context, String folderType, int itemType) {
+        String[] selectionArgs = {folderType, String.valueOf(itemType)};
+        return query(context, null, APPTYPE + "=? AND " + ITEM_TYPE + "=? ", selectionArgs, null);
     }
 
     /**
@@ -76,6 +88,7 @@ public class AppTypeTable {
                     model.packageName = cursor.getString(cursor.getColumnIndexOrThrow(PACKAGENAME));
                     model.className = cursor.getString(cursor.getColumnIndexOrThrow(CLASSNAME));
                     model.title = cursor.getString(cursor.getColumnIndexOrThrow(TITLE));
+                    model.itemType = cursor.getInt(cursor.getColumnIndexOrThrow(ITEM_TYPE));
                     list.add(model);
                 }
                 return list;
@@ -98,6 +111,7 @@ public class AppTypeTable {
             values.put(PACKAGENAME, appTypeModel.packageName);
             values.put(CLASSNAME, appTypeModel.className);
             values.put(TITLE, appTypeModel.title);
+            values.put(ITEM_TYPE, appTypeModel.itemType);
             return contentResolver.insert(CONTENT_URI, values);
         } catch (Exception e) {
             e.printStackTrace();

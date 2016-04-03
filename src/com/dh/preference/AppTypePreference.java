@@ -12,8 +12,8 @@ public class AppTypePreference {
     private SharedPreferences mPrefs;
 
     private static AppTypePreference instance;
-
-    private static final String HAS_CONFIG_SYSTEM_APP_ICON = "has_config_system_app_icon";
+    /* v3.1 */
+    private static final String HAS_CONFIG_SYSTEM_APP_ICON = "has_config_system_app_icon_v31";
     private Boolean mHasConfigSystemAppIcon = null;
 
     private AppTypePreference(Context context) {
