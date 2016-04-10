@@ -45,7 +45,12 @@ public class AppTypeHelper {
         /* v3.1 */
         List<String> insertedDefaultWorkspace = new ArrayList<>();
 
-        next: for (AppType appType : AppType.values()) {
+        AppType[] appTypes =
+                {AppType.PHONE, AppType.CONTACTS, AppType.BROWSER, AppType.MMS, AppType.CLOCK, AppType.CALENDAR,
+                        AppType.GALLERY, AppType.EMAIL, AppType.CALCULATOR, AppType.SETTING, AppType.CAMERA,
+                        AppType.MUSIC};
+
+        next: for (AppType appType : appTypes) {
             List<ActivityInfo> infos = new ArrayList<>();
             String queryintent = "";
             boolean isQueryIntent = false;
@@ -456,7 +461,6 @@ public class AppTypeHelper {
     }
 
     /**
-     *
      * @param paramContext
      * @param localList 手机上所有应用
      * @param matchArrayList 应用类型对应的市场上的应用
