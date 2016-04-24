@@ -40,9 +40,10 @@ public class AppTypeTable {
 
     // v3.0
     public static AppTypeModel queryByPackageClassName(Context context, String packageName, String className) {
-        String[] selectionArgs = {packageName, className};
+        String[] selectionArgs = {packageName, className, String.valueOf(ITEM_TYPE_APP)};
         List<AppTypeModel> models =
-                query(context, null, PACKAGENAME + "=? AND " + CLASSNAME + "=? ", selectionArgs, null);
+                query(context, null, PACKAGENAME + "=? AND " + CLASSNAME + "=? " + ITEM_TYPE + "=? ", selectionArgs,
+                        null);
         if (models != null && models.size() > 0) {
             return models.get(0);
         }
@@ -63,8 +64,8 @@ public class AppTypeTable {
      * @return
      */
     public static AppTypeModel queryByAppType(Context context, String appType) {
-        String[] selectionArgs = {appType};
-        List<AppTypeModel> models = query(context, null, APPTYPE + "=? ", selectionArgs, null);
+        String[] selectionArgs = {appType, String.valueOf(ITEM_TYPE_APP)};
+        List<AppTypeModel> models = query(context, null, APPTYPE + "=? " + ITEM_TYPE + "=? ", selectionArgs, null);
         if (models != null && models.size() > 0) {
             return models.get(0);
         }
