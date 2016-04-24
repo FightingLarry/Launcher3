@@ -122,11 +122,13 @@ public class AppTypeHelper {
         }
 
         // v3.1 文件夹类型
+        // 获取手机上所有的应用信息。
         Intent localIntent = new Intent(Intent.ACTION_MAIN, null);
         localIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> localList = context.getPackageManager().queryIntentActivities(localIntent, 0);
         for (ResolveInfo resolveInfo : localList) {
             String packageName = resolveInfo.activityInfo.packageName;
+            // 判断应用是否已经加入到WorkSpace，已经加入了，就不会加入到文件夹。
             if (!insertedDefaultWorkspace.contains(packageName)) {
                 FolderType folderType = FolderTypeHelpr.getFolderTypeByPackage(packageName);
                 if (folderType != null) {

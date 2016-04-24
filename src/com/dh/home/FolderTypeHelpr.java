@@ -14,6 +14,7 @@ public class FolderTypeHelpr {
 
 
     public static FolderType getFolderTypeByPackage(String packageName) {
+        // 初始化数据
         if (map.isEmpty()) {
             init();
         }
