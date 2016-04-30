@@ -1551,28 +1551,35 @@ public class LauncherProvider extends ContentProvider {
                 throws IOException, XmlPullParserException {
             int count = 0;
 
+            //8个文件夹的初始位置。
             String xString = getAttributeValue(parser, ATTR_X);
             String yString = getAttributeValue(parser, ATTR_Y);
             int x = Integer.parseInt(xString);
             int y = Integer.parseInt(yString);
 
+            //获取桌面布局，xy
             LauncherAppState app = LauncherAppState.getInstance();
             DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
+            //桌面布局的列数。
             int xCount = (int) grid.numColumns;
             // final int yCount = (int) grid.numRows;
+
             AppTypeTable provider = new AppTypeTable();
+            //获取标题
             String[] titleArray = mContext.getResources().getStringArray(R.array.folder_title);
             FolderType[] typeArray = FolderType.values();
             for (int i = 0; i < typeArray.length; i++) {
                 FolderType type = typeArray[i];
+                //获取folderType下的所有应用信息。
                 List<AppTypeModel> folderModels =
                         provider.queryByFolderType(mContext, type.getValue(), AppTypeTable.ITEM_TYPE_FOLDER);
                 if (folderModels != null && folderModels.size() > 0) {
                     // 文件夹的位置重新定义
                     values.put(LauncherSettings.Favorites.CELLX, x);
                     values.put(LauncherSettings.Favorites.CELLY, y);
-
+                    //具体的添加应用到到文件夹。
                     boolean added = loadFolderByFolderType(db, values, titleArray[i], folderModels);
+                    //下一个文件夹的位置，重新计算。
                     if (added) {
                         count++;
                         // 计算下一个文件夹位置
@@ -1591,6 +1598,7 @@ public class LauncherProvider extends ContentProvider {
         // v3.1
         private boolean loadFolderByFolderType(SQLiteDatabase db, ContentValues values, String title,
                 List<AppTypeModel> folderModels) throws IOException, XmlPullParserException {
+            //改变文件夹标题
             values.put(LauncherSettings.Favorites.TITLE, title);
             long folderId = addFolder(db, values);
             boolean added = folderId >= 0;
