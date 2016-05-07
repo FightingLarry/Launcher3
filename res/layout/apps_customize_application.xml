@@ -13,7 +13,25 @@
      limitations under the License.
 -->
 
-<com.android.launcher3.BubbleTextView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/WorkspaceIcon.AppsCustomize"
-    android:id="@+id/application_icon"
-    android:focusable="true" />
+<!--v4.0-->
+<com.android.launcher3.ShortcutView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <com.android.launcher3.BubbleTextView
+        android:id="@+id/application_icon"
+        style="@style/WorkspaceIcon.AppsCustomize"
+        android:focusable="true"
+        android:paddingTop="@dimen/icons_margin_top" />
+
+    <com.android.launcher3.ShortcutDeleteView
+        android:id="@+id/delete"
+        android:layout_width="@dimen/deleteview_wh"
+        android:layout_height="@dimen/deleteview_wh"
+        android:layout_marginStart="@dimen/deleteview_margin_left"
+        android:paddingBottom="@dimen/deleteview_padding"
+        android:paddingRight="@dimen/deleteview_padding" />
+
+    <include layout="@layout/tcl_unread_textview" />
+
+</com.android.launcher3.ShortcutView>
