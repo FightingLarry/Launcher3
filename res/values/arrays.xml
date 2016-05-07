@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="folder_title">
+        <item>聊天通讯</item>
+        <item>生活娱乐</item>
+        <item>影音播放</item>
+        <item>新闻阅读</item>
+        <item>游戏</item>
+        <item>学习办公</item>
+        <item>主题壁纸</item>
+        <item>系统工具</item>
+    </string-array>
+</resources>

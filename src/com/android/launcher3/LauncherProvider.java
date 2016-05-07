@@ -68,6 +68,8 @@ import com.android.launcher3.compat.UserManagerCompat;
 import com.android.launcher3.config.ProviderConfig;
 import com.dh.home.AppTypeModel;
 import com.dh.home.AppTypeTable;
+import com.dh.home.FolderType;
+import com.dh.home.FolderTypeHelpr;
 
 public class LauncherProvider extends ContentProvider {
     private static final String TAG = "Launcher.LauncherProvider";
@@ -75,7 +77,7 @@ public class LauncherProvider extends ContentProvider {
 
     private static final String DATABASE_NAME = "launcher.db";
     // v2.1
-    private static final int DATABASE_VERSION = 21;
+    private static final int DATABASE_VERSION = 22;
 
     static final String OLD_AUTHORITY = "com.android.launcher2.settings";
     public static final String AUTHORITY = ProviderConfig.AUTHORITY;
@@ -152,7 +154,7 @@ public class LauncherProvider extends ContentProvider {
             throw new RuntimeException("Error: attempting to insert null values");
         }
         // {@v2.1
-        if (!table.equals(AppTypeTable.TABLE_APPTYPE)) {
+        if (!table.equals(AppTypeTable.TABLE_NAME)) {
             // @}
             if (!values.containsKey(LauncherSettings.ChangeLogColumns._ID)) {
                 throw new RuntimeException("Error: attempting to add item without specifying an id");
@@ -422,6 +424,7 @@ public class LauncherProvider extends ContentProvider {
         // Style attrs -- "Extra"
         private static final String ATTR_KEY = "key";
         private static final String ATTR_VALUE = "value";
+        private static final String ATTR_FOLDERTYPE = "folderType";
 
         private final Context mContext;
         private final PackageManager mPackageManager;
@@ -530,10 +533,12 @@ public class LauncherProvider extends ContentProvider {
 
         // v2.1
         private void addAppTypeTable(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + AppTypeTable.TABLE_APPTYPE + " (" + AppTypeTable.ID
+            db.execSQL("CREATE TABLE " + AppTypeTable.TABLE_NAME + " (" + AppTypeTable.ID
                     + " INTEGER PRIMARY KEY AUTOINCREMENT," + AppTypeTable.APPTYPE + " TEXT,"
                     + AppTypeTable.PACKAGENAME + " TEXT," + AppTypeTable.CLASSNAME + " TEXT," + AppTypeTable.TITLE
-                    + " TEXT," + "modified INTEGER NOT NULL DEFAULT 0);");
+                    + " TEXT," + "modified INTEGER NOT NULL DEFAULT 0," + AppTypeTable.ITEM_TYPE
+                    + " INTEGER NOT NULL DEFAULT " + AppTypeTable.ITEM_TYPE_APP + ");");
+            // v3.1
         }
 
         private void removeOrphanedItems(SQLiteDatabase db) {
@@ -878,6 +883,23 @@ public class LauncherProvider extends ContentProvider {
                 // else old version remains, which means we wipe old data
             }
 
+            // v3.1
+            if (version < 22) {
+                db.beginTransaction();
+                try {
+                    // Insert new column for holding restore status
+                    db.execSQL("ALTER TABLE " + AppTypeTable.TABLE_NAME + " ADD COLUMN " + AppTypeTable.ITEM_TYPE
+                            + " INTEGER NOT NULL DEFAULT " + AppTypeTable.ITEM_TYPE_APP + ";");
+                    db.setTransactionSuccessful();
+                    version = 22;
+                } catch (SQLException ex) {
+                    // Old version remains, which means we wipe old data
+                    Log.e(TAG, ex.getMessage(), ex);
+                } finally {
+                    db.endTransaction();
+                }
+            }
+
             if (version != DATABASE_VERSION) {
                 version = DATABASE_VERSION;
 
@@ -885,7 +907,7 @@ public class LauncherProvider extends ContentProvider {
                 db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAVORITES);
                 db.execSQL("DROP TABLE IF EXISTS " + TABLE_WORKSPACE_SCREENS);
                 // v2.1 version = 21
-                db.execSQL("DROP TABLE IF EXISTS " + AppTypeTable.TABLE_APPTYPE);
+                db.execSQL("DROP TABLE IF EXISTS " + AppTypeTable.TABLE_NAME);
 
                 onCreate(db);
             }
@@ -1478,8 +1500,18 @@ public class LauncherProvider extends ContentProvider {
                             }
                         }
                     } else if (TAG_FOLDER.equals(name)) {
-                        // Folder contents are nested in this XML file
-                        added = loadFolder(db, values, res, parser);
+                        // v3.1
+                        String folderType = getAttributeValue(parser, ATTR_FOLDERTYPE);
+                        if (!TextUtils.isEmpty(folderType) && FolderTypeHelpr.AUTO.equals(folderType)) {
+                            int _count = loadFolderByFolderType(db, values, parser);
+                            added = _count > 0;
+                            if (added) {
+                                count += (_count - 1);
+                            }
+                        } else {
+                            // Folder contents are nested in this XML file
+                            added = loadFolder(db, values, res, parser);
+                        }
 
                     } else if (TAG_PARTNER_FOLDER.equals(name)) {
                         // Folder contents come from an external XML resource
@@ -1512,6 +1544,127 @@ public class LauncherProvider extends ContentProvider {
                 Log.w(TAG, "Got exception parsing favorites.", e);
             }
             return count;
+        }
+
+        // v3.1
+        private int loadFolderByFolderType(SQLiteDatabase db, ContentValues values, XmlResourceParser parser)
+                throws IOException, XmlPullParserException {
+            int count = 0;
+
+            // 8个文件夹的初始位置。
+            String xString = getAttributeValue(parser, ATTR_X);
+            String yString = getAttributeValue(parser, ATTR_Y);
+            int x = Integer.parseInt(xString);
+            int y = Integer.parseInt(yString);
+
+            // 获取桌面布局，xy
+            LauncherAppState app = LauncherAppState.getInstance();
+            DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
+            // 桌面布局的列数。
+            int xCount = (int) grid.numColumns;
+            // final int yCount = (int) grid.numRows;
+
+            AppTypeTable provider = new AppTypeTable();
+            // 获取标题
+            String[] titleArray = mContext.getResources().getStringArray(R.array.folder_title);
+            FolderType[] typeArray = FolderType.values();
+            for (int i = 0; i < typeArray.length; i++) {
+                FolderType type = typeArray[i];
+                // 获取folderType下的所有应用信息。
+                List<AppTypeModel> folderModels =
+                        provider.queryByFolderType(mContext, type.getValue(), AppTypeTable.ITEM_TYPE_FOLDER);
+                if (folderModels != null && folderModels.size() > 0) {
+                    // 文件夹的位置重新定义
+                    values.put(LauncherSettings.Favorites.CELLX, x);
+                    values.put(LauncherSettings.Favorites.CELLY, y);
+                    // 具体的添加应用到到文件夹。
+                    boolean added = loadFolderByFolderType(db, values, titleArray[i], folderModels);
+                    // 下一个文件夹的位置，重新计算。
+                    if (added) {
+                        count++;
+                        // 计算下一个文件夹位置
+                        if (x == xCount - 1) {
+                            x = 0;
+                            y++;
+                        } else {
+                            x++;
+                        }
+                    }
+                }
+            }
+            return count;
+        }
+
+        // v3.1
+        private boolean loadFolderByFolderType(SQLiteDatabase db, ContentValues values, String title,
+                List<AppTypeModel> folderModels) throws IOException, XmlPullParserException {
+            // 改变文件夹标题
+            values.put(LauncherSettings.Favorites.TITLE, title);
+            long folderId = addFolder(db, values);
+            boolean added = folderId >= 0;
+            if (folderId < 0) {
+                throw new RuntimeException("Folders can contain only shortcuts");
+            }
+            ArrayList<Long> folderItems = new ArrayList<>();
+            for (AppTypeModel folderModel : folderModels) {
+                final ContentValues childValues = new ContentValues();
+                childValues.put(LauncherSettings.Favorites.CONTAINER, folderId);
+                final long id = addAppShortcutByFolderType(db, childValues, folderModel);
+                if (id >= 0) {
+                    folderItems.add(id);
+                }
+            }
+
+            // 当item时一个时，也能新建文件夹
+            if (folderItems.size() < 1 && folderId >= 0) {
+                // Delete the folder
+                deleteId(db, folderId);
+                // If we have a single item, promote it to where the folder
+                // would have been.
+                if (folderItems.size() == 1) {
+                    final ContentValues childValues = new ContentValues();
+                    copyInteger(values, childValues, LauncherSettings.Favorites.CONTAINER);
+                    copyInteger(values, childValues, LauncherSettings.Favorites.SCREEN);
+                    copyInteger(values, childValues, LauncherSettings.Favorites.CELLX);
+                    copyInteger(values, childValues, LauncherSettings.Favorites.CELLY);
+                    final long id = folderItems.get(0);
+                    db.update(TABLE_FAVORITES, childValues, LauncherSettings.Favorites._ID + "=" + id, null);
+                } else {
+                    added = false;
+                }
+            }
+            return added;
+        }
+
+        // v3.1
+        private long addAppShortcutByFolderType(SQLiteDatabase db, ContentValues values, AppTypeModel molder) {
+            final String packageName = molder.packageName;
+            final String className = molder.className;
+            if (!TextUtils.isEmpty(packageName) && !TextUtils.isEmpty(className)) {
+                ActivityInfo info;
+                try {
+                    ComponentName cn;
+                    try {
+                        cn = new ComponentName(packageName, className);
+                        info = mPackageManager.getActivityInfo(cn, 0);
+                    } catch (PackageManager.NameNotFoundException nnfe) {
+                        String[] packages = mPackageManager.currentToCanonicalPackageNames(new String[] {packageName});
+                        cn = new ComponentName(packages[0], className);
+                        info = mPackageManager.getActivityInfo(cn, 0);
+                    }
+                    final Intent intent = buildMainIntent();
+                    intent.setComponent(cn);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+
+                    return addAppShortcut(db, values, info.loadLabel(mPackageManager).toString(), intent);
+                } catch (PackageManager.NameNotFoundException e) {
+                    Log.w(TAG, "Unable to add favorite: " + packageName + "/" + className, e);
+                }
+                return -1;
+            } else {
+                Log.e(TAG, "Skipping invalid <favorite> with no component or uri");
+                return -1;
+            }
         }
 
         /**
@@ -1580,7 +1733,7 @@ public class LauncherProvider extends ContentProvider {
             // We can only have folders with >= 2 items, so we need to remove the
             // folder and clean up if less than 2 items were included, or some
             // failed to add, and less than 2 were actually added
-            if (folderItems.size() < 2 && folderId >= 0) {
+            if (folderItems.size() < 1 && folderId >= 0) {
                 // Delete the folder
                 deleteId(db, folderId);
 

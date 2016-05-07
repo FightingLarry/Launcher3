@@ -207,7 +207,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
         public void bindAllApplications(ArrayList<AppInfo> apps);
 
         public void bindAppsAdded(ArrayList<Long> newScreens, ArrayList<ItemInfo> addNotAnimated,
-                                  ArrayList<ItemInfo> addAnimated, ArrayList<AppInfo> addedApps);
+                ArrayList<ItemInfo> addAnimated, ArrayList<AppInfo> addedApps);
 
         public void bindAppsUpdated(ArrayList<AppInfo> apps);
 
@@ -218,7 +218,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
         public void updatePackageBadge(String packageName);
 
         public void bindComponentsRemoved(ArrayList<String> packageNames, ArrayList<AppInfo> appInfos,
-                                          UserHandleCompat user);
+                UserHandleCompat user);
 
         public void bindPackagesUpdated(ArrayList<Object> widgetsAndShortcuts);
 
@@ -329,7 +329,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
     }
 
     static Pair<Long, int[]> findNextAvailableIconSpace(Context context, String name, Intent launchIntent,
-                                                        int firstScreenIndex, ArrayList<Long> workspaceScreens) {
+            int firstScreenIndex, ArrayList<Long> workspaceScreens) {
         // Lock on the app so that we don't try and get the items while apps are being added
         LauncherAppState app = LauncherAppState.getInstance();
         LauncherModel model = app.getModel();
@@ -599,7 +599,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
      * screen, cellX, cellY>
      */
     static void addOrMoveItemInDatabase(Context context, ItemInfo item, long container, long screenId, int cellX,
-                                        int cellY) {
+            int cellY) {
         if (item.container == ItemInfo.NO_ID) {
             // From all apps
             addItemToDatabase(context, item, container, screenId, cellX, cellY, false);
@@ -627,7 +627,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
                         && modelShortcut.spanX == shortcut.spanX
                         && modelShortcut.spanY == shortcut.spanY
                         && ((modelShortcut.dropPos == null && shortcut.dropPos == null) || (modelShortcut.dropPos != null
-                        && shortcut.dropPos != null && modelShortcut.dropPos[0] == shortcut.dropPos[0] && modelShortcut.dropPos[1] == shortcut.dropPos[1]))) {
+                                && shortcut.dropPos != null && modelShortcut.dropPos[0] == shortcut.dropPos[0] && modelShortcut.dropPos[1] == shortcut.dropPos[1]))) {
                     // For all intents and purposes, this is the same object
                     return;
                 }
@@ -662,7 +662,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
     }
 
     static void updateItemInDatabaseHelper(Context context, final ContentValues values, final ItemInfo item,
-                                           final String callingFunction) {
+            final String callingFunction) {
         final long itemId = item.id;
         final Uri uri = LauncherSettings.Favorites.getContentUri(itemId, false);
         final ContentResolver cr = context.getContentResolver();
@@ -678,7 +678,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
     }
 
     static void updateItemsInDatabaseHelper(Context context, final ArrayList<ContentValues> valuesList,
-                                            final ArrayList<ItemInfo> items, final String callingFunction) {
+            final ArrayList<ItemInfo> items, final String callingFunction) {
         final ContentResolver cr = context.getContentResolver();
 
         final StackTraceElement[] stackTrace = new Throwable().getStackTrace();
@@ -770,8 +770,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
                 try {
                     waiter.wait();
                     success = true;
-                } catch (InterruptedException e) {
-                }
+                } catch (InterruptedException e) {}
             }
         }
     }
@@ -780,7 +779,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
      * Move an item in the DB to a new <container, screen, cellX, cellY>
      */
     static void moveItemInDatabase(Context context, final ItemInfo item, final long container, final long screenId,
-                                   final int cellX, final int cellY) {
+            final int cellX, final int cellY) {
         item.container = container;
         item.cellX = cellX;
         item.cellY = cellY;
@@ -807,7 +806,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
      * cellY have already been updated on the ItemInfos.
      */
     static void moveItemsInDatabase(Context context, final ArrayList<ItemInfo> items, final long container,
-                                    final int screen) {
+            final int screen) {
 
         ArrayList<ContentValues> contentValues = new ArrayList<ContentValues>();
         int count = items.size();
@@ -839,7 +838,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
      * Move and/or resize item in the DB to a new <container, screen, cellX, cellY, spanX, spanY>
      */
     static void modifyItemInDatabase(Context context, final ItemInfo item, final long container, final long screenId,
-                                     final int cellX, final int cellY, final int spanX, final int spanY) {
+            final int cellX, final int cellY, final int spanX, final int spanY) {
         item.container = container;
         item.cellX = cellX;
         item.cellY = cellY;
@@ -898,8 +897,8 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
             intentWithoutPkg = intent;
         }
         Cursor c =
-                cr.query(LauncherSettings.Favorites.CONTENT_URI, new String[]{"title", "intent"},
-                        "title=? and (intent=? or intent=?)", new String[]{title, intentWithPkg.toUri(0),
+                cr.query(LauncherSettings.Favorites.CONTENT_URI, new String[] {"title", "intent"},
+                        "title=? and (intent=? or intent=?)", new String[] {title, intentWithPkg.toUri(0),
                                 intentWithoutPkg.toUri(0)}, null);
         boolean result = false;
         try {
@@ -929,7 +928,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
         ArrayList<ItemInfo> items = new ArrayList<ItemInfo>();
         final ContentResolver cr = context.getContentResolver();
         Cursor c =
-                cr.query(LauncherSettings.Favorites.CONTENT_URI, new String[]{LauncherSettings.Favorites.ITEM_TYPE,
+                cr.query(LauncherSettings.Favorites.CONTENT_URI, new String[] {LauncherSettings.Favorites.ITEM_TYPE,
                         LauncherSettings.Favorites.CONTAINER, LauncherSettings.Favorites.SCREEN,
                         LauncherSettings.Favorites.CELLX, LauncherSettings.Favorites.CELLY,
                         LauncherSettings.Favorites.SPANX, LauncherSettings.Favorites.SPANY,
@@ -977,7 +976,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
         final ContentResolver cr = context.getContentResolver();
         Cursor c =
                 cr.query(LauncherSettings.Favorites.CONTENT_URI, null, "_id=? and (itemType=? or itemType=?)",
-                        new String[]{String.valueOf(id), String.valueOf(LauncherSettings.Favorites.ITEM_TYPE_FOLDER)},
+                        new String[] {String.valueOf(id), String.valueOf(LauncherSettings.Favorites.ITEM_TYPE_FOLDER)},
                         null);
 
         try {
@@ -1017,7 +1016,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
      * cellY fields of the item. Also assigns an ID to the item.
      */
     static void addItemToDatabase(Context context, final ItemInfo item, final long container, final long screenId,
-                                  final int cellX, final int cellY, final boolean notify) {
+            final int cellX, final int cellY, final boolean notify) {
         item.container = container;
         item.cellX = cellX;
         item.cellY = cellY;
@@ -1256,19 +1255,19 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
     @Override
     public void onPackageChanged(String packageName, UserHandleCompat user) {
         int op = PackageUpdatedTask.OP_UPDATE;
-        enqueuePackageUpdated(new PackageUpdatedTask(op, new String[]{packageName}, user));
+        enqueuePackageUpdated(new PackageUpdatedTask(op, new String[] {packageName}, user));
     }
 
     @Override
     public void onPackageRemoved(String packageName, UserHandleCompat user) {
         int op = PackageUpdatedTask.OP_REMOVE;
-        enqueuePackageUpdated(new PackageUpdatedTask(op, new String[]{packageName}, user));
+        enqueuePackageUpdated(new PackageUpdatedTask(op, new String[] {packageName}, user));
     }
 
     @Override
     public void onPackageAdded(String packageName, UserHandleCompat user) {
         int op = PackageUpdatedTask.OP_ADD;
-        enqueuePackageUpdated(new PackageUpdatedTask(op, new String[]{packageName}, user));
+        enqueuePackageUpdated(new PackageUpdatedTask(op, new String[] {packageName}, user));
     }
 
     @Override
@@ -1491,12 +1490,12 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
         return false;
     }
 
-    //v3.0
+    // v3.0
     void updateCalendarPkg(Context context) {
         AppTypeModel model = AppTypeTable.queryByAppType(context, AppType.CALENDAR.getValue());
         if (model != null && !TextUtils.isEmpty(model.packageName)) {
             enqueuePackageUpdated(new PackageUpdatedTask(PackageUpdatedTask.OP_UPDATE,
-                    new String[]{model.packageName}, UserHandleCompat.myUserHandle()));
+                    new String[] {model.packageName}, UserHandleCompat.myUserHandle()));
         }
     }
 
@@ -1639,8 +1638,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
             // Optimize for end-user experience: if the Launcher is up and // running with the
             // All Apps interface in the foreground, load All Apps first. Otherwise, load the
             // workspace first (default).
-            keep_running:
-            {
+            keep_running: {
                 // Elevate priority when Home launches for the first time to avoid
                 // starving at boot time. Staring at a blank home is not cool.
                 synchronized (mLock) {
@@ -1769,7 +1767,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
 
         // check & update map of what's occupied; used to discard overlapping/invalid items
         private boolean checkItemPlacement(HashMap<Long, ItemInfo[][]> occupied, ItemInfo item,
-                                           AtomicBoolean deleteOnInvalidPlacement) {
+                AtomicBoolean deleteOnInvalidPlacement) {
             LauncherAppState app = LauncherAppState.getInstance();
             DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
             final int countX = (int) grid.numColumns;
@@ -2327,6 +2325,10 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
                             client.delete(LauncherSettings.Favorites.getContentUri(id, false), null, null);
                         } catch (RemoteException e) {
                             Log.w(TAG, "Could not remove id = " + id);
+                        } finally {
+                            if (client != null) {
+                                client.release();
+                            }
                         }
                     }
                 }
@@ -2346,6 +2348,10 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
                                 selectionBuilder.toString(), null);
                     } catch (RemoteException e) {
                         Log.w(TAG, "Could not update restored rows");
+                    } finally {
+                        if (updater != null) {
+                            updater.release();
+                        }
                     }
                 }
 
@@ -2448,7 +2454,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
          * specified screen.
          */
         private void filterCurrentWorkspaceItems(long currentScreenId, ArrayList<ItemInfo> allWorkspaceItems,
-                                                 ArrayList<ItemInfo> currentScreenItems, ArrayList<ItemInfo> otherScreenItems) {
+                ArrayList<ItemInfo> currentScreenItems, ArrayList<ItemInfo> otherScreenItems) {
             // Purge any null ItemInfos
             Iterator<ItemInfo> iter = allWorkspaceItems.iterator();
             while (iter.hasNext()) {
@@ -2494,8 +2500,8 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
          * Filters the set of widgets which are on the specified screen.
          */
         private void filterCurrentAppWidgets(long currentScreenId, ArrayList<LauncherAppWidgetInfo> appWidgets,
-                                             ArrayList<LauncherAppWidgetInfo> currentScreenWidgets,
-                                             ArrayList<LauncherAppWidgetInfo> otherScreenWidgets) {
+                ArrayList<LauncherAppWidgetInfo> currentScreenWidgets,
+                ArrayList<LauncherAppWidgetInfo> otherScreenWidgets) {
 
             for (LauncherAppWidgetInfo widget : appWidgets) {
                 if (widget == null) continue;
@@ -2512,8 +2518,8 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
          * Filters the set of folders which are on the specified screen.
          */
         private void filterCurrentFolders(long currentScreenId, HashMap<Long, ItemInfo> itemsIdMap,
-                                          HashMap<Long, FolderInfo> folders, HashMap<Long, FolderInfo> currentScreenFolders,
-                                          HashMap<Long, FolderInfo> otherScreenFolders) {
+                HashMap<Long, FolderInfo> folders, HashMap<Long, FolderInfo> currentScreenFolders,
+                HashMap<Long, FolderInfo> otherScreenFolders) {
 
             for (long id : folders.keySet()) {
                 ItemInfo info = itemsIdMap.get(id);
@@ -2565,8 +2571,8 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
         }
 
         private void bindWorkspaceItems(final Callbacks oldCallbacks, final ArrayList<ItemInfo> workspaceItems,
-                                        final ArrayList<LauncherAppWidgetInfo> appWidgets, final HashMap<Long, FolderInfo> folders,
-                                        ArrayList<Runnable> deferredBindRunnables) {
+                final ArrayList<LauncherAppWidgetInfo> appWidgets, final HashMap<Long, FolderInfo> folders,
+                ArrayList<Runnable> deferredBindRunnables) {
 
             final boolean postOnMainThread = (deferredBindRunnables != null);
 
@@ -2927,14 +2933,14 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
                             if (si.isPromise()
                                     && si.getTargetComponent() != null
                                     && launcherApps.isPackageEnabledForProfile(
-                                    si.getTargetComponent().getPackageName(), user)) {
+                                            si.getTargetComponent().getPackageName(), user)) {
                                 installedPackages.add(si.getTargetComponent().getPackageName());
                             }
                         } else if (info instanceof LauncherAppWidgetInfo) {
                             LauncherAppWidgetInfo widget = (LauncherAppWidgetInfo) info;
                             if (widget.hasRestoreFlag(LauncherAppWidgetInfo.FLAG_PROVIDER_NOT_READY)
                                     && launcherApps.isPackageEnabledForProfile(widget.providerName.getPackageName(),
-                                    user)) {
+                                            user)) {
                                 installedPackages.add(widget.providerName.getPackageName());
                             }
                         }
@@ -3229,8 +3235,8 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
      * If c is not null, then it will be used to fill in missing data like the title and icon.
      */
     public ShortcutInfo getShortcutInfo(PackageManager manager, Intent intent, UserHandleCompat user, Context context,
-                                        Cursor c, int iconIndex, int titleIndex, HashMap<Object, CharSequence> labelCache,
-                                        boolean allowMissingTarget) {
+            Cursor c, int iconIndex, int titleIndex, HashMap<Object, CharSequence> labelCache,
+            boolean allowMissingTarget) {
         if (user == null) {
             Log.d(TAG, "Null user found in getShortcutInfo");
             return null;
@@ -3366,7 +3372,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
      * Make an ShortcutInfo object for a shortcut that isn't an application.
      */
     private ShortcutInfo getShortcutInfo(Cursor c, Context context, int iconTypeIndex, int iconPackageIndex,
-                                         int iconResourceIndex, int iconIndex, int titleIndex) {
+            int iconResourceIndex, int iconIndex, int titleIndex) {
 
         Bitmap icon = null;
         final ShortcutInfo info = new ShortcutInfo();
@@ -3442,7 +3448,7 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
     }
 
     ShortcutInfo addShortcut(Context context, Intent data, long container, int screen, int cellX, int cellY,
-                             boolean notify) {
+            boolean notify) {
         final ShortcutInfo info = infoFromShortcutIntent(context, data, null);
         if (info == null) {
             return null;

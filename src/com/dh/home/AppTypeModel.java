@@ -14,5 +14,7 @@ public class AppTypeModel {
 
     public String title;
 
+    public int itemType;
+
 
 }

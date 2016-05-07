@@ -42,7 +42,15 @@ public class AppTypeHelper {
         }
         AppTypePreference.getInstance(context).saveHasConfigSystemAppIcon(true);
 
-        next: for (AppType appType : AppType.values()) {
+        /* v3.1 */
+        List<String> insertedDefaultWorkspace = new ArrayList<>();
+
+        AppType[] appTypes =
+                {AppType.PHONE, AppType.CONTACTS, AppType.BROWSER, AppType.MMS, AppType.CLOCK, AppType.CALENDAR,
+                        AppType.GALLERY, AppType.EMAIL, AppType.CALCULATOR, AppType.SETTING, AppType.CAMERA,
+                        AppType.MUSIC};
+
+        next: for (AppType appType : appTypes) {
             List<ActivityInfo> infos = new ArrayList<>();
             String queryintent = "";
             boolean isQueryIntent = false;
@@ -86,7 +94,7 @@ public class AppTypeHelper {
                 if (isQueryIntent) {
                     // 直接取第一个就行。
                     ActivityInfo activityInfo = infos.get(0);
-                    saveToDb(context, appType, activityInfo);
+                    saveToDb(context, appType.getValue(), activityInfo, insertedDefaultWorkspace);
                 } else {
                     // 筛选出唯一的应用，系统应用优先。
                     for (ActivityInfo info : infos) {
@@ -102,27 +110,53 @@ public class AppTypeHelper {
                         }
                         if (isSystemApp) {
                             // 如果是系统应用，直接持久化
-                            saveToDb(context, appType, info);
+                            saveToDb(context, appType.getValue(), info, insertedDefaultWorkspace);
                             continue next;
                         }
                     }
                     // 如果不是系统应用，找到list的第一个应用信息，持久化。
                     ActivityInfo activityInfo = infos.get(0);
-                    saveToDb(context, appType, activityInfo);
+                    saveToDb(context, appType.getValue(), activityInfo, insertedDefaultWorkspace);
                 }
             }
+        }
 
+        // v3.1 文件夹类型
+        // 获取手机上所有的应用信息。
+        Intent localIntent = new Intent(Intent.ACTION_MAIN, null);
+        localIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> localList = context.getPackageManager().queryIntentActivities(localIntent, 0);
+        for (ResolveInfo resolveInfo : localList) {
+            String packageName = resolveInfo.activityInfo.packageName;
+            // 判断应用是否已经加入到WorkSpace，已经加入了，就不会加入到文件夹。
+            if (!insertedDefaultWorkspace.contains(packageName)) {
+                FolderType folderType = FolderTypeHelpr.getFolderTypeByPackage(packageName);
+                if (folderType != null) {
+                    saveToDb(context, folderType.getValue(), resolveInfo.activityInfo, insertedDefaultWorkspace,
+                            AppTypeTable.ITEM_TYPE_FOLDER);
+                }
+            }
         }
     }
 
-    private static void saveToDb(Context context, AppType appType, ActivityInfo activityInfo) {
+    private static void saveToDb(Context context, String appType, ActivityInfo activityInfo,
+            List<String> insertedDefaultWorkspace, int itemType) {
         PackageManager packageManager = context.getPackageManager();
         AppTypeModel model = new AppTypeModel();
-        model.appType = appType.getValue();
+        model.appType = appType;
         model.packageName = activityInfo.packageName;
         model.className = activityInfo.name;
         model.title = activityInfo.loadLabel(packageManager).toString();
+        model.itemType = itemType;
         AppTypeTable.save(context, model);
+        if (itemType == AppTypeTable.ITEM_TYPE_APP) {
+            insertedDefaultWorkspace.add(activityInfo.packageName);
+        }
+    }
+
+    private static void saveToDb(Context context, String appType, ActivityInfo activityInfo,
+            List<String> insertedDefaultWorkspace) {
+        saveToDb(context, appType, activityInfo, insertedDefaultWorkspace, AppTypeTable.ITEM_TYPE_APP);
     }
 
     synchronized static List<ActivityInfo> matchLoaclAppsByAppType(Context context, String appType) {
@@ -429,7 +463,6 @@ public class AppTypeHelper {
     }
 
     /**
-     *
      * @param paramContext
      * @param localList 手机上所有应用
      * @param matchArrayList 应用类型对应的市场上的应用
