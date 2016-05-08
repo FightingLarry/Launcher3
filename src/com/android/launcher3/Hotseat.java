@@ -62,7 +62,8 @@ public class Hotseat extends FrameLayout {
         mLauncher = launcher;
     }
 
-    CellLayout getLayout() {
+    // v4.0
+    public CellLayout getLayout() {
         return mContent;
     }
 

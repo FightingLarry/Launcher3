@@ -78,6 +78,7 @@ import com.android.launcher3.LauncherSettings.Favorites;
 import com.android.launcher3.compat.PackageInstallerCompat;
 import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
 import com.android.launcher3.compat.UserHandleCompat;
+import com.dh.home.editmode.EditModeManager;
 
 /**
  * The workspace is a wide area with a wallpaper and a finite number of pages. Each page contains a
@@ -399,6 +400,12 @@ public class Workspace extends SmoothPagedView
     }
 
     public void onDragStart(final DragSource source, Object info, int dragAction) {
+        // v4.0 start
+        if (mState == State.NORMAL) {
+            EditModeManager.getInstance().enterEditMode(this, mLauncher.getHotseat(), getCurrentPage());
+        }
+        // v4.0 end
+
         mIsDragOccuring = true;
         updateChildrenLayersEnabled(false);
         mLauncher.lockScreenOrientation();
@@ -512,7 +519,8 @@ public class Workspace extends SmoothPagedView
     /**
      * @return The open folder on the current screen, or null if there is none
      */
-    Folder getOpenFolder() {
+    // v4.0
+    public Folder getOpenFolder() {
         DragLayer dragLayer = mLauncher.getDragLayer();
         int count = dragLayer.getChildCount();
         for (int i = 0; i < count; i++) {
@@ -1009,6 +1017,11 @@ public class Workspace extends SmoothPagedView
             } else {
                 screenId = mLauncher.getHotseat().getOrderInHotseat(x, y);
             }
+
+            // v4.0
+            if (EditModeManager.isEditMode()) {
+                EditModeManager.getInstance().startOnAddInSreenViewAnimator(child, EditModeManager.HOTSEAT_ANIMATOR);
+            }
         } else {
             // Show folder title if not in the hotseat
             if (child instanceof FolderIcon) {
@@ -1016,6 +1029,11 @@ public class Workspace extends SmoothPagedView
             }
             layout = getScreenWithId(screenId);
             child.setOnKeyListener(new IconKeyEventListener());
+
+            // v4.0
+            if (EditModeManager.isEditMode()) {
+                EditModeManager.getInstance().startOnAddInSreenViewAnimator(child, screenId);
+            }
         }
 
         ViewGroup.LayoutParams genericLp = child.getLayoutParams();
@@ -1209,10 +1227,18 @@ public class Workspace extends SmoothPagedView
                 enableChildrenCache(mCurrentPage - 1, mCurrentPage + 1);
             }
         }
+
     }
 
     protected void onPageEndMoving() {
         super.onPageEndMoving();
+        // v4.0
+        if (hasCustomContent() && getCurrentPage() == 0) {
+            EditModeManager.getInstance().exitEditMode(this, mLauncher.getHotseat());
+        } else if (EditModeManager.isEditMode()) {
+            EditModeManager.getInstance().enterEditMode(this, mLauncher.getHotseat(), getCurrentPage());
+        }
+
 
         if (isHardwareAccelerated()) {
             updateChildrenLayersEnabled(false);

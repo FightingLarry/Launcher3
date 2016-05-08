@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
@@ -49,7 +50,10 @@ import com.dh.home.editmode.EditModeManager;
 /**
  * An icon that can appear on in the workspace representing an {@link UserFolder}.
  */
-public class FolderIcon extends FrameLayout implements FolderListener {
+
+public class FolderIcon extends FrameLayout implements FolderListener,
+// 4.0
+            ApplicationActionListener {
     private Launcher mLauncher;
     private Folder mFolder;
     private FolderInfo mInfo;
@@ -139,7 +143,7 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         return !workspace.workspaceInModalState();
     }
 
-    // v4.0
+    // V4.0 start
     public boolean isShowDeleteView() {
         return mFolderDelete.getVisibility() == View.VISIBLE;
     }
@@ -152,7 +156,57 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         mFolderDelete.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public void setNeedShowDeleteView(boolean needShowDeleteView) {
 
+    }
+
+    private AnimatorSet mAnimatorSet;
+
+    @Override
+    public void startAnimation() {
+        if (mAnimatorSet != null && !mAnimatorSet.isRunning()) {
+            mAnimatorSet.setStartDelay(EditModeManager.getApplicationRandomDelay());
+            mAnimatorSet.start();
+        }
+    }
+
+    @Override
+    public void cancleAnimator() {
+        if (mAnimatorSet != null) {
+            mAnimatorSet.cancel();
+        }
+    }
+
+    @Override
+    public boolean isAnimatorNull() {
+        return mAnimatorSet == null;
+    }
+
+    @Override
+    public void setAnimator(AnimatorSet animator) {
+        this.mAnimatorSet = animator;
+    }
+
+    @Override
+    public void setApplicationAnimatorId(long id) {
+        if (!isAnimatorNull()) {
+            ArrayList<Animator.AnimatorListener> listener = mAnimatorSet.getListeners();
+            for (Animator.AnimatorListener animatorListener : listener) {
+                if (animatorListener instanceof EditModeManager.ApplicationAnimatorListener) {
+                    ((EditModeManager.ApplicationAnimatorListener) animatorListener).id = id;
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean isAnimatorRunning() {
+        return mAnimatorSet != null && mAnimatorSet.isRunning();
+    }
+
+    // V4.0 end
 
     static FolderIcon fromXml(int resId, Launcher launcher, ViewGroup group, FolderInfo folderInfo, IconCache iconCache) {
         @SuppressWarnings("all")

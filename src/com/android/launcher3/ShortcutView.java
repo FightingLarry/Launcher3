@@ -203,11 +203,10 @@ public class ShortcutView extends FrameLayout implements ApplicationActionListen
         if (!isAnimatorNull()) {
             ArrayList<AnimatorListener> listener = mAnimatorSet.getListeners();
             for (AnimatorListener animatorListener : listener) {
-                // TODO
-                // if (animatorListener instanceof ApplicationAnimatorListener) {
-                // ((ApplicationAnimatorListener) animatorListener).id = id;
-                // break;
-                // }
+                if (animatorListener instanceof EditModeManager.ApplicationAnimatorListener) {
+                    ((EditModeManager.ApplicationAnimatorListener) animatorListener).id = id;
+                    break;
+                }
             }
         }
 

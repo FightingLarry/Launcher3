@@ -127,6 +127,7 @@ import com.android.launcher3.compat.PackageInstallerCompat;
 import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
 import com.android.launcher3.compat.UserHandleCompat;
 import com.android.launcher3.compat.UserManagerCompat;
+import com.dh.home.editmode.EditModeManager;
 
 /**
  * Default launcher application.
@@ -1105,6 +1106,9 @@ public class Launcher extends Activity
         }
         // v3.0
         unregisterTimeTickReceiver();
+
+        // v4.0
+        EditModeManager.getInstance().exitEditMode(mWorkspace, getHotseat());
     }
 
     QSBScroller mQsbScroller = new QSBScroller() {
@@ -2377,6 +2381,10 @@ public class Launcher extends Activity
 
     @Override
     public void onBackPressed() {
+
+        // v4.0
+        EditModeManager.getInstance().exitEditMode(mWorkspace, getHotseat());
+
         if (isAllAppsVisible()) {
             if (mAppsCustomizeContent.getContentType() == AppsCustomizePagedView.ContentType.Applications) {
                 showWorkspace(true);
@@ -2510,6 +2518,8 @@ public class Launcher extends Activity
             if (mWorkspace.isInOverviewMode()) {
                 mWorkspace.exitOverviewMode(mWorkspace.indexOfChild(v), true);
             }
+            // v4.0
+            EditModeManager.getInstance().exitEditMode(mWorkspace, getHotseat());
         }
 
         Object tag = v.getTag();
@@ -3067,6 +3077,11 @@ public class Launcher extends Activity
         // the workspace items
         folder.sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
         getDragLayer().sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED);
+
+
+        // v4.0
+        EditModeManager.getInstance().enterEditModeOnFolder(folder);
+
     }
 
     public void closeFolder() {
@@ -3077,6 +3092,9 @@ public class Launcher extends Activity
             }
             closeFolder(folder);
         }
+
+        // v4.0
+        EditModeManager.getInstance().exitEditModeOnFolder();
     }
 
     void closeFolder(Folder folder) {
@@ -3104,6 +3122,8 @@ public class Launcher extends Activity
                 if (mWorkspace.enterOverviewMode()) {
                     mWorkspace.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
                             HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+                    // v4.0
+                    EditModeManager.getInstance().exitEditMode(mWorkspace, getHotseat());
                     return true;
                 } else {
                     return false;
@@ -3135,6 +3155,8 @@ public class Launcher extends Activity
                     mWorkspace.startReordering(v);
                 } else {
                     mWorkspace.enterOverviewMode();
+                    // v4.0
+                    EditModeManager.getInstance().exitEditMode(mWorkspace, getHotseat());
                 }
             } else {
                 final boolean isAllAppsButton =

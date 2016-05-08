@@ -576,11 +576,13 @@ public class CellLayout extends ViewGroup {
         mInterceptTouchListener = listener;
     }
 
-    int getCountX() {
+    // v4.0
+    public int getCountX() {
         return mCountX;
     }
 
-    int getCountY() {
+    // v4.0
+    public int getCountY() {
         return mCountY;
     }
 
@@ -3216,5 +3218,24 @@ public class CellLayout extends ViewGroup {
 
     public boolean lastDownOnOccupiedCell() {
         return mLastDownOnOccupiedCell;
+    }
+
+    /**
+     * v4.0
+     * 
+     * @param index
+     * @return
+     */
+    public View getShortcutAtIndex(int index) {
+        return mShortcutsAndWidgets.getChildAt(index);
+    }
+
+    /**
+     * v4.0
+     * 
+     * @return
+     */
+    public int getShortcutCount() {
+        return mShortcutsAndWidgets.getChildCount();
     }
 }
