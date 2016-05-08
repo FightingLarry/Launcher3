@@ -1499,6 +1499,22 @@ public class LauncherModel extends BroadcastReceiver implements LauncherAppsComp
         }
     }
 
+    // v4.0
+    public void clearFolder(final FolderInfo info) {
+
+        Runnable r = new Runnable() {
+
+            @Override
+            public void run() {
+                synchronized (sBgLock) {
+                    info.clear();
+                }
+            }
+        };
+
+        runOnMainThread(r);
+    }
+
 
     /**
      * Runnable for the thread that loads the contents of the launcher: - workspace icons - widgets

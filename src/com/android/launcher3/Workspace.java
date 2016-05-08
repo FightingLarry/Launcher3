@@ -44,6 +44,7 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -2502,7 +2503,15 @@ public class Workspace extends SmoothPagedView
         boolean textVisible = false;
 
         destCanvas.save();
-        if (v instanceof TextView) {
+        // v4.0 start
+        if (v instanceof ShortcutView) {
+            Drawable d = (((ShortcutView) v).getBubbleTextView()).getCompoundDrawables()[1];
+            Rect bounds = getDrawableBounds(d);
+            clipRect.set(0, 0, bounds.width() + padding, bounds.height() + padding);
+            destCanvas.translate(padding / 2 - bounds.left, padding / 2 - bounds.top);
+            d.draw(destCanvas);
+            // v4.0 end
+        } else if (v instanceof TextView) {
             Drawable d = ((TextView) v).getCompoundDrawables()[1];
             Rect bounds = getDrawableBounds(d);
             clipRect.set(0, 0, bounds.width() + padding, bounds.height() + padding);
@@ -2540,7 +2549,20 @@ public class Workspace extends SmoothPagedView
         Bitmap b;
 
         int padding = expectedPadding.get();
-        if (v instanceof TextView) {
+        // v4.0 start
+        Bitmap deleteIcon = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.application_delete);
+        int size = deleteIcon.getWidth();
+        padding += size / 2;
+        boolean isNeedDeleteIcon = false;
+
+        if (v instanceof ShortcutView) {
+            Drawable d = (((ShortcutView) v).getBubbleTextView()).getCompoundDrawables()[1];
+            Rect bounds = getDrawableBounds(d);
+            b = Bitmap.createBitmap(bounds.width() + padding, bounds.height() + padding, Bitmap.Config.ARGB_8888);
+            expectedPadding.set(padding - bounds.left - bounds.top);
+            isNeedDeleteIcon = ((ShortcutView) v).getNeedShowDeleteView();
+            // v4.0 end
+        } else if (v instanceof TextView) {
             Drawable d = ((TextView) v).getCompoundDrawables()[1];
             Rect bounds = getDrawableBounds(d);
             b = Bitmap.createBitmap(bounds.width() + padding, bounds.height() + padding, Bitmap.Config.ARGB_8888);
@@ -2566,7 +2588,10 @@ public class Workspace extends SmoothPagedView
 
         mCanvas.setBitmap(b);
         drawDragView(v, mCanvas, padding);
-        mOutlineHelper.applyExpensiveOutlineWithBlur(b, mCanvas, outlineColor, outlineColor);
+        // v4.0 start
+        // mOutlineHelper.applyExpensiveOutlineWithBlur(b, mCanvas,
+        // outlineColor, outlineColor);
+        // v4.0 end
         mCanvas.setBitmap(null);
         return b;
     }
@@ -2635,7 +2660,9 @@ public class Workspace extends SmoothPagedView
         DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();
         Point dragVisualizeOffset = null;
         Rect dragRect = null;
-        if (child instanceof BubbleTextView) {
+        // v4.0 start
+        if (child instanceof ShortcutView) {
+            // v4.0 end
             int iconSize = grid.iconSizePx;
             int top = child.getPaddingTop();
             int left = (bmpWidth - iconSize) / 2;
@@ -2652,10 +2679,12 @@ public class Workspace extends SmoothPagedView
         }
 
         // Clear the pressed state if necessary
-        if (child instanceof BubbleTextView) {
-            BubbleTextView icon = (BubbleTextView) child;
-            icon.clearPressedBackground();
+        // v4.0 start
+        if (child instanceof ShortcutView) {
+            ShortcutView icon = (ShortcutView) child;
+            icon.getBubbleTextView().clearPressedBackground();
         }
+        // v4.0 end
 
         if (child.getTag() == null || !(child.getTag() instanceof ItemInfo)) {
             String msg =
@@ -4751,7 +4780,9 @@ public class Workspace extends SmoothPagedView
         mapOverItems(MAP_RECURSE, new ItemOperator() {
             @Override
             public boolean evaluate(ItemInfo info, View v, View parent) {
-                if (info instanceof ShortcutInfo && v instanceof BubbleTextView) {
+                // v4.0 start
+                if (info instanceof ShortcutInfo && v instanceof ShortcutView) {
+                    // v4.0 end
                     ShortcutInfo shortcutInfo = (ShortcutInfo) info;
                     ComponentName cn = shortcutInfo.getTargetComponent();
                     AppInfo appInfo = appsMap.get(cn);
@@ -4808,7 +4839,9 @@ public class Workspace extends SmoothPagedView
                         }
 
                         if (infoUpdated) {
-                            BubbleTextView shortcut = (BubbleTextView) v;
+                            // v4.0 start
+                            BubbleTextView shortcut = ((ShortcutView) v).getBubbleTextView();
+                            // v4.0 end
                             shortcut.applyFromShortcutInfo(shortcutInfo, mIconCache, true, promiseStateChanged);
 
                             if (parent != null) {
@@ -4841,7 +4874,9 @@ public class Workspace extends SmoothPagedView
         mapOverItems(MAP_RECURSE, new ItemOperator() {
             @Override
             public boolean evaluate(ItemInfo info, View v, View parent) {
-                if (info instanceof ShortcutInfo && v instanceof BubbleTextView) {
+                // v4.0 start
+                if (info instanceof ShortcutInfo && v instanceof ShortcutView) {
+                    // v4.0 end
                     ShortcutInfo shortcutInfo = (ShortcutInfo) info;
                     ComponentName cn = shortcutInfo.getTargetComponent();
                     if (user.equals(shortcutInfo.user) && cn != null && shortcutInfo.isPromise()
@@ -4853,9 +4888,10 @@ public class Workspace extends SmoothPagedView
                             // Only update the icon for restored apps.
                             shortcutInfo.updateIcon(mIconCache);
                         }
-                        BubbleTextView shortcut = (BubbleTextView) v;
-                        shortcut.applyFromShortcutInfo(shortcutInfo, mIconCache, true, false);
-
+                        // v4.0 start
+                        ShortcutView shortcut = (ShortcutView) v;
+                        shortcut.getBubbleTextView().applyFromShortcutInfo(shortcutInfo, mIconCache, true, false);
+                        // v4.0 end
                         if (parent != null) {
                             parent.invalidate();
                         }
@@ -4874,7 +4910,9 @@ public class Workspace extends SmoothPagedView
             mapOverItems(MAP_RECURSE, new ItemOperator() {
                 @Override
                 public boolean evaluate(ItemInfo info, View v, View parent) {
-                    if (info instanceof ShortcutInfo && v instanceof BubbleTextView) {
+                    // v4.0 start
+                    if (info instanceof ShortcutInfo && v instanceof ShortcutView) {
+                        // v4.0 end
                         ShortcutInfo si = (ShortcutInfo) info;
                         ComponentName cn = si.getTargetComponent();
                         if (si.isPromise() && (cn != null) && installInfo.packageName.equals(cn.getPackageName())) {
@@ -4883,7 +4921,9 @@ public class Workspace extends SmoothPagedView
                                 // Mark this info as broken.
                                 si.status &= ~ShortcutInfo.FLAG_INSTALL_SESSION_ACTIVE;
                             }
-                            ((BubbleTextView) v).applyState(false);
+                            // v4.0 start
+                            (((ShortcutView) v).getBubbleTextView()).applyState(false);
+                            // v4.0 end
                         }
                     } else if (v instanceof PendingAppWidgetHostView
                             && info instanceof LauncherAppWidgetInfo

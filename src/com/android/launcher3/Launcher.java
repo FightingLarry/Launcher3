@@ -46,6 +46,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.SearchManager;
 import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetManager;
@@ -1428,12 +1429,19 @@ public class Launcher extends Activity
      * @param info The data structure describing the shortcut.
      * @return A View inflated from layoutResId.
      */
+
     View createShortcut(int layoutResId, ViewGroup parent, ShortcutInfo info) {
-        BubbleTextView favorite = (BubbleTextView) mInflater.inflate(layoutResId, parent, false);
-        favorite.applyFromShortcutInfo(info, mIconCache, true);
-        favorite.setOnClickListener(this);
-        favorite.setOnFocusChangeListener(mFocusHandler);
-        return favorite;
+        // v4.0 start
+        ShortcutView view = (ShortcutView) mInflater.inflate(layoutResId, parent, false);
+        view.setTag(info);
+        view.setOnFocusChangeListener(mFocusHandler);
+        view.setOnClickListener(this);
+        view.getDeleteView().setOnClickListener(this);
+        view.applyFromShortcutInfo(info, mIconCache, true);
+
+
+        return view;
+        // v4.0 end
     }
 
     /**
@@ -2416,7 +2424,81 @@ public class Launcher extends Activity
         if (!mWorkspace.isFinishedSwitchingState()) {
             return;
         }
+        // v4.0 start
+        if (v instanceof ShortcutDeleteView) {
+            if (v.getParent() instanceof ShortcutView) {
+                ShortcutView shortcut = (ShortcutView) v.getParent();
+                ShortcutInfo info = (ShortcutInfo) shortcut.getTag();
+                Intent intent = info.getIntent();
+                if (info.itemType == LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT
+                        || (intent != null && (intent.getComponent() == null || intent.getComponent().getPackageName()
+                                .equals(getPackageName())))) {
+                    LauncherModel.deleteItemFromDatabase(this, info);
+                    if (shortcut.getParent().getParent().getParent().getParent() instanceof Folder) {
+                        // ((Folder)
+                        // shortcut.getParent().getParent().getParent()).onUninstallActivityReturned(false);
+                        ((CellLayout) shortcut.getParent().getParent()).removeView(shortcut);
+                    } else if (shortcut.getParent().getParent().getParent() instanceof Workspace) {
+                        // mWorkspace.onUninstallActivityReturned(false);
+                        ((CellLayout) shortcut.getParent().getParent()).removeView(shortcut);
+                    }
 
+                } else if (Utilities.isSystemApp(this, intent)) {
+                    startApplicationDetailsActivity(intent.getComponent(), UserHandleCompat.myUserHandle());
+                } else {
+                    startApplicationUninstallActivity(intent.getComponent(), AppInfo.DOWNLOADED_FLAG,
+                            UserHandleCompat.myUserHandle());
+                }
+                mWorkspace.removeExtraEmptyScreen(true, true);
+            } else if (v.getParent() instanceof FolderIcon) {
+
+                FolderIcon folderIcon = (FolderIcon) v.getParent();
+                final FolderInfo info = (FolderInfo) folderIcon.getTag();
+                int size = info.contents.size();
+                removeFolder(info);
+                folderIcon.setVisibility(View.GONE);
+                LauncherModel.deleteFolderContentsFromDatabase(Launcher.this, info);
+                CellLayout cell = (CellLayout) folderIcon.getParent().getParent();
+                // long id =
+                // cell.isHotseat() ? LauncherSettings.Favorites.CONTAINER_HOTSEAT : mWorkspace
+                // .getIdForScreen(cell);
+                cell.removeView(folderIcon);
+                addShortcutIcon(info.contents);
+                getModel().clearFolder(info);
+                if (size <= 0) {
+                    mWorkspace.removeExtraEmptyScreen(true, true);
+                }
+            } else if (v.getParent() instanceof AppWidgetHostView) {
+                AppWidgetHostView appwidget = (AppWidgetHostView) v.getParent();
+                LauncherAppWidgetInfo item = (LauncherAppWidgetInfo) appwidget.getTag();
+                // Remove the widget from the workspace
+                removeAppWidget(item);
+                LauncherModel.deleteItemFromDatabase(this, item);
+
+                final LauncherAppWidgetInfo launcherAppWidgetInfo = item;
+                final LauncherAppWidgetHost appWidgetHost = getAppWidgetHost();
+                if ((appWidgetHost != null) && launcherAppWidgetInfo.isWidgetIdValid()) {
+                    // Deleting an app widget ID is a void call but writes to
+                    // disk before returning
+                    // to the caller...
+                    new AsyncTask<Void, Void, Void>() {
+                        public Void doInBackground(Void... args) {
+                            appWidgetHost.deleteAppWidgetId(launcherAppWidgetInfo.appWidgetId);
+                            return null;
+                        }
+                    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void) null);
+                }
+                CellLayout parentCell = (CellLayout) appwidget.getParent().getParent();
+                if (parentCell != null) {
+                    parentCell.removeView(appwidget);
+                }
+
+                mWorkspace.removeExtraEmptyScreen(true, true);
+            }
+            mWorkspace.onUninstallActivityReturned(true);
+            return;
+        }
+        // v4.0 end
         if (v instanceof Workspace) {
             if (mWorkspace.isInOverviewMode()) {
                 mWorkspace.exitOverviewMode(true);
@@ -2445,6 +2527,20 @@ public class Launcher extends Activity
             if (v instanceof PendingAppWidgetHostView) {
                 onClickPendingWidget((PendingAppWidgetHostView) v);
             }
+
+        }
+    }
+
+    // v4.0
+    private void addShortcutIcon(ArrayList<ShortcutInfo> infos) {
+        ArrayList<ItemInfo> addShortcuts = new ArrayList<ItemInfo>();
+        for (ShortcutInfo info : infos) {
+            addShortcuts.add(info);
+        }
+        // Add the new apps to the model and bind them
+        if (!addShortcuts.isEmpty()) {
+            LauncherAppState app = LauncherAppState.getInstance();
+            app.getModel().addAndBindAddedWorkspaceApps(this, addShortcuts);
         }
     }
 
@@ -2588,7 +2684,9 @@ public class Launcher extends Activity
         }
 
         // Check for abandoned promise
-        if ((v instanceof BubbleTextView) && shortcut.isPromise()
+        // v4.0 start
+        if ((v instanceof ShortcutView) && shortcut.isPromise()
+        // v4.0 end
                 && !shortcut.hasStatusFlag(ShortcutInfo.FLAG_INSTALL_SESSION_ACTIVE)) {
             showBrokenAppInstallDialog(shortcut.getTargetComponent().getPackageName(),
                     new DialogInterface.OnClickListener() {
@@ -2623,11 +2721,13 @@ public class Launcher extends Activity
 
         boolean success = startActivitySafely(v, intent, tag);
         mStats.recordLaunch(intent, shortcut);
+        // v4.0 start
+        // if (success && v instanceof BubbleTextView) {
+        // mWaitingForResume = (BubbleTextView) v;
+        // mWaitingForResume.setStayPressed(true);
 
-        if (success && v instanceof BubbleTextView) {
-            mWaitingForResume = (BubbleTextView) v;
-            mWaitingForResume.setStayPressed(true);
-        }
+        // }
+        // v4.0 end
     }
 
     /**
@@ -4129,7 +4229,9 @@ public class Launcher extends Activity
 
         // Create the custom content page (this call updates mDefaultScreen which calls
         // setCurrentPage() so ensure that all pages are added before calling this).
-        if (hasCustomContentToLeft()) {
+        // v4.0 start
+        if (!mWorkspace.hasCustomContent() && hasCustomContentToLeft()) {
+            // v4.0 end
             mWorkspace.createCustomContentContainer();
             populateCustomContentContainer();
         }

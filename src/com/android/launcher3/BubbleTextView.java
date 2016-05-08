@@ -76,7 +76,8 @@ public class BubbleTextView extends TextView {
         super(context, attrs, defStyle);
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BubbleTextView, defStyle, 0);
-        mCustomShadowsEnabled = a.getBoolean(R.styleable.BubbleTextView_customShadows, true);
+        // v4.0
+        mCustomShadowsEnabled = a.getBoolean(R.styleable.BubbleTextView_customShadows, false);
         a.recycle();
 
         if (mCustomShadowsEnabled) {
@@ -231,8 +232,9 @@ public class BubbleTextView extends TextView {
         }
 
         // Only show the shadow effect when persistent pressed state is set.
-        if (getParent() instanceof ShortcutAndWidgetContainer) {
-            CellLayout layout = (CellLayout) getParent().getParent();
+        // v4.0
+        if (getParent().getParent() instanceof ShortcutAndWidgetContainer) {
+            CellLayout layout = (CellLayout) (getParent().getParent().getParent());
             layout.setPressedIcon(this, mPressedBackground, mOutlineHelper.shadowBitmapPadding);
         }
 

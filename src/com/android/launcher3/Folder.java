@@ -641,14 +641,23 @@ public class Folder extends LinearLayout
     }
 
     protected View createAndAddShortcut(ShortcutInfo item) {
-        final BubbleTextView textView = (BubbleTextView) mInflater.inflate(R.layout.folder_application, this, false);
-        textView.applyFromShortcutInfo(item, mIconCache, false);
+        // v4.0 start
+        final ShortcutView shortcutView = (ShortcutView) mInflater.inflate(R.layout.folder_application, this, false);
+        shortcutView.setOnLongClickListener(this);
+        shortcutView.setOnFocusChangeListener(mFocusIndicatorHandler);
+        shortcutView.setOnClickListener(this);
+        shortcutView.setTag(item);
+        shortcutView.applyFromShortcutInfo(item, mIconCache, false);
+        // shortcutView.setNeedShowDeleteView(false);
+        // shortcutView.hideDeleteView();
+        // textView.setOnClickListener(this);
+        // textView.setOnLongClickListener(this);
+        // textView.setOnFocusChangeListener(mFocusIndicatorHandler);
 
-        textView.setOnClickListener(this);
-        textView.setOnLongClickListener(this);
-        textView.setOnFocusChangeListener(mFocusIndicatorHandler);
-
-        // We need to check here to verify that the given item's location isn't already occupied
+        shortcutView.getDeleteView().setOnClickListener(mLauncher);
+        // v4.0 end
+        // We need to check here to verify that the given item's location isn't
+        // already occupied
         // by another item.
         if (mContent.getChildAt(item.cellX, item.cellY) != null || item.cellX < 0 || item.cellY < 0
                 || item.cellX >= mContent.getCountX() || item.cellY >= mContent.getCountY()) {
@@ -661,9 +670,11 @@ public class Folder extends LinearLayout
 
         CellLayout.LayoutParams lp = new CellLayout.LayoutParams(item.cellX, item.cellY, item.spanX, item.spanY);
         boolean insert = false;
-        textView.setOnKeyListener(new FolderKeyEventListener());
-        mContent.addViewToCellLayout(textView, insert ? 0 : -1, (int) item.id, lp, true);
-        return textView;
+        // v4.0
+        shortcutView.setOnKeyListener(new FolderKeyEventListener());
+
+        mContent.addViewToCellLayout(shortcutView, insert ? 0 : -1, (int) item.id, lp, true);
+        return shortcutView;
     }
 
     public void onDragEnter(DragObject d) {

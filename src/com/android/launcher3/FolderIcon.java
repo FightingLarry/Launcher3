@@ -39,10 +39,12 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.FolderInfo.FolderListener;
+import com.dh.home.editmode.EditModeManager;
 
 /**
  * An icon that can appear on in the workspace representing an {@link UserFolder}.
@@ -113,6 +115,9 @@ public class FolderIcon extends FrameLayout implements FolderListener {
     private Alarm mOpenAlarm = new Alarm();
     private ItemInfo mDragInfo;
 
+    // v4.0
+    private ShortcutDeleteView mFolderDelete;
+
     public FolderIcon(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
@@ -134,6 +139,21 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         return !workspace.workspaceInModalState();
     }
 
+    // v4.0
+    public boolean isShowDeleteView() {
+        return mFolderDelete.getVisibility() == View.VISIBLE;
+    }
+
+    public void hideDeleteView() {
+        mFolderDelete.setVisibility(View.GONE);
+    }
+
+    public void showDeleteView() {
+        mFolderDelete.setVisibility(View.VISIBLE);
+    }
+
+
+
     static FolderIcon fromXml(int resId, Launcher launcher, ViewGroup group, FolderInfo folderInfo, IconCache iconCache) {
         @SuppressWarnings("all")
         // suppress dead code warning
@@ -148,18 +168,31 @@ public class FolderIcon extends FrameLayout implements FolderListener {
 
         FolderIcon icon = (FolderIcon) LayoutInflater.from(launcher).inflate(resId, group, false);
         icon.setClipToPadding(false);
+        // v4.0 start
+        icon.mFolderDelete = (ShortcutDeleteView) icon.findViewById(R.id.delete);
+        if (!EditModeManager.isEditMode()) {
+            icon.mFolderDelete.setVisibility(View.GONE);
+        }
+        icon.mFolderDelete.setOnClickListener(launcher);
+        // v4.0 end
+
         icon.mFolderName = (BubbleTextView) icon.findViewById(R.id.folder_icon_name);
         icon.mFolderName.setText(folderInfo.title);
         icon.mFolderName.setCompoundDrawablePadding(0);
-        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) icon.mFolderName.getLayoutParams();
-        lp.topMargin = grid.iconSizePx + grid.iconDrawablePaddingPx;
 
+        // v4.0 start
+        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) icon.mFolderName.getLayoutParams();
+        // v4.0 end
         // Offset the preview background to center this view accordingly
         icon.mPreviewBackground = (ImageView) icon.findViewById(R.id.preview_background);
-        lp = (FrameLayout.LayoutParams) icon.mPreviewBackground.getLayoutParams();
-        lp.topMargin = grid.folderBackgroundOffset;
-        lp.width = grid.folderIconSizePx;
-        lp.height = grid.folderIconSizePx;
+        // v4.0 start
+        lp = (RelativeLayout.LayoutParams) icon.mPreviewBackground.getLayoutParams();
+        // v4.0 TODO dh
+        lp.topMargin = grid.iconDrawablePaddingPx;
+
+        lp.width = grid.iconSizePx;
+        lp.height = grid.iconSizePx;
+        // v4.0 end
 
         icon.setTag(folderInfo);
         icon.setOnClickListener(launcher);
@@ -374,7 +407,15 @@ public class FolderIcon extends FrameLayout implements FolderListener {
             final DragView srcView, Rect dstRect, float scaleRelativeToDragLayer, Runnable postAnimationRunnable) {
 
         // These correspond two the drawable and view that the icon was dropped _onto_
-        Drawable animateDrawable = getTopDrawable((TextView) destView);
+        // v4.0 start
+        TextView tv = null;
+        if (destView instanceof ShortcutView) {
+            tv = ((ShortcutView) destView).getBubbleTextView();
+        } else {
+            tv = (TextView) destView;
+        }
+        Drawable animateDrawable = getTopDrawable(tv);
+        // v4.0 end
         computePreviewDrawingParams(animateDrawable.getIntrinsicWidth(), destView.getMeasuredWidth());
 
         // This will animate the first item from it's position as an icon into its
@@ -387,9 +428,11 @@ public class FolderIcon extends FrameLayout implements FolderListener {
     }
 
     public void performDestroyAnimation(final View finalView, Runnable onCompleteRunnable) {
-        Drawable animateDrawable = getTopDrawable((TextView) finalView);
-        computePreviewDrawingParams(animateDrawable.getIntrinsicWidth(), finalView.getMeasuredWidth());
-
+        // v4.0 start
+        BubbleTextView icon = ((ShortcutView) finalView).getBubbleTextView();
+        Drawable animateDrawable = getTopDrawable(icon);
+        computePreviewDrawingParams(animateDrawable.getIntrinsicWidth(), icon.getMeasuredWidth());
+        // v4.0 end
         // This will animate the first item from it's position as an icon into its
         // position as the first item in the preview
         animateFirstItem(animateDrawable, FINAL_ITEM_ANIMATION_DURATION, true, onCompleteRunnable);
@@ -599,7 +642,9 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         if (mAnimating) {
             computePreviewDrawingParams(mAnimParams.drawable);
         } else {
-            v = (TextView) items.get(0);
+            // v4.0 start
+            v = ((ShortcutView) items.get(0)).getBubbleTextView();
+            // v4.0 end
             d = getTopDrawable(v);
             computePreviewDrawingParams(d);
         }
@@ -607,7 +652,9 @@ public class FolderIcon extends FrameLayout implements FolderListener {
         int nItemsInPreview = Math.min(items.size(), NUM_ITEMS_IN_PREVIEW);
         if (!mAnimating) {
             for (int i = nItemsInPreview - 1; i >= 0; i--) {
-                v = (TextView) items.get(i);
+                // v4.0 start
+                v = ((ShortcutView) items.get(i)).getBubbleTextView();
+                // v4.0 end
                 if (!mHiddenItems.contains(v.getTag())) {
                     d = getTopDrawable(v);
                     mParams = computePreviewItemDrawingParams(i, mParams);

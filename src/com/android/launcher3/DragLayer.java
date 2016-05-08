@@ -558,8 +558,11 @@ public class DragLayer extends FrameLayout implements ViewGroup.OnHierarchyChang
         int toX = coord[0];
         int toY = coord[1];
         float toScale = scale;
-        if (child instanceof TextView) {
-            TextView tv = (TextView) child;
+        // v4.0 start
+        if (child instanceof TextView || child instanceof ShortcutView) {
+
+            View tv = child;
+            // v4.0 end
             // Account for the source scale of the icon (ie. from AllApps to Workspace, in which
             // the workspace may have smaller icon bounds).
             toScale = scale / dragView.getIntrinsicIconScaleFactor();

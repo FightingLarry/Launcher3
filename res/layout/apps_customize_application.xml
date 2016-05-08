@@ -32,6 +32,4 @@
         android:paddingBottom="@dimen/deleteview_padding"
         android:paddingRight="@dimen/deleteview_padding" />
 
-    <include layout="@layout/tcl_unread_textview" />
-
 </com.android.launcher3.ShortcutView>

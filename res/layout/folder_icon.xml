@@ -13,24 +13,46 @@
      limitations under the License.
 -->
 
+<!--v4.0-->
 <com.android.launcher3.FolderIcon xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:focusable="true">
 
-    <ImageView
-        android:id="@+id/preview_background"
-        android:layout_gravity="center_horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:antialias="true"
-        android:src="@drawable/portal_ring_inner_holo" />
-
-    <com.android.launcher3.BubbleTextView
-        style="@style/WorkspaceIcon"
-        android:id="@+id/folder_icon_name"
-        android:layout_gravity="top"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:paddingTop="@dimen/icons_margin_top">
+
+        <ImageView
+            android:id="@+id/preview_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:antialias="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/portal_ring_inner_holo" />
+
+        <com.android.launcher3.BubbleTextView
+            android:id="@+id/folder_icon_name"
+            style="@style/WorkspaceIcon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/preview_background"
+            android:layout_centerHorizontal="true"
+            android:hint="@string/folder_hint_text"
+            android:textColorHint="@color/workspace_icon_text_color" />
+    </RelativeLayout>
+
+    <com.android.launcher3.ShortcutDeleteView
+        android:id="@+id/delete"
+        android:layout_width="@dimen/deleteview_wh"
+        android:layout_height="@dimen/deleteview_wh"
+        android:layout_marginStart="@dimen/deleteview_margin_left"
+        android:paddingBottom="@dimen/deleteview_padding"
+        android:paddingRight="@dimen/deleteview_padding" />
+
+
 </com.android.launcher3.FolderIcon>

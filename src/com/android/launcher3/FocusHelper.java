@@ -231,7 +231,13 @@ public class FocusHelper {
         ViewGroup itemContainer;
         int countX;
         int countY;
-        if (v.getParent() instanceof ShortcutAndWidgetContainer) {
+        // v4.0
+        if (v.getParent() instanceof ShortcutView) {
+            itemContainer = (ViewGroup) v.getParent().getParent();
+            parentLayout = (ViewGroup) itemContainer.getParent();
+            countX = ((CellLayout) parentLayout).getCountX();
+            countY = ((CellLayout) parentLayout).getCountY();
+        } else if (v.getParent() instanceof ShortcutAndWidgetContainer) {
             itemContainer = (ViewGroup) v.getParent();
             parentLayout = (ViewGroup) itemContainer.getParent();
             countX = ((CellLayout) parentLayout).getCountX();
@@ -453,7 +459,15 @@ public class FocusHelper {
      * Handles key events in the workspace hotseat (bottom of the screen).
      */
     static boolean handleHotseatButtonKeyEvent(View v, int keyCode, KeyEvent e, int orientation) {
-        ShortcutAndWidgetContainer parent = (ShortcutAndWidgetContainer) v.getParent();
+        // v4.0
+        ShortcutAndWidgetContainer parent = null;
+        if (v.getParent() instanceof ShortcutView) {
+            parent = (ShortcutAndWidgetContainer) v.getParent().getParent();
+        } else {
+            parent = (ShortcutAndWidgetContainer) v.getParent();
+        }
+        // ShortcutAndWidgetContainer parent = (ShortcutAndWidgetContainer)
+        // v.getParent();
         final CellLayout layout = (CellLayout) parent.getParent();
 
         // NOTE: currently we don't special case for the phone UI in different
@@ -561,7 +575,8 @@ public class FocusHelper {
         int newI = i + delta;
         while (0 <= newI && newI < count) {
             View newV = views.get(newI);
-            if (newV instanceof BubbleTextView || newV instanceof FolderIcon) {
+            // v4.0
+            if (newV instanceof ShortcutView || newV instanceof FolderIcon) {
                 return newV;
             }
             newI += delta;
@@ -600,7 +615,8 @@ public class FocusHelper {
                 View newV = views.get(index);
                 CellLayout.LayoutParams tmpLp = (CellLayout.LayoutParams) newV.getLayoutParams();
                 boolean satisfiesRow = (lineDelta < 0) ? (tmpLp.cellY < row) : (tmpLp.cellY > row);
-                if (satisfiesRow && (newV instanceof BubbleTextView || newV instanceof FolderIcon)) {
+                // v4.0
+                if (satisfiesRow && (newV instanceof ShortcutView || newV instanceof FolderIcon)) {
                     float tmpDistance =
                             (float) Math
                                     .sqrt(Math.pow(tmpLp.cellX - lp.cellX, 2) + Math.pow(tmpLp.cellY - lp.cellY, 2));
@@ -626,7 +642,13 @@ public class FocusHelper {
      * Handles key events in a Workspace containing.
      */
     static boolean handleIconKeyEvent(View v, int keyCode, KeyEvent e) {
-        ShortcutAndWidgetContainer parent = (ShortcutAndWidgetContainer) v.getParent();
+        // v4.0
+        ShortcutAndWidgetContainer parent = null;
+        if (v.getParent() instanceof ShortcutView) {
+            parent = (ShortcutAndWidgetContainer) v.getParent().getParent();
+        } else {
+            parent = (ShortcutAndWidgetContainer) v.getParent();
+        }
         final CellLayout layout = (CellLayout) parent.getParent();
         final Workspace workspace = (Workspace) layout.getParent();
         final ViewGroup launcher = (ViewGroup) workspace.getParent();
@@ -792,7 +814,15 @@ public class FocusHelper {
      * Handles key events for items in a Folder.
      */
     static boolean handleFolderKeyEvent(View v, int keyCode, KeyEvent e) {
-        ShortcutAndWidgetContainer parent = (ShortcutAndWidgetContainer) v.getParent();
+        // v4.0
+        ShortcutAndWidgetContainer parent = null;
+        if (v.getParent() instanceof ShortcutView) {
+            parent = (ShortcutAndWidgetContainer) v.getParent().getParent();
+        } else {
+            parent = (ShortcutAndWidgetContainer) v.getParent();
+        }
+        // ShortcutAndWidgetContainer parent = (ShortcutAndWidgetContainer)
+        // v.getParent();
         final CellLayout layout = (CellLayout) parent.getParent();
         final ScrollView scrollView = (ScrollView) layout.getParent();
         final Folder folder = (Folder) scrollView.getParent();

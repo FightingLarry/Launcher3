@@ -105,6 +105,13 @@ public class FolderInfo extends ItemInfo {
         listeners.clear();
     }
 
+    // 4.0
+    public void clear() {
+        while (contents.size() != 0) {
+            remove(contents.get(0));
+        }
+    }
+
     interface FolderListener {
         public void onAdd(ShortcutInfo item);
 

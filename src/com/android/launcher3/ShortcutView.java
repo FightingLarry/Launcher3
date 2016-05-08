@@ -1,35 +1,18 @@
 package com.android.launcher3;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
-import com.android.launcher3.Launcher.ApplicationAnimatorListener;
 import com.dh.home.editmode.EditModeManager;
-import com.tcl.launcher3.base.log.TLog;
-import com.tcl.launcher3.unread.UnreadLoader;
-import com.tcl.launcher3.utils.AndroidUtil;
-import com.tcl.launcher3.utils.BitmapLruCache;
 
 /**
  * v4.0
@@ -151,12 +134,15 @@ public class ShortcutView extends FrameLayout implements ApplicationActionListen
     // // Only show the shadow effect when persistent pressed state is set.
     // if (getParent().getParent() instanceof ShortcutAndWidgetContainer) {
     // CellLayout layout = (CellLayout) getParent().getParent();
-    // layout.setPressedIcon(this, mPressedBackground,
-    // mOutlineHelper.shadowBitmapPadding);
+    // layout.setPressedIcon(this, mPressedBackground, mOutlineHelper.shadowBitmapPadding);
     // }
     //
     // updateIconState();
     // }
+
+    public void applyFromShortcutInfo(ShortcutInfo info, IconCache iconCache, boolean setDefaultPadding) {
+        mBubbleTextView.applyFromShortcutInfo(info, iconCache, setDefaultPadding, false);
+    }
 
     @Override
     public void setPressed(boolean pressed) {

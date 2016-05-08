@@ -690,8 +690,8 @@ public class AppsCustomizePagedView extends PagedViewWithDraggableItems
     @Override
     protected boolean beginDragging(final View v) {
         if (!super.beginDragging(v)) return false;
-
-        if (v instanceof BubbleTextView) {
+        // v4.0
+        if (v instanceof ShortcutView) {
             beginDraggingApplication(v);
         } else if (v instanceof PagedViewWidget) {
             if (!beginDraggingWidget(v)) {
@@ -952,15 +952,23 @@ public class AppsCustomizePagedView extends PagedViewWithDraggableItems
         ArrayList<Bitmap> images = new ArrayList<Bitmap>();
         for (int i = startIndex; i < endIndex; ++i) {
             AppInfo info = mApps.get(i);
-            BubbleTextView icon =
-                    (BubbleTextView) mLayoutInflater.inflate(R.layout.apps_customize_application, layout, false);
-            icon.applyFromApplicationInfo(info);
-            icon.setOnClickListener(mLauncher);
+            // v4.0
+            ShortcutView icon =
+                    (ShortcutView) mLayoutInflater.inflate(R.layout.apps_customize_application, layout, false);
+            icon.setTag(info);
             icon.setOnLongClickListener(this);
+            icon.setOnClickListener(mLauncher);
             icon.setOnTouchListener(this);
             icon.setOnKeyListener(this);
             icon.setOnFocusChangeListener(layout.mFocusHandlerView);
 
+            BubbleTextView bubble = icon.getBubbleTextView();
+            bubble.applyFromApplicationInfo(info);
+            // bubble.setOnClickListener(mLauncher);
+            // bubble.setOnTouchListener(this);
+            // bubble.setOnKeyListener(this);
+            // bubble.setOnFocusChangeListener(layout.mFocusHandlerView);
+            icon.getDeleteView().setOnClickListener(mLauncher);
             int index = i - startIndex;
             int x = index % mCellCountX;
             int y = index / mCellCountX;

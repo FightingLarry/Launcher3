@@ -347,8 +347,19 @@ public class CellLayout extends ViewGroup {
             mTouchFeedbackView.animate().cancel();
         } else {
             int offset = getMeasuredWidth() - getPaddingLeft() - getPaddingRight() - (mCountX * mCellWidth);
-            mTouchFeedbackView.setTranslationX(icon.getLeft() + (int) Math.ceil(offset / 2f) - padding);
-            mTouchFeedbackView.setTranslationY(icon.getTop() - padding);
+
+            // v4.0 start
+            int left = icon.getLeft();
+            int top = icon.getTop();
+            if (icon.getParent() instanceof ShortcutView) {
+                ShortcutView parent = (ShortcutView) icon.getParent();
+                left = parent.getLeft();
+                top = parent.getTop();
+            }
+
+            mTouchFeedbackView.setTranslationX(left + (int) Math.ceil(offset / 2f) - padding);
+            mTouchFeedbackView.setTranslationY(top - padding);
+            // v4.0 end
             if (mTouchFeedbackView.setBitmap(background)) {
                 mTouchFeedbackView.setAlpha(0);
                 mTouchFeedbackView.animate().alpha(1).setDuration(FastBitmapDrawable.CLICK_FEEDBACK_DURATION)
@@ -580,6 +591,11 @@ public class CellLayout extends ViewGroup {
 
     public boolean addViewToCellLayout(View child, int index, int childId, LayoutParams params, boolean markCells) {
         final LayoutParams lp = params;
+        // v4.0
+        if (child instanceof ShortcutView) {
+            BubbleTextView bubbleChild = ((ShortcutView) child).getBubbleTextView();
+            bubbleChild.setTextVisibility(!mIsHotseat);
+        }
 
         // Hotseat icons - remove text
         if (child instanceof BubbleTextView) {
@@ -675,7 +691,7 @@ public class CellLayout extends ViewGroup {
 
     /**
      * Given a point, return the cell that strictly encloses that point
-     * 
+     *
      * @param x X coordinate of the point
      * @param y Y coordinate of the point
      * @param result Array of 2 ints to hold the x and y coordinate of the cell
@@ -698,7 +714,7 @@ public class CellLayout extends ViewGroup {
 
     /**
      * Given a point, return the cell that most closely encloses that point
-     * 
+     *
      * @param x X coordinate of the point
      * @param y Y coordinate of the point
      * @param result Array of 2 ints to hold the x and y coordinate of the cell
@@ -712,7 +728,6 @@ public class CellLayout extends ViewGroup {
      *
      * @param cellX X coordinate of the cell
      * @param cellY Y coordinate of the cell
-     *
      * @param result Array of 2 ints to hold the x and y coordinate of the point
      */
     void cellToPoint(int cellX, int cellY, int[] result) {
@@ -728,7 +743,6 @@ public class CellLayout extends ViewGroup {
      *
      * @param cellX X coordinate of the cell
      * @param cellY Y coordinate of the cell
-     *
      * @param result Array of 2 ints to hold the x and y coordinate of the point
      */
     void cellToCenterPoint(int cellX, int cellY, int[] result) {
@@ -740,7 +754,6 @@ public class CellLayout extends ViewGroup {
      *
      * @param cellX X coordinate of the cell
      * @param cellY Y coordinate of the cell
-     *
      * @param result Array of 2 ints to hold the x and y coordinate of the point
      */
     void regionToCenterPoint(int cellX, int cellY, int spanX, int spanY, int[] result) {
@@ -1425,6 +1438,11 @@ public class CellLayout extends ViewGroup {
         }
         markCellsForView(c.x, c.y, c.spanX, c.spanY, mTmpOccupied, true);
         return success;
+    }
+
+    // v4.0
+    public boolean isHotseat() {
+        return mIsHotseat;
     }
 
     /**
@@ -2666,7 +2684,6 @@ public class CellLayout extends ViewGroup {
      *        found.
      * @param spanX The horizontal span of the cell we want to find.
      * @param spanY The vertical span of the cell we want to find.
-     *
      * @return True if a vacant cell of the specified dimension was found, false otherwise.
      */
     boolean findCellForSpan(int[] cellXY, int spanX, int spanY) {
@@ -2696,7 +2713,6 @@ public class CellLayout extends ViewGroup {
      * @param ignoreView The home screen item we should treat as not occupying any space
      * @param intersectX The X coordinate of the cell that we should try to overlap
      * @param intersectX The Y coordinate of the cell that we should try to overlap
-     *
      * @return True if a vacant cell of the specified dimension was found, false otherwise.
      */
     boolean findCellForSpanThatIntersects(int[] cellXY, int spanX, int spanY, int intersectX, int intersectY) {
@@ -2902,7 +2918,6 @@ public class CellLayout extends ViewGroup {
      * @param vacant Holds the x and y coordinate of the vacant cell
      * @param spanX Horizontal cell span.
      * @param spanY Vertical cell span.
-     *
      * @return True if a vacant cell was found
      */
     public boolean getVacantCell(int[] vacant, int spanX, int spanY) {
