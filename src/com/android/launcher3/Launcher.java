@@ -2452,10 +2452,9 @@ public class Launcher extends Activity
                     }
 
                 } else if (Utilities.isSystemApp(this, intent)) {
-                    startApplicationDetailsActivity(intent.getComponent(), UserHandleCompat.myUserHandle());
+                    startApplicationDetailsActivity(intent.getComponent(), info.user);
                 } else {
-                    startApplicationUninstallActivity(intent.getComponent(), AppInfo.DOWNLOADED_FLAG,
-                            UserHandleCompat.myUserHandle());
+                    startApplicationUninstallActivity(intent.getComponent(), AppInfo.DOWNLOADED_FLAG, info.user);
                 }
                 mWorkspace.removeExtraEmptyScreen(true, true);
             } else if (v.getParent() instanceof FolderIcon) {
